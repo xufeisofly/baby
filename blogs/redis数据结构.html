@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga29025e">1. Redis Keys</a></li>
+<li><a href="#orgd7e28d3">2. Redis Strings</a>
+<ul>
+<li><a href="#org071deda">2.1. incr incrby decr decrby</a></li>
+<li><a href="#orgba4c653">2.2. exsits and del and type</a></li>
+<li><a href="#orgbf42ae2">2.3. redis expires</a></li>
+</ul>
+</li>
+<li><a href="#org6e7fb29">3. Redis Lists</a>
+<ul>
+<li><a href="#orgdeae7ec">3.1. lpush rpush</a></li>
+<li><a href="#org72c813b">3.2. lpop rpop</a></li>
+<li><a href="#org7373e90">3.3. use of lists</a></li>
+<li><a href="#org1c4fb16">3.4. ltrim</a></li>
+<li><a href="#orgd12e8b2">3.5. keys的自动创建与删除</a></li>
+</ul>
+</li>
+<li><a href="#org75361b0">4. Redis Hashes</a>
+<ul>
+<li><a href="#org4609e6c">4.1. hincrby</a></li>
+</ul>
+</li>
+<li><a href="#orgd1b2850">5. Redis Sets</a></li>
+<li><a href="#org1e03b33">6. Redis Sorted Sets</a>
+<ul>
+<li><a href="#org0ae93fe">6.1. operating on ranges</a></li>
+</ul>
+</li>
+<li><a href="#orgc64f142">7. Bitmaps</a></li>
+<li><a href="#org4735717">8. HyperlogLogs</a></li>
+<li><a href="#org7fdf3ce">9. 总结使用场景</a></li>
+</ul>
+</div>
+</div>
+<p>
+下面为redis支持的数据结构：
+</p>
+<ol class="org-ol">
+<li>strings</li>
+<li>lists: strings元素的集合，顺序为插入的顺序</li>
+<li>sets: strings元素的集合，但唯一且没有顺序</li>
+<li>sorted sets: 可排序的sets，根据'score'排序</li>
+<li>hash: 和ruby的hash一样</li>
+<li>bit数组: 暂时不知道</li>
+<li>HyperLogLogs: &#x2026;</li>
+</ol>
+
+<div id="outline-container-orga29025e" class="outline-2">
+<h2 id="orga29025e"><span class="section-number-2">1</span> Redis Keys</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Redis Keys是binary safe的，所以可以使用任意二进制流，比如'foo'或者jpg图片，空字符串也是一种key。选择key需要注意以下几点：
+</p>
+<ol class="org-ol">
+<li>不要使用太长的key，因为会影响查询速度；占用更多内存空间。</li>
+<li>不要用太短的key，比如'user:1000:followers'非要写成'u:1000:flw'我的天，影响可读性。</li>
+<li>key的名字尽量表示schema，比如'user:222'，多字符可以用'.'或者'-'来分割，比如'comment:123:reply-to'</li>
+</ol>
+<blockquote>
+<p>
+和SQL数据库相比，NoSQL数据库感觉就是把SQL的table和column按照特定规则组合成string，放到NoSQL的key中
+</p>
+</blockquote>
+<ol class="org-ol">
+<li>key size最大值为512MB</li>
+</ol>
+<blockquote>
+<p>
+鬼能超过-_-
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgd7e28d3" class="outline-2">
+<h2 id="orgd7e28d3"><span class="section-number-2">2</span> Redis Strings</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Redis Strings的类型和Memcached的完全一致（抢生意真开心）。可以用来缓存html页面啊什么的。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; set mykey somevalue
+OK
+&gt; get mykey
+<span style="color: #a3be8c;">"somevalue"</span>
+</pre>
+</div>
+
+<p>
+通过set和get可以分别对一个key的value进行设置和读取。value的大小也不能超过512MB。set的时候有额外参数。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; set mykey newval nx <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#22914;&#26524;key&#24050;&#32463;&#23384;&#22312;&#21017;&#19981;set</span>
+<span style="color: #8c8c8c;">(</span>nil<span style="color: #8c8c8c;">)</span>
+&gt; set mykey newval xx <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#21482;&#26377;key&#23384;&#22312;&#30340;&#26102;&#20505;&#25165;set</span>
+OK
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org071deda" class="outline-3">
+<h3 id="org071deda"><span class="section-number-3">2.1</span> incr incrby decr decrby</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-shell">&gt; set counter <span style="color: #d08770;">100</span>
+OK
+&gt; incr counter
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">101</span>
+&gt; incrby counter <span style="color: #d08770;">20</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">121</span>
+</pre>
+</div>
+
+<p>
+当然还有decr和decrby。这两种命令是不会有竞争现象的，就是说如果两个client当前某个key的value都是10，然后同时incr，那么redis会等到两个incr操作都执行完成以后才返回值，也就是12。
+</p>
+
+<p>
+mset, mget是multiple keys的操作，可以用来减少延迟。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; mset a <span style="color: #d08770;">10</span> b <span style="color: #d08770;">20</span> c <span style="color: #d08770;">30</span>
+Ok
+&gt; mget a b c <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">mget&#20250;&#36820;&#22238;&#19968;&#20010;array</span>
+<span style="color: #a3be8c;">"10"</span>
+<span style="color: #a3be8c;">"20"</span>
+<span style="color: #a3be8c;">"30"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgba4c653" class="outline-3">
+<h3 id="orgba4c653"><span class="section-number-3">2.2</span> exsits and del and type</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-shell">&gt; set mykey hello
+OK
+&gt; exsits mykey <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#26816;&#26597;&#26159;&#21542;&#23384;&#22312;mykey</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; type mykey <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#36820;&#22238;mykey value&#30340;&#31867;&#22411;</span>
+string
+&gt; del mykey <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#21024;&#38500;mykey</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbf42ae2" class="outline-3">
+<h3 id="orgbf42ae2"><span class="section-number-3">2.3</span> redis expires</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+redis还有一个特性，就是可以设置数据的过期时间，时间一旦到达，则key会被自动删除。
+</p>
+<ol class="org-ol">
+<li>自动删除时redis会在硬盘上保存key的删除时间。</li>
+<li>过期时间默认单位是s</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; set key somevalue
+OK
+&gt; expire key <span style="color: #d08770;">5</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; get key <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#31435;&#21051;</span>
+<span style="color: #a3be8c;">"somevalue"</span>
+&gt; get key <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">5s&#20197;&#21518;</span>
+<span style="color: #8c8c8c;">(</span>nil<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; set key <span style="color: #d08770;">100</span> ex <span style="color: #d08770;">10</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#21487;&#20197;&#22312;set&#30340;&#26102;&#20505;&#30452;&#25509;&#35774;&#32622;expire time</span>
+Ok
+&gt; ttl key <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#26597;&#30475;total time left</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">9</span>
+</pre>
+</div>
+
+<p>
+还可以使用persist删除expire time的设置
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6e7fb29" class="outline-2">
+<h2 id="org6e7fb29"><span class="section-number-2">3</span> Redis Lists</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Redis Lists是linked list，并不是Array，所以就算你的list有很多很多元素，增加元素时用的时间也是一样的。这是优点。缺点是，通过index所以list里的一个元素比在array里要慢不少。如果想要通过index快速获取某一个element，建议使用sorted list这种类型。
+</p>
+</div>
+
+<div id="outline-container-orgdeae7ec" class="outline-3">
+<h3 id="orgdeae7ec"><span class="section-number-3">3.1</span> lpush rpush</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+分别是在左边和在右边增加一个element
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; rpush mylist A
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; lpush mylist B
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">2</span>
+&gt; lrange mylist <span style="color: #d08770;">0</span> -1 <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#20174;0&#21040;&#26368;&#21518;&#20010;&#20803;&#32032;&#65292;&#21363;&#25152;&#26377;&#20803;&#32032;</span>
+<span style="color: #a3be8c;">"B"</span>
+<span style="color: #a3be8c;">"A"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org72c813b" class="outline-3">
+<h3 id="org72c813b"><span class="section-number-3">3.2</span> lpop rpop</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+从左边或右边pop elements，例子就不举了
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7373e90" class="outline-3">
+<h3 id="org7373e90"><span class="section-number-3">3.3</span> use of lists</h3>
+<div class="outline-text-3" id="text-3-3">
+<ol class="org-ol">
+<li>记录最近一次的更新操作（数据的上一次变动可以放到list）</li>
+<li>用于构建一个生产者消费者队列（如ruby的sidekiq）</li>
+</ol>
+
+<blockquote>
+<p>
+队列的实现可以用lpush rpop，但会出现rpop时list当中没有值的情况，这种情况应该多等一会再重试rpop，可以直接使用brpop，比如brpop mylist 5, 就是如果mylist可以rpop就rpop，如果mylist为空就等待5s之后再rpop
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org1c4fb16" class="outline-3">
+<h3 id="org1c4fb16"><span class="section-number-3">3.4</span> ltrim</h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+截取特定范围的lists，其余部分被remove
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; rpush mylist <span style="color: #d08770;">1</span> <span style="color: #d08770;">2</span> <span style="color: #d08770;">3</span> <span style="color: #d08770;">4</span> <span style="color: #d08770;">5</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">5</span>
+&gt; ltrim mylist <span style="color: #d08770;">0</span> <span style="color: #d08770;">2</span>
+OK
+&gt; lrange mylist <span style="color: #d08770;">0</span> -1
+<span style="color: #a3be8c;">"1"</span>
+<span style="color: #a3be8c;">"2"</span>
+<span style="color: #a3be8c;">"3"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd12e8b2" class="outline-3">
+<h3 id="orgd12e8b2"><span class="section-number-3">3.5</span> keys的自动创建与删除</h3>
+<div class="outline-text-3" id="text-3-5">
+<blockquote>
+<p>
+目前redis中的key都不是单独创建和删除的，而是我们直接使用set lpush等赋值命令时自动创建，然后在value为空的时候自动删除的
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org75361b0" class="outline-2">
+<h2 id="org75361b0"><span class="section-number-2">4</span> Redis Hashes</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+redis的hash就是我们熟悉的hash
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; hmset user:1000 username antirez birthyear <span style="color: #d08770;">1977</span> verified <span style="color: #d08770;">1</span>
+OK
+&gt; hget user:1000 username
+<span style="color: #a3be8c;">"antirez"</span>
+&gt; hget user:1000 birthyear
+<span style="color: #a3be8c;">"1977"</span>
+&gt; hgetall user:1000
+<span style="color: #a3be8c;">"username"</span>
+<span style="color: #a3be8c;">"antirez"</span>
+<span style="color: #a3be8c;">"birthyear"</span>
+<span style="color: #a3be8c;">"1977"</span>
+<span style="color: #a3be8c;">"verified"</span>
+<span style="color: #a3be8c;">"1"</span>
+</pre>
+</div>
+
+<p>
+hash的value没有明确的大小限制，hmset是给multiple fields赋值，hmget返回的是一个数组，此处不再举例
+</p>
+</div>
+
+<div id="outline-container-org4609e6c" class="outline-3">
+<h3 id="org4609e6c"><span class="section-number-3">4.1</span> hincrby</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+和incrby类似，不过是用在hash上的而已
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; hincrby user:1000 birthyear <span style="color: #d08770;">10</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1987</span>
+&gt; hincrby user:1000 birthyear <span style="color: #d08770;">10</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1997</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+hashes是通过一种特殊方式编码的，可以让内存读取更有效率
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd1b2850" class="outline-2">
+<h2 id="orgd1b2850"><span class="section-number-2">5</span> Redis Sets</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Redis Sets是无序的字符串的集合
+</p>
+<blockquote>
+<p>
+和list有什么区别？
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; sadd myset <span style="color: #d08770;">1</span> <span style="color: #d08770;">2</span> <span style="color: #d08770;">3</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">3</span>
+&gt; smembers myset <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">set&#26159;&#27809;&#26377;&#20219;&#20309;order&#30340;</span>
+<span style="color: #d08770;">1.</span> <span style="color: #d08770;">3</span>
+<span style="color: #d08770;">2.</span> <span style="color: #d08770;">1</span>
+<span style="color: #d08770;">3.</span> <span style="color: #d08770;">2</span>
+</pre>
+</div>
+
+<p>
+可以通过sismember来确定set里面有没有特定元素
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; sismember myset <span style="color: #d08770;">3</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; sismember myset <span style="color: #d08770;">20</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">0</span>
+</pre>
+</div>
+
+<p>
+sets可以用来表示model之间的relation
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; sadd news:1000:tags <span style="color: #d08770;">1</span> <span style="color: #d08770;">2</span> <span style="color: #d08770;">5</span> <span style="color: #d08770;">77</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">4</span>
+</pre>
+</div>
+
+<p>
+总之set有很多配套的方法，包括scard 可以返回set里面元素的个数，srandmember可以随机化所有的elements等
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1e03b33" class="outline-2">
+<h2 id="org1e03b33"><span class="section-number-2">6</span> Redis Sorted Sets</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Sorted Sets某种意义上就是sets，但它也可以说是sets和hash的混合体，所有的element都被绑定了一个point value，叫做score（所以说像hash），elements是经过排序的，排序的规则如下：
+</p>
+<ol class="org-ol">
+<li>如果A.score &gt; B.score，则A &gt; B</li>
+<li>如果A.score = B.score，但A的字母顺序比B大，则A &gt; B</li>
+<li>总之A和B不可能相同，因为sorted sets的element都是唯一的</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; zadd hackers <span style="color: #d08770;">1940</span> <span style="color: #a3be8c;">"Alan Kay"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1957</span> <span style="color: #a3be8c;">"Sophie Wilson"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1953</span> <span style="color: #a3be8c;">"Richard Stallman"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1949</span> <span style="color: #a3be8c;">"Anita Borg"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1965</span> <span style="color: #a3be8c;">"Yukihiro Matsumoto"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1914</span> <span style="color: #a3be8c;">"Hedy Lamarr"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1916</span> <span style="color: #a3be8c;">"Claude Shannon"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1969</span> <span style="color: #a3be8c;">"Linus Torvalds"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; zadd hackers <span style="color: #d08770;">1912</span> <span style="color: #a3be8c;">"Alan Turing"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+</pre>
+</div>
+
+<p>
+zadd比sadd多了一个score参数
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; zrange hackers <span style="color: #d08770;">0</span> -1
+<span style="color: #d08770;">1</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Alan Turing"</span>
+<span style="color: #d08770;">2</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Hedy Lamarr"</span>
+<span style="color: #d08770;">3</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Claude Shannon"</span>
+<span style="color: #d08770;">4</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Alan Kay"</span>
+<span style="color: #d08770;">5</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Anita Borg"</span>
+<span style="color: #d08770;">6</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Richard Stallman"</span>
+<span style="color: #d08770;">7</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Sophie Wilson"</span>
+<span style="color: #d08770;">8</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Yukihiro Matsumoto"</span>
+<span style="color: #d08770;">9</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Linus Torvalds"</span>
+</pre>
+</div>
+
+<p>
+排序是按照score来的
+</p>
+</div>
+
+<div id="outline-container-org0ae93fe" class="outline-3">
+<h3 id="org0ae93fe"><span class="section-number-3">6.1</span> operating on ranges</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+sorted sets强大的地方是可以根据score的range进行操作，比如找到1950年之后出生的人
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; zrangebyscore hackers -inf <span style="color: #d08770;">1950</span>
+<span style="color: #d08770;">1</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Alan Turing"</span>
+<span style="color: #d08770;">2</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Hedy Lamarr"</span>
+<span style="color: #d08770;">3</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Claude Shannon"</span>
+<span style="color: #d08770;">4</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Alan Kay"</span>
+<span style="color: #d08770;">5</span><span style="color: #88090B;">)</span> <span style="color: #a3be8c;">"Anita Borg"</span>
+</pre>
+</div>
+
+<p>
+或者是remove 1940到1960之间出生的人
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">&gt; zremrangebyscore hackers <span style="color: #d08770;">1940</span> <span style="color: #d08770;">1960</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">4</span> 
+</pre>
+</div>
+
+<p>
+从这个角度看，sorted sets真的就是一个hash，只不过hash的key是数字，且集成了一些固有的好用的方法
+</p>
+
+<p>
+还有一个zrank可以返回value对应的位置
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; zrank hackers <span style="color: #a3be8c;">"Anita Borg"</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">4</span>
+</pre>
+</div>
+
+<p>
+sorted sets还可以通过首字母的顺序进行一些操作，这里不再赘述，可以查看相关资料。
+</p>
+
+<blockquote>
+<p>
+sorted sets的一大优势：zadd只是O(log(N))的时间复杂度，所以如果有大量的updates，可以使用sorted sets
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc64f142" class="outline-2">
+<h2 id="orgc64f142"><span class="section-number-2">7</span> Bitmaps</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+bitmaps并不是一种单独的数据类型，而是基于string类型的，因为string类型的最大空间是512MB，所以可以设置最多2<sup>32不同的bits</sup>
+</p>
+
+<blockquote>
+<p>
+bitmaps的最大优点就是节约空间
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; setbit key <span style="color: #d08770;">10</span> <span style="color: #d08770;">1</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">10&#26159;bit number&#65292;1&#26159;bit value</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; getbit key <span style="color: #d08770;">10</span>
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+bitmaps一般用来储存boolean的字段
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org4735717" class="outline-2">
+<h2 id="org4735717"><span class="section-number-2">8</span> HyperlogLogs</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+hll数据类型主要是用于计算唯一元素的数量。一般计算唯一元素数量要占用很大的内存，内存的使用和items的数量相关，但hll使用了独特的算法，使得内存的占用数量一定
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">&gt; pfadd hll a b c
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">1</span>
+&gt; pfcount hll
+<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">integer</span><span style="color: #8c8c8c;">)</span> <span style="color: #d08770;">4</span>
+</pre>
+</div>
+
+<p>
+pfadd实际并没有把items加入hll，hll数据类型只是包含了一种状态而非真正的元素
+</p>
+
+<blockquote>
+<p>
+应该只有在数据量相当大的时候才会用到这个吧
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org7fdf3ce" class="outline-2">
+<h2 id="org7fdf3ce"><span class="section-number-2">9</span> 总结使用场景</h2>
+<div class="outline-text-2" id="text-9">
+<ol class="org-ol">
+<li>string 保存一个简单的值</li>
+<li>list 生产者消费者队列，或保存更新的log</li>
+<li>hash 保存对象类似的结构</li>
+<li>sets 保存model之间的relation关系</li>
+<li>sorted sets 大量的updates，或者根据score的元素操作</li>
+<li>bitmaps boolean类型，节省内存空间的需求</li>
+<li>hyperloglogs 大量数据计算总个数，对内存占用有很高要求</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

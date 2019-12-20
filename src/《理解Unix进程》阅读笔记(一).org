@@ -1,0 +1,161 @@
+#+BEGIN_QUOTE
+本书只有100页，但对于只是长期写代码却对unix底层缺乏了解的大部分程序员很有帮助，译者翻译的通俗易懂，书中介绍了Unix进程的相关概念，通讯方法等，并且在最后对Unicorn，Resque等使用unix编程的项目进行了详细的介绍。
+#+END_QUOTE
+
+一切代码都是在进程中运行的。
+
+** 进程皆有标识
+
+   进程标示符称为pid，pid，em...就是一个ID，ruby查看pid的方法
+   
+   #+BEGIN_SRC ruby
+   puts Process.pid
+   #+END_SRC
+
+** 进程皆有父
+
+   系统的每一个进程都有一个父进程。
+
+   #+BEGIN_QUOTE
+   疑惑：那第一个进程的父进程是什么？
+   #+END_QUOTE
+   
+   一般进程的父进程就是调用它的那个进程，比如我们在irb里面调用一个进程，那么该进程的父进程就是irb的进程，查看父进程pid的方法
+   
+   #+BEGIN_SRC ruby
+   puts Process.ppid
+   #+END_SRC
+
+** 进程皆有文件描述符
+
+   可以文件描述符就是打开文件的"foreign_key"，在Unix中，万物皆视为为文件，开启一个进程势必会打开一个文件，其实这里的文件称为资源更好，那么文件描述符实际上是标示了某个被进程操作的资源，如套接字，管道等等。
+   每个资源只能被打开一次，如果后面的进程需要打开这个资源，需要先将这个资源关闭。
+
+   #+BEGIN_SRC ruby
+   passwd = File.open('/etc/passwd' )
+   puts passwd.fileno
+   
+   hosts= File.open( '/etc/hosts')
+   puts hosts.fileno
+   
+   null = File.open( '/dev/null' )
+   puts null.fileno
+   #+END_SRC
+
+   输出
+   
+   #+BEGIN_SRC ruby
+   3
+   4
+   3
+   #+END_SRC
+   
+   因此能够看出
+
+   #+BEGIN_EXAMPLE
+   1. 分配的文件描述符是尚未使用的最小值
+   2. 资源一旦关闭，之前它的文件描述符就又可以使用了
+   #+END_EXAMPLE
+   
+   每个unix进程生成之处，都会自动打开三个资源，分别是
+
+   #+BEGIN_EXAMPLE
+   1. 标准输入：STDIN // 文件描述符：0
+   2. 标准输出：STDOUT // 文件描述符：1
+   3. 标准错误：STDERR // 文件描述符：2
+   #+END_EXAMPLE
+
+** 进程皆有资源限制
+
+   进程资源的限制分为软限制和硬限制
+
+   #+BEGIN_SRC ruby
+   p Process.getrlimit(:NOFILE)
+   #=> [2560, 9223372036854775807]
+   #+END_SRC
+   
+   #+BEGIN_EXAMPLE
+   软限制：自定义的限制，超出后报异常，可以更改，这个数字为能够打开的资源数
+   硬限制：只有超级客户可以更改硬限制, 上面那个超大的数实际上就是没有限制的意思
+   #+END_EXAMPLE
+
+   #+BEGIN_SRC ruby
+   Process.setrlimit(:NOFILE, 3)
+   
+   Process.getrlimit(:NOFILE)
+   #+END_SRC
+
+** 进程皆有环境变量
+
+   环境变量是包含进程数据的键值对。进程从其父进程那里集成环境变量。
+   环境变量在ruby中是通过ENV传递的
+   #+BEGIN_SRC ruby
+   $ MESSAGE='wing it' ruby -e "puts ENV['MESSAGE']"
+   #+END_SRC
+
+   注意ENV并不是一个Hash
+
+** 进程皆有参数
+
+   所有的进程都可以传递参数，参数会封装成为一个称为ARGV的数组
+   
+   #+BEGIN_SRC ruby
+   $ ruby argv.rb foo bar
+   
+   #=> ARGV = ['foo', 'bar']
+   #+END_SRC
+
+** 进程皆有名
+   
+   也就是每个进程都有个name字段，ruby中可以通过$PROGRAM_NAME获得，比如irb进程的名称就叫做irb
+
+   #+BEGIN_SRC ruby
+   irb
+   > puts $PROGRAM_NAME
+   #+END_SRC
+
+   by the way，进程名称也可以修改，直接赋值即可
+
+** 进程皆有退出码
+   
+   进程退出的时候会更新上一个退出码，用于表明退出时的情况，退出码=0时表示顺利退出，其他表示出现了错误
+
+*** 退出进程的方法
+    
+    在ruby中退出进程的方法有下面几种
+    
+**** Kernel#exit
+     
+     #+BEGIN_SRC ruby
+     exit # 意味着以0作为退出码退出
+     exit 22 # 强制指定一个退出码
+     at_exit { puts "exit hook!" } # at_exit是exit的钩子方法，退出时会执行block
+     #+END_SRC
+   
+**** Kernel#exit!
+     
+     和exit的区别是exit!的退出码为1，且不会执行at_exit
+
+**** Kernel#abort
+     
+     #+BEGIN_SRC ruby
+     abort # 退出码为1     
+     at_exit { puts "last!" } # 会调用at_exit
+     abort "some error" # 可以指定STDERR
+     #+END_SRC
+
+     
+**** Kernel#raise
+
+     #+BEGIN_SRC ruby
+     raise 'hell' # 退出码为1，且会调用at_exit
+     #+END_SRC
+
+** 总结
+   
+   如果把进程看成一个的table，那么它包含的字段如下
+   
+| pid | parent_id | resource_ids | env                                    | argv           | name | exit_code |
+|-----+-----------+--------------+----------------------------------------+----------------+------+-----------|
+| 123 |       122 | [0,1,2,3...] | {"MESSAGE": "bala", "EDITOR": "emacs"} | ['foo', 'bar'] | irb  |         0 |
+

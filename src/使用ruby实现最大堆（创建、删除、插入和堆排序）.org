@@ -1,0 +1,181 @@
+#+BEGIN_QUOTE
+本文参考：https://www.jianshu.com/p/21bef3fc3030
+另，个人博客使用的Organismo gem还在开发中，尚不支持org mode图片，所以本文没有图片
+#+END_QUOTE
+
+** 最大堆的内存表现形式
+   
+   最大堆使用数组形式实现，因为最大堆是完全二叉树，所以不会存在数组空间的浪费，可以通过bfs的层序遍历实现。当然我们先试着自己创建一个抽象的堆。
+
+   #+BEGIN_SRC ruby
+   class Node
+     attr_accessor :value, :left, :right
+   
+     def initialize(value, left, right)
+       @value = value
+       @left = left
+       @right = right
+     end
+   end
+
+   # 堆的实现
+   class Heap
+     attr_accessor :root
+   
+     def initialize(value)
+       @root = Node.new(value, nil, nil)
+     end
+   
+     def add(value)
+       if final_node.left.nil?
+         final_node.left = Node.new(value, nil, nil)
+       else
+         final_node.right = Node.new(value, nil, nil)
+       end
+     end
+   
+     def bfs(node = @root)
+       heap_arr = []
+       current_node = node
+       queue = []
+       queue << current_node
+   
+       while queue.any? do
+         current_node = queue.shift
+         heap_arr << current_node.value.to_s
+   
+         queue << current_node.left
+         queue << current_node.right
+   
+         queue.compact!
+       end
+       [current_node, heap_arr]
+     end
+   
+     def final_node
+       bfs[0]
+     end
+   
+     def to_array
+       bfs[1].map(&:to_i)
+     end
+   end
+   #+END_SRC
+   
+   关键在于bfs方法，bfs就是使用宽度有限的层序遍历，在bfs方法中，我们定义了一个先入先出的队列，每遍历到一个根结点，就把它的子节点加入队列，最后返回最后一个子节点和遍历的数组。
+   
+   我们可以通过to_array将Heap变成数组的表现形式。但是在数组中我们如何表示父节点和左右子节点呢。
+   - 父节点：i/2 (i != 1)，若i == 1，则i是根结点
+   - 左子节点：2i (2i <= n)，若不满足则无左子节点
+   - 右子节点：2i + 1 (2i + 1 <= n)，若不满足则无右子结点
+
+** 最大堆的插入
+
+   最大堆的插入是“结点上浮”，插入的位置一定是最后的子节点，这样才能保证依然是完全二叉树。然后需要“上浮”，和父节点比较做出位置变化。
+
+   #+BEGIN_SRC ruby
+   class MaxHeap
+     attr_accessor :heap_arr
+
+     def initialize(heap_arr)
+       @heap_arr = [nil] + heap_arr
+     end
+
+     def insert(value)
+       i = heap_arr.size
+       heap_arr[i] = value
+
+       while i > 1 && value > heap_arr[i / 2] do
+         tmp = heap_arr[i]
+         heap_arr[i] = heap_arr[i / 2]
+         heap_arr[i / 2] = tmp
+         i = i / 2
+       end
+       heap_arr
+     end
+   end
+   #+END_SRC
+
+   initialize中前面加一个[nil]是因为堆变为数组后第一个元素的角标为1比较好处理。
+
+** 最大堆的删除
+
+   最大堆的删除的就是删除根结点，关键是删除之后为了让堆依然作为完全二叉树，就需要把最后一个子节点放到根结点上，然后执行这个结点的“下沉”
+
+   #+BEGIN_SRC ruby
+   class MaxHeap
+     def delete
+       heap_arr[1] = heap_arr.last
+       heap_arr.pop
+
+       parent = 1
+       child = 2
+
+       while child < heap_arr.size do
+         if heap_arr[child] > heap_arr[parent]
+           heap_arr = heap_arr.swap(child-1, parent-1)
+           child += 1
+           
+           if heap_arr[child] > heap_arr[parent]
+             heap_arr = heap_arr.swap(child-1, parent-1)
+             parent = (child - 1) * 2
+           else
+             parent = child * 2
+           end
+           child = parent * 2
+         end
+       end
+       heap_arr
+     end
+   end
+
+   class Array
+     def swap(a, b)
+       tmp = self[a]
+       self[a] = self[b]
+       self[b] = tmp
+     end
+   end
+   #+END_SRC
+
+   最大堆的删除说明删除之前必须是最大堆，然后从根结点开始下沉。
+
+** 最大堆的创建
+
+   其实最大堆的创建就可以利用上面最大堆的插入或者删除的原理。利用最大堆的每一个子树还是最大堆的特点，我们可以从最末端的子树开始。然后逐个忘上遍历。然后逐个“下沉”
+
+   #+BEGIN_SRC ruby
+   class MaxHeap
+     def initialize(heap_arr)
+       @heap_arr = ([nil] + heap_arr).to_max_heap_arr
+     end
+   end
+
+   class Array
+     def to_max_heap_arr
+       # 找到最后一个根结点
+       parent = (self.size / 2).to_i
+       
+       while parent > 0 do
+         left_child = parent * 2
+         right_child = parent * 2 + 1
+
+         if self[left_child] > self[parent]
+           self.swap(left_child, parent)
+         end
+
+         if self[right_child] && self[right_child] > self[parent]
+           self.swap(right_child, parent)
+         end
+
+         parent -= 1
+       end
+       self
+     end
+   end
+   #+END_SRC
+
+** 总结
+   - 最大堆插入：“上升法”，只在自己树分支上的子节点和父节点比较
+   - 最大堆删除：“下沉法”，最后一个子节点替换被删除的根节点，然后在单个树分支上不断下沉
+   - 最大堆创建：“下沉法”，和删除不一样的是，需要对根节点进行倒叙遍历下沉，每次下沉只是下沉一步，就继续遍历下一个树。

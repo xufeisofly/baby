@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org8f1fe48">1. Rename Method</a></li>
+<li><a href="#orgff1ed5d">2. Separate Query from Modifier</a></li>
+<li><a href="#orgc0bc61a">3. Preserve Whole Object</a></li>
+<li><a href="#org9593cd6">4. Replace Parameters with Methods</a></li>
+<li><a href="#org89ee881">5. Introduce Parameter Object</a></li>
+<li><a href="#org88606d3">6. Replace Constructor with Factory Method</a></li>
+<li><a href="#orgab0e1e0">7. Replace Error Code with Exception</a>
+<ul>
+<li>
+<ul>
+<li><a href="#org8c4ef7e">7.0.1. 1. 非受控异常</a></li>
+<li><a href="#orgb5553ef">7.0.2. 2. 受控异常</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org61eb2cc">8. Replace Exception with Test</a></li>
+</ul>
+</div>
+</div>
+<blockquote>
+<ol class="org-ol">
+<li>将“修改对象状态”的函数和“查询对象状态的函数”分开设计</li>
+<li>设计接口时，所有可以隐藏的数据都应该被隐藏起来</li>
+</ol>
+</blockquote>
+
+<div id="outline-container-org8f1fe48" class="outline-2">
+<h2 id="org8f1fe48"><span class="section-number-2">1</span> Rename Method</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+给函数起一个好名字有一个办法：首先考虑应该给这个函数写上一句怎样的注释，然后想办法将注释变成函数名称
+</p>
+</blockquote>
+<p>
+你的代码首先是为人写的，其次才是为计算机写的
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">old_method</span>
+  do_something
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+可以先使用旧函数调用新函数
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">new_method</span>
+  do_something
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">old_method</span>
+  new_method
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+然后就可以慢慢的，逐一的找到旧函数并改名，最后将旧函数删掉
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgff1ed5d" class="outline-2">
+<h2 id="orgff1ed5d"><span class="section-number-2">2</span> Separate Query from Modifier</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+<p>
+将查询函数和修改函数分离
+</p>
+</blockquote>
+<blockquote>
+<p>
+任何有返回值的函数，都不应该有副作用（副作用应该指除了查询之外的其他动作）。
+如果你遇到一个“既有返回值又有副作用”的函数，就应该试着将查询动作从修改动作中分割出来。
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">find_thief</span>
+  thief = find_person<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:thief</span><span style="color: #8c8c8c;">)</span>
+  send_alert
+  thief
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">check_security</span>
+  thief = find_thief
+  some_later_code<span style="color: #8c8c8c;">(</span>thief<span style="color: #8c8c8c;">)</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面却send<sub>alert</sub>，应该将其拆出来
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">new_find_thief</span>
+  thief = find_person<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:thief</span><span style="color: #8c8c8c;">)</span>
+  thief
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">find_thief</span>
+  thief = find_person<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:thief</span><span style="color: #8c8c8c;">)</span>
+  send_alert
+  new_find_thief
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">check_security</span>
+  find_thief
+  thief = new_find_thief
+  some_later_code<span style="color: #8c8c8c;">(</span>thief<span style="color: #8c8c8c;">)</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+最后，就可以更改find<sub>thief了</sub>
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">find_thief</span>
+  send_alert
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<blockquote>
+<p>
+最后的最后，为find<sub>thief改个名字可能更好一点</sub>
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgc0bc61a" class="outline-2">
+<h2 id="orgc0bc61a"><span class="section-number-2">3</span> Preserve Whole Object</h2>
+<div class="outline-text-2" id="text-3">
+<blockquote>
+<p>
+保持对象的完整性
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby">method<span style="color: #8c8c8c;">(</span>deal.days, deal.priority<span style="color: #8c8c8c;">)</span> =&gt; method<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+<p>
+动机：如果有一天method需要一个新的参数，就得全局搜method一一加上，不如直接放入一个对象，想要什么要什么
+副作用：函数所在的对象会依赖整个被调用的对象，如果会使得依赖结构恶化，就不应该这么使用。但是如果使用了该对象 <br />
+过多的数据，说明这个方法应该放在那个类中
+</p>
+</div>
+</div>
+
+<div id="outline-container-org9593cd6" class="outline-2">
+<h2 id="org9593cd6"><span class="section-number-2">4</span> Replace Parameters with Methods</h2>
+<div class="outline-text-2" id="text-4">
+<blockquote>
+<p>
+以函数取代参数
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby">level = get_level<span style="color: #8c8c8c;">()</span>
+my_method<span style="color: #8c8c8c;">(</span>level<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+<p>
+改为
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">my_method<span style="color: #8c8c8c;">()</span>
+</pre>
+</div>
+<p>
+动机：如果能减少一个参数，就减少一个参数，这个方法的另一个动力是减少临时变量。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org89ee881" class="outline-2">
+<h2 id="org89ee881"><span class="section-number-2">5</span> Introduce Parameter Object</h2>
+<div class="outline-text-2" id="text-5">
+<blockquote>
+<p>
+引入参数对象，将若干个参数构建成为一个对象传入
+</p>
+</blockquote>
+<p>
+不知道多少次看到代码用一对值表示一个范围，start end upper lower，可以创建一个Range对象
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #c0c5ce;">Range</span> = <span style="color: #c0c5ce;">Struct</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:start</span>, <span style="color: #d08770;">:end</span><span style="color: #8c8c8c;">)</span>
+range = <span style="color: #c0c5ce;">Range</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">start:</span> start, <span style="color: #b48ead;">end</span>: <span style="color: #b48ead;">end</span><span style="color: #8c8c8c;">)</span>
+
+method<span style="color: #8c8c8c;">(</span>range<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org88606d3" class="outline-2">
+<h2 id="org88606d3"><span class="section-number-2">6</span> Replace Constructor with Factory Method</h2>
+<div class="outline-text-2" id="text-6">
+<blockquote>
+<p>
+用工厂函数取代构造函数
+</p>
+</blockquote>
+<p>
+动机：构造函数只能返回当前类的一个对象，工厂函数可以返回任何对象，比如返回子类的对象以取代类型码
+不过在ruby中很少见到啊
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@type</span> = type
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+改为
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@type</span> = type
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">if</span> type == <span style="color: #a3be8c;">'teacher'</span> <span style="color: #b48ead;">then</span>
+      <span style="color: #c0c5ce;">Teacher</span>.new
+    <span style="color: #b48ead;">elsif</span> type == <span style="color: #a3be8c;">'worker'</span> <span style="color: #b48ead;">then</span>
+      <span style="color: #c0c5ce;">Worker</span>.new
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+构造函数的好处就是可以在本类中返回子类的对象
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgab0e1e0" class="outline-2">
+<h2 id="orgab0e1e0"><span class="section-number-2">7</span> Replace Error Code with Exception</h2>
+<div class="outline-text-2" id="text-7">
+<blockquote>
+<p>
+ruby里基本都是exception，很少再见到error code了，不过对于异常的分类还是可以学习一下
+</p>
+</blockquote>
+</div>
+<div id="outline-container-org8c4ef7e" class="outline-4">
+<h4 id="org8c4ef7e"><span class="section-number-4">7.0.1</span> 1. 非受控异常</h4>
+<div class="outline-text-4" id="text-7-0-1">
+<p>
+非受控异常指的是小概率的，不存在于程序正常逻辑中的异常，这种异常应该在出现之前就想办法尽量避免，比如
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">model.save!
+</pre>
+</div>
+<p>
+抛出的异常就属于非受控异常
+</p>
+</div>
+</div>
+<div id="outline-container-orgb5553ef" class="outline-4">
+<h4 id="orgb5553ef"><span class="section-number-4">7.0.2</span> 2. 受控异常</h4>
+<div class="outline-text-4" id="text-7-0-2">
+<p>
+受控异常一般是已知的有该可能性发生的错误，由于是大概率的，我们必须要rescue
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">raise</span> <span style="color: #c0c5ce;">PhoneNumberException</span>, <span style="color: #a3be8c;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span> <span style="color: #b48ead;">if</span> phone.blank?
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span>
+  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+<span style="color: #b48ead;">rescue</span> <span style="color: #c0c5ce;">PhoneNumberException</span> =&gt; e
+  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org61eb2cc" class="outline-2">
+<h2 id="org61eb2cc"><span class="section-number-2">8</span> Replace Exception with Test</h2>
+<div class="outline-text-2" id="text-8">
+<blockquote>
+<p>
+用测试取代异常
+</p>
+</blockquote>
+<blockquote>
+<p>
+Exceptions can be perceived as non-local GOTO statements. This can adversely affect the readability of your code and mislead team members as to the actual intent of your method
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span>
+  <span style="color: #b48ead;">if</span> phone.present?
+    do_something
+  <span style="color: #b48ead;">else</span>
+    <span style="color: #d08770;">raise</span> <span style="color: #c0c5ce;">PhoneNumberException</span>, <span style="color: #a3be8c;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+应该改为
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span>
+  <span style="color: #b48ead;">if</span> phone.present?
+    do_something
+  <span style="color: #b48ead;">else</span>
+    <span style="color: #b48ead;">return</span> something
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+不要滥用Exception, 不要把异常当作条件语句，引入正常的工作流，应当使用return
+</p>
+<blockquote>
+<p>
+“…exceptions should rarely be used as part of a program’s normal flow; exceptions should be reserved for unexpected events”
+</p>
+</blockquote>
+<pre class="example">
+不能这么用的原因如下：
+1. 异常不是用来干这个的。代码会让人迷惑，因为异常是一种错误，不是一种流控制
+2. 难以追踪。这么使用异常相当于使用goto语句，难以追踪
+3. 如果对于正常的情况都使用异常，那用什么来标识真正的异常？
+4. 异常性能太慢。有文章做过研究，raise或fail异常的性能会比其他低很多倍
+</pre>
+<p>
+还有一种情况我们经常会看到
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BadController</span> &lt; <span style="color: #c0c5ce;">ApplicationController</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span>
+    some_object.save!
+  <span style="color: #b48ead;">rescue</span> =&gt; e
+    render <span style="color: #d08770;">json:</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">msg:</span> e.message <span style="color: #8c8c8c;">}</span>, <span style="color: #d08770;">status:</span> <span style="color: #d08770;">:unprocessable_entity</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+这里rescue了StandardError，造成的问题就是一些其他的Error可能也会被rescue导致我们无法发现
+（但这里经常用的一个原因是，我不知道会发生什么error，所以我想在页面上看看，就都rescue了）
+所以更好的一种方式是，指定你想rescue的error
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BetterController</span> &lt; <span style="color: #c0c5ce;">ApplicationController</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span>
+    some_object.save!
+  <span style="color: #b48ead;">rescue</span> <span style="color: #c0c5ce;">ActiveRecord</span>::<span style="color: #c0c5ce;">RecordInvalid</span> =&gt; e
+    render <span style="color: #d08770;">json:</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">msg:</span> e.message <span style="color: #8c8c8c;">}</span>, <span style="color: #d08770;">status:</span> <span style="color: #d08770;">:unprocessable_entity</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+但这样还是有个问题
+</p>
+<blockquote>
+<p>
+The code above is not intentional and should be considered a violation of the Principle of Least Astonishment. 
+Programmers read code a heck of a lot more than they write it so your code should be clear and intentional. Utilizing a conditional expressively states “I’m expecting this case to fail sometimes, and here’s how we handle it.”
+</p>
+</blockquote>
+<p>
+说白了，就是这种错误是我很可能会发生的，所以是一种控制流，不要用异常处理
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BestController</span> &lt; <span style="color: #c0c5ce;">ApplicationController</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span>
+    <span style="color: #b48ead;">if</span> some_object.save
+      <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">do_something</span>
+    <span style="color: #b48ead;">else</span>
+      render <span style="color: #d08770;">json:</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">msg:</span> <span style="color: #a3be8c;">'xxx'</span> <span style="color: #8c8c8c;">}</span>, <span style="color: #d08770;">status:</span> <span style="color: #d08770;">:unprocessable_entity</span>
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+相关文章：
+</p>
+
+<p>
+<a href="http://www.codinghell.ch/blog/2013/03/31/how-and-when-not-to-use-exceptions/">How and When (Not) to Use Exceptions</a>
+</p>
+
+<p>
+<a href="http://launchware.com/articles/catch-all-exception-handling-is-not-flow-control">Catch All Exception Handling Is Not Flow Control</a>
+</p>
+
+<p>
+<a href="https://mensfeld.pl/2015/03/exceptions-should-not-be-expected-stop-using-them-for-control-flow-or-any-other-logic-handling-in-ruby/">Exceptions should not be expected – stop using them for control flow (or any other logic handling) in Ruby</a>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

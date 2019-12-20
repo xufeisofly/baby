@@ -1,0 +1,130 @@
+** javascript的执行顺序
+   javascript的执行顺序是什么样子的，举下面的例子
+
+   #+BEGIN_SRC javascript
+   a = 2
+   var a
+   console.log(a)
+   #+END_SRC
+   
+   答案是2
+
+   #+BEGIN_SRC javascript
+   console.log(a)
+
+   var a = 2
+   #+END_SRC
+
+   答案是undefined（不是Reference Error），为什么呢？
+   
+   对于var a = 2，编辑器会将其看成两个声明，第一个是定义声明会在编译阶段执行，第二个赋值声明会等待执行阶段执行，所以第一段代码对于编译器来说是这个样子。
+   
+   #+BEGIN_SRC javascript
+   var a
+   a = 2
+   console.log(a)
+   #+END_SRC
+   
+   而第二段代码是
+
+   #+BEGIN_SRC javascript
+   var a
+   console.log(a)
+   a = 2
+   #+END_SRC
+
+   我们把这个叫做“提升”
+   
+** 函数声明的提升
+   
+   声明有变量声明，如var a = 2，还有函数声明。函数声明也会提升，其实这个我们都熟，函数声明放在前面和后面都是一样的，因为实际编译时发生了提升。
+
+   #+BEGIN_SRC javascript
+   foo()
+
+   function foo() {
+     console.log(a) // undefined
+
+     var a = 2
+   }
+   #+END_SRC
+
+   但是函数表达式不会提升，因为函数表达式实际上是一个赋值操作
+
+   #+BEGIN_SRC javascript
+   foo() // TypeError, 而不是ReferenceError
+
+   var foo = function bar() {
+     //...
+   }
+   #+END_SRC
+
+** 提升规则
+   
+*** 函数优先
+
+    当函数和变量同名时，提升遵循函数优先的规则，如下
+    
+    #+BEGIN_SRC javascript
+    foo() // 1
+
+    var foo
+
+    function foo() {
+      console.log(1)
+    }
+
+    foo = function() {
+      console.log(2)
+    }
+    #+END_SRC
+
+    尽管var foo出现在function foo()之前，但function foo()声明会提升到最前面，因为是重复声明，所以var foo被忽略。
+    
+    #+BEGIN_SRC javascript
+    function foo() {
+      console.log(1)
+    }
+
+    foo()
+
+    foo = function() {
+      console.log(2)
+    }
+    #+END_SRC
+
+*** 函数声明覆盖原则
+    
+    对于函数声明，当出现重复的声明时，后面的函数声明会覆盖前面的函数声明
+
+    #+BEGIN_SRC javascript
+    foo() // 3
+
+    function foo() {
+      console.log(1)
+    }
+
+    var foo = function() {
+      console.log(2)
+    }
+
+    function foo() {
+      console.log(3)
+    }
+    #+END_SRC
+    
+*** 声明不受条件控制
+
+    下面的声明并不受if else控制，因为除了声明之外其他语句并不“提升”，只能等待执行阶段
+
+    #+BEGIN_SRC javascript
+    foo() // b
+
+    var a = true
+
+    if(a) {
+      function foo() { console.log("a") }
+    } else {
+      function foo() { console.log("b") }
+    }
+    #+END_SRC

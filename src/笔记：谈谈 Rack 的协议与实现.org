@@ -1,0 +1,176 @@
+** 写在前面
+   本文大量参考了draveness的博客，是该文章的阅读笔记，推荐阅读原文，链接：https://draveness.me/rack
+
+   Rack是应用和Webserver之前的桥梁。Rails就是通过Rack实现webserver和应用程序之间的http通讯。上面的文章对rack进行了系统全面的阐述。
+
+** Rack 协议
+
+   Rack应用就是一个能够响应call方法的ruby对象，它接受一个参数env，返回包含http三个基本值的数组，即[status, headers, body]。
+
+   #+BEGIN_QUOTE
+   A Rack application is a Ruby object (not a class) that responds to call. It takes exactly one argument, the environment and returns an Array of exactly three values: The status, the headers, and the body.
+   #+END_QUOTE
+
+   这里的body实际上是个数组，因为可能会有多个响应内容。
+
+** 中间件
+   
+   Rack协议规定了webserver和Rack应用之间的通信方式，中间件使之能够在上层改变http响应和请求，而不会影响Rack底层的实现。文中定义了一个中间件StatusLogger
+
+   #+BEGIN_SRC ruby
+   class StatusLogger
+     def initialize(app, options={})
+       @app = app
+     end
+
+     def call(env)
+       status, headers, body = @app.call(env)
+       puts status
+       [status, headers, body]
+     end
+   end
+   #+END_SRC
+
+   我们可以在config.ru中测试这个中间件的作用
+
+   #+BEGIN_SRC ruby
+   use StatusLogger
+   run Proc.new { |env| ['200', { 'Content-Type' => 'text/html' }, ['get rack\'d']] }
+   #+END_SRC
+
+   然后执行rackup config.ru命令，每次模拟发送请求时，都会puts status。可见，可以在中间件中自定义http请求或返回的代码。
+
+** Rack的实现源码
+
+   当执行rackup config.ru时，实际上是在执行
+   
+   #+BEGIN_SRC ruby
+   require 'rack'
+   Rack::Server.start
+   #+END_SRC
+   
+   源码中生成了Rack::Server的对象，并调用了其start方法。在实例化对象的时候，有几个默认的参数需要了解一下。
+   
+   #+BEGIN_SRC ruby
+   def default_options
+     environment  = ENV['RACK_ENV'] || 'development'
+     default_host = environment == 'development' ? 'localhost' : '0.0.0.0'
+     {
+       :environment => environment,
+       :pid         => nil,
+       :Port        => 9292,
+       :Host        => default_host,
+       :AccessLog   => [],
+       :config      => "config.ru"
+     }
+   end
+   #+END_SRC
+   
+   可见，默认监听9292端口，默认文件名为config.ru。
+
+** 包装应用
+   
+   在run应用前，需要先将应用“包装”好，所谓的包装，就是将中间件和rack层按照一定的顺序打包，在Rack::Server中对应的方法是
+   #+BEGIN_SRC ruby
+   def wrapped_app
+     @wrapped_app ||= build_app app
+   end
+   #+END_SRC
+
+   其中app方法过程复杂，我们只需要知道是一个Rack应用，包含了所有的中间件以及Proc对象，就像这样
+   
+   #+BEGIN_SRC ruby
+   Rack::Builder.new {
+     use MiddleWare1
+     use MiddleWare2
+     run Proc.new { |env| ['200', { 'Content-Type' => 'text/html' }, ['get rack\'d']] }
+   }.to_app
+   #+END_SRC
+
+   build_app的作用是将所有的中间件包裹在Rack的周围，因为每一个中间件和Rack一样，都是响应一个call方法
+   
+   #+BEGIN_SRC ruby
+   def build_app(app)
+     middleware[options[:environment]].reverse_each do |middleware|
+       middleware = middleware.call(self) if middleware.respond_to?(:call)
+       klass, *args = middleware
+       app = klass.new(app, *args)
+     end
+     app
+   end
+   #+END_SRC
+   
+   #+BEGIN_QUOTE
+   每一个中间件在call方法中都会调用另一个中间件或者rack应用，在接收到应用的返回之后会分别对响应进行处理最后由最先定义的中间件返回
+   #+END_QUOTE
+   
+   最后，我们按照如下顺序进行调用
+   
+   #+BEGIN_EXAMPLE
+   (request) ---> MiddleWare1 => MiddleWare2 => RackApp => MiddleWare2 => MiddleWare1 ---> (response)
+   #+END_EXAMPLE
+
+   总之，实现了下面的效果
+   
+   #+BEGIN_SRC ruby
+   # config.ru
+   use MiddleWare1
+   use MiddleWare2
+   run RackApp
+
+   # equals to
+   MiddleWare1.new(MiddleWare2.new(RackApp))
+   #+END_SRC
+
+** 选择Webserver
+   webserver选择方法
+   
+   #+BEGIN_SRC ruby
+   def server
+     @_server ||= Rack::Handler.get(options[:server])
+     unless @_server
+       @_server = Rack::Handler.default
+     end
+     @_server
+   end
+   #+END_SRC
+
+   可见，如果执行rackup命令时传入了server参数，比如rackup -s WEBrick，就会使用该webserver启动，否则就是用默认的webserver。
+   选择好对应的webserver且将应用打包好之后，就会执行webserver的run方法了。
+   
+   #+BEGIN_QUOTE
+   所有遵循rack协议的webserver都会实现一个run方法，并且接受app和options和一个block作为参数
+   #+END_QUOTE
+
+** Rails和Rack
+
+   执行rake middleware
+
+   #+BEGIN_SRC ruby
+   $ rake middleware
+
+   use Rack::Cors
+   use Raven::Rack
+   use Rack::Sendfile
+   use ActionDispatch::Static
+   use ActionDispatch::Executor
+   use ActiveSupport::Cache::Strategy::LocalCache::Middleware
+   use Rack::Runtime
+   use ActionDispatch::RequestId
+   use RequestStore::Middleware
+   use ActionDispatch::RemoteIp
+   use Rails::Rack::Logger
+   use ActionDispatch::ShowExceptions
+   use ActionDispatch::DebugExceptions
+   use ActionDispatch::Reloader
+   use ActionDispatch::Callbacks
+   use ActiveRecord::Migration::CheckPending
+   use Rack::Head
+   use Rack::ConditionalGet
+   use Rack::ETag
+   use Warden::Manager
+   use RailsEventStore::Middleware
+   run Unicrm::Application.routes
+   #+END_SRC
+   
+   最后一个是一个RouteSet实例，Rails所有的请求都会经过路由表，根据一定规则分配给控制器

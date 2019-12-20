@@ -1,0 +1,252 @@
+#+TITLE: Python 描述符
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+[[http://niltouch-1256880307.file.myqcloud.com/41/411.jpeg]]
+
+#+BEGIN_QUOTE
+描述符是 python 独有的特性，很多ORM如SQLAlchemy都是通过描述符实现的，其他的库如formatter工具poseidon也是，可见这是很多框架喜欢用的玩意儿，因此学会了描述符，至少能让你更快的阅读各种框架的源码。
+#+END_QUOTE
+
+** 什么是描述符
+   
+   一个python的类中有各种属性和各种方法，那么如何去描述一个属性呢？就是 get_value 和 set_value (为了简化理解，此处不讨论delete)，从这个角度看，属性也是「对象」。如果给属性定义一个interface，就是下面这样。
+   
+   #+BEGIN_SRC go
+   interface {
+     func set
+     func get
+   }
+   #+END_SRC
+   
+   所谓的描述符，就是把属性描述成一个对象，在它的类中有  __set__ 和 __get__ 方法，那么这个对象就完全可以充当属性了，这也是一种duck typing的表现，有了这个类，我们就可以重新定义一个属性的get和set，让它表现各种各样你想要的情形。说了这么多可能还不太懂，下面举个例子。
+
+*** 举个例子
+
+   类Product存在两个实例属性，price和amount，我们可以初始化它们的值，但必须满足一个条件，两个值都需要大于0。
+
+   #+BEGIN_SRC python
+   class Product(object):
+       
+       def __init__(self, price, amount):
+           self.price = price
+           self.amount = amount
+   #+END_SRC
+
+   我们可能马上会想到一个做法，就是定义方法进行验证
+
+   #+BEGIN_SRC python
+   class Product(object):       
+       def __init__(self, price, amount):
+           self.price = self.get_price(price)
+           self.amount = self.get_amount(amount)
+
+       def total(self):
+           return self.price * self.amount
+
+       def get_price(self, price):
+           if price < 0:
+               raise
+           return price
+
+       def get_amount(self, amount):
+           if amount < 0:
+               raise
+           return amount
+   #+END_SRC
+
+   当然，如果验证逻辑相同，我们也可以提取出来一个验证的方法，对于读属性来说也是一样的。既然我们能提取方法，为什么不能提取出来一个类呢？就像下面这样。
+
+   #+BEGIN_SRC python
+   class Quantity(object):
+       def __init__(self, name):
+           self.name = name
+
+       def __set__(self, instance, value):
+           if value > 0:
+               instance.__dict__[self.name] = value
+           else:
+               raise
+
+   class Product(object):
+       price = Quantity('price')
+       amount = Quantity('amount')
+
+       def __init__(self, price, amount):
+           self.price = price
+           self.amount = amount
+
+       def total(self):
+           return self.price * self.amount
+   #+END_SRC
+
+   本来是Product实例属性的price和amount变成了Quantity类的实例，因此price和price=就是Quantity().__get__和Quantity().__set__。当然描述符不止可以应用于属性，还可以应用于方法，比如property就是使用描述符实现并作用于func上的。将实例属性或实例方法委托给另一个类的对象，这个类的对象就叫做「描述符」。
+
+*** 一个疑问
+   
+   想必很多人有个疑问，为什么要用类属性，而不是实例属性嵌入描述符类呢？原因很简单，实例属性，只有在类实例化的时候才会有啊，如果我们在 __init__ 写一个下面的代码
+
+   #+BEGIN_SRC python
+   def __init__(self):
+       self.price = Quantity('price')
+       self.amount = Quantity('amount')
+   #+END_SRC
+
+   那么就真的只是给price 和 amount属性赋值了两个Quantity对象而已，并没有重新定义 price= 和 price 方法。而使用描述符的原因，就是为了重新定义 price= 和 price 方法。那为什么使用类属性可以实现呢？因为python有个匪夷所思的特性，self.price会优先认为是实例属性，但如果python发现对象不存在price这个属性值，就会从类中寻找对应属性。而在我们每次__init__中self.price时，因为从类中找到了对应的属性，因此就不会重新生成一个实例属性放在__dict__中了。从此self.price就变成了Quantity('price')，产生了下面的对应关系：
+
+   #+BEGIN_SRC python
+   Product.price => Quantity('price')
+
+   product.price => Quantity('price').__get__()
+   
+   product.price = value => Quantity('price').__set__(product, value)
+   #+END_SRC
+
+   说了这么多绕口令，描述符用一个词来描述就是「委托」，用一句话来描述就是：重新定义value和value=，而且是批量修改所有属性的定义。
+
+*** 覆盖型和非覆盖型描述符
+
+    根据有没有__set__方法，描述符可以分为这两种类型。在这里不需要多么关注定义，理解了「覆盖」两个字即可。
+    
+**** 覆盖型
+     
+     如果描述符类中定义了__set__方法，那么无论是读还是写，描述符都会覆盖__dict__当中的属性。如
+
+     #+BEGIN_SRC python
+     price = Quantity()
+
+     self.price => <Quantity>
+
+     self.price = 1
+
+     self.price => <Quantity>
+     #+END_SRC
+
+     只要class Quantity中定义了__set__方法，即使self.__dict__新增了price属性，price也会被Quantity()覆盖
+
+**** 非覆盖型描述符
+
+     反之，如果Quantity类中没有定义__set__，只定义了__get__等其他方法，那么描述符就很容易被属性值覆盖，如
+
+     #+BEGIN_SRC python
+     price = Quantity()
+
+     self.price => <Quantity>
+
+     self.price = 1
+
+     self.price => 1
+     #+END_SRC
+
+*** 使用描述符的具体实例
+
+    描述符是python的独门武器，为什么其他的语言就没有描述符呢，那没有描述符其他语言又是如何实现的相关功能呢？想要解决这个问题，我们先研究一下python中使用描述符实现的一些经典功能。
+
+**** property
+     
+     内置的property也是描述符，为了方便，我们实现一个
+
+     #+BEGIN_SRC python
+     class property(object):
+     
+         def __init__(self, func):
+             self.func = func
+
+         def __get__(self, ins, cls=None):
+         res = self.func(ins)
+             return res
+
+     class Mine(object):
+         def age(self):
+             return 1
+
+         age = property(age)
+
+     Mine().age
+     # => 1
+     #+END_SRC
+
+     接下来有点像公式推导了
+     
+     #+BEGIN_SRC python
+     mine = Mine()
+
+     mine.age = Mine.age(mine)
+
+     age = property(age)
+
+     Mine.age(mine) = Mine.property(age)(mine) = property.__get__(property(age), mine, Mine)
+     #+END_SRC
+
+     这里要注意，在类外调用的话__get__中需要有一个cls参数，原因就是实际上调用的是 Mine.age(mine)，而在类内调用如前面对类属性price的装饰则不必，因为一般是在类内调用的只是 self.price, 即price(ins)，并没有涉及到类。所以可以把cls=None。类外调用会传，类内调用则不会。
+
+**** lotan 的 Field
+
+     lotan 是一个用于构建model层的库，与之前我常用的Rails的ActiveRecord不同，很多Model层和DAO层是分离的，通过DAO层操作数据库，然后Model层构建model对象供业务使用，lotan的目的就是隔离DAO，通过一个key构建出一个数据完备的model对象，比如。
+
+     #+BEGIN_SRC python
+     class Book(BaseModel):
+         id = models.IntField(is_key=True)
+         title = models.StringField()
+
+         def resolve_by_id(self):
+             return DAO.get_data_by_id()
+
+     book = Lotan().create_session().build_model(Book, id=1)
+     book
+     => <Book id=1 title='ThreeBody'>    
+     #+END_SRC
+
+     很明显，lotan使用描述符实现，并且还定义了描述符的子类描述符，不难想到存在一个Field描述符类，而IntField的StringField都继承自Field。而当给self.id赋值时，会调用Field中的__set__方法，__set__方法会寻找resolve_by_id方法，使用其返回值对model进行初始化。
+
+** 其他语言的实现
+
+   这里还有一个疑问，既然python使用描述符来实现ORM等特性，而且描述符还是其「独家」的功能，那么其他语言是如何解决相同问题的呢，为什么其他语言不能实现描述符？下面浅谈一下Ruby。
+
+*** Ruby
+    
+    Ruby能否实现描述符？答案是不能，原因如下：
+    
+    1. Ruby实例属性不是公开的，@price无法从外部作用域访问，只能通过方法self.price访问
+    2. self.price只会寻找方法，并不会寻找类变量
+    3. 到头来只需要定义self.price和self.price=方法即可
+
+    #+BEGIN_SRC ruby
+    class Product
+      def initialize(price)
+        @price = price
+      end
+    
+      def price
+        raise if @price < 0
+        @price
+      end
+
+      def price=(value)
+        raise if value < 0
+        @price = value
+      end
+    end
+    #+END_SRC
+
+    当然上面这个python也很容易实现，描述符本来就是针对批量属性的，不过对于多属性的get set修改，Ruby及其灵活的元编程特性应该可以很容易的实现。比如使用 missing_method, 或者直接define_method "#{variable}"来动态定义get和set方法，这是ruby的风格，具体就不深究。
+
+** 几个使用建议
+
+   最后附上《Fluent Python》中的几条描述符使用的建议。
+
+   - 只读描述符必须有__set__方法。
+
+   不然self.price会被新的属性赋值覆盖，而且这样你才能够在__set__报错来禁止写入
+
+   - 用于验证的描述符可以只有__set__方法
+
+   因为只会在set时候验证，而读取时读取__dict__中的值就行了，速度还快，不用__get__方法
+
+   - 仅有__get__方法的描述符可以实现高效缓存
+
+   因为可覆盖，第一次走__get__，在__get__中定义__dict__[price]，以后就可以通过__dict__方法获取
+
+   - 特殊方法不受影响
+
+   只有__get__方法时虽然属性可以被覆盖，但特殊方法不会，即如果__get__中你做了这件事
+   __dict__[__repr__] = 1
+   后面调用__repr时还是会走__class__.__repr__方法，而不是1

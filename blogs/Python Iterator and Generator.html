@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org937653a">1. Iterator(迭代器)</a>
+<ul>
+<li><a href="#org9208639">1.1. 可迭代对象</a></li>
+<li><a href="#org551a1e2">1.2. 迭代器协议</a></li>
+</ul>
+</li>
+<li><a href="#orgbb370d2">2. Generator(生成器)</a>
+<ul>
+<li><a href="#orgde153c2">2.1. 生成器函数</a></li>
+<li><a href="#org349a9ec">2.2. 生成器表达式</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+<img src="http://niltouch-1256880307.file.myqcloud.com/38/38-1.jpg" alt="38-1.jpg" />]]
+</p>
+
+<blockquote>
+<p>
+    入职知乎以后，虽然是早十晚六的油腻生活，但不知道时间都去哪了，还是只能在地铁上学Python。《Fluent Python》这本书是我精心挑选，豆瓣评分9.x的大作，买来一看果然没让我失望，基本看不懂，但我坚信它是好书，因为里面涉及很多底层的实现和Python的思想，而非简单的语法。
+今天看到了Iterator和Generator。
+</p>
+</blockquote>
+
+<div id="outline-container-org937653a" class="outline-2">
+<h2 id="org937653a"><span class="section-number-2">1</span> Iterator(迭代器)</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org9208639" class="outline-3">
+<h3 id="org9208639"><span class="section-number-3">1.1</span> 可迭代对象</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Python中有很多类型有迭代的属性，我们称之为「迭代对象」(Iterable)，比如:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">for</span> i <span style="color: #b48ead;">in</span> <span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span>,<span style="color: #d08770;">2</span>,<span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span>:
+    <span style="color: #b48ead;">print</span> i
+
+<span style="color: #b48ead;">for</span> k, v <span style="color: #b48ead;">in</span> <span style="color: #8c8c8c;">{</span><span style="color: #a3be8c;">'a'</span>: <span style="color: #d08770;">1</span>, <span style="color: #a3be8c;">'b'</span>: <span style="color: #d08770;">2</span>, <span style="color: #a3be8c;">'c'</span>: <span style="color: #d08770;">3</span><span style="color: #8c8c8c;">}</span>:
+    <span style="color: #b48ead;">print</span> v
+
+<span style="color: #b48ead;">for</span> i <span style="color: #b48ead;">in</span> <span style="color: #8c8c8c;">(</span><span style="color: #d08770;">1</span>,<span style="color: #d08770;">2</span>,<span style="color: #d08770;">3</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">print</span> i
+
+<span style="color: #b48ead;">for</span> i <span style="color: #b48ead;">in</span> <span style="color: #a3be8c;">'abc'</span>:
+    <span style="color: #b48ead;">print</span> i
+</pre>
+</div>
+
+<p>
+for循环就是迭代属性的一种表现。而序列可以迭代的原因，是因为iter函数。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org551a1e2" class="outline-3">
+<h3 id="org551a1e2"><span class="section-number-3">1.2</span> 迭代器协议</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+解释器需要迭代对象x时，会自动调用iter(x)，而iter函数有以下作用：
+</p>
+
+<ol class="org-ol">
+<li>检查对象是否有_<sub>iter</sub>_<sub>方法</sub>，如果有就调用，获取一个迭代器</li>
+<li>如果没有_<sub>iter</sub>_<sub>方法</sub>，但是有_<sub>getitem</sub>_<sub>方法</sub>，则创建一个迭代器</li>
+</ol>
+
+<p>
+也就是说_<sub>iter</sub>_<sub>或</sub>_<sub>getitem</sub>_<sub>方法的实现是这些类型可以被迭代调用的原因</sub>，因为他们都会提供一个「迭代器」。那么不禁要问，如何实现一个迭代器？实现一个迭代器只需要支持两个方法：
+</p>
+
+<ol class="org-ol">
+<li>_<sub>iter</sub>__ 返回一个迭代器，也就是自身</li>
+<li>next 获取下一个元素</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MyIterator</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, n<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.n = n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__iter__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">self</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">next</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#20197;2&#20026;step&#36845;&#20195;</span>
+        <span style="color: #b48ead;">if</span> <span style="color: #b48ead;">self</span>.n &lt; <span style="color: #d08770;">10</span>:
+            <span style="color: #b48ead;">self</span>.n += <span style="color: #d08770;">2</span>
+            <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">self</span>.n
+        <span style="color: #b48ead;">else</span>:
+            <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#36229;&#20986;&#36845;&#20195;&#19978;&#38480;&#25243;&#20986;StopIteration</span>
+            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">StopIteration</span>
+</pre>
+</div>
+
+<p>
+然后再实现一个可迭代对象
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MyIterable</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, n<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.n = n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__str__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">print</span> <span style="color: #b48ead;">self</span>.n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__iter__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#36820;&#22238;&#19968;&#20010;&#36845;&#20195;&#22120;</span>
+        <span style="color: #b48ead;">return</span> MyIterator<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>.n<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+然后就可以实现下面的迭代效果
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">i</span> = MyIterable<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #b48ead;">for</span> x <span style="color: #b48ead;">in</span> i:
+    <span style="color: #b48ead;">print</span> x
+
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; 4, 6, 8, 10    </span>
+</pre>
+</div>
+
+<p>
+由于迭代器也实现了_<sub>iter</sub>_<sub>方法</sub>，因此迭代器也可以迭代，一句话说明
+</p>
+
+<blockquote>
+<p>
+迭代器是可迭代对象，但可迭代对象不是迭代器
+</p>
+</blockquote>
+
+<p>
+看到这里我有个疑惑，为什么不直接在MyIterable类中实现next方法，让可迭代对象也是迭代器。书中的解释是这样的：
+</p>
+
+<blockquote>
+<p>
+为了支持对聚合对象的多种遍历
+</p>
+</blockquote>
+
+<p>
+也就是说可能需要不同的遍历方式，一个对象也就需要支持提供多种迭代器，如果把对象自己变成迭代器，那迭代的方式就只有next方法实现的那一种了。
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgbb370d2" class="outline-2">
+<h2 id="orgbb370d2"><span class="section-number-2">2</span> Generator(生成器)</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+上面的代码中为了实现可迭代的MyIterable对象居然写了两个类，为了用更加函数式的操作简化这个方式，我们有了「生成器」。生成器指的是生成器对象，然而这个对象却不是通过实例化一个类产生的，这个特别Python。有两种生成生成器对象的方式，分别是「生成器函数」和「生成器表达式」
+</p>
+</div>
+
+<div id="outline-container-orgde153c2" class="outline-3">
+<h3 id="orgde153c2"><span class="section-number-3">2.1</span> 生成器函数</h3>
+<div class="outline-text-3" id="text-2-1">
+<blockquote>
+<p>
+生成器函数就是拥有「yield」关键字的函数
+</p>
+</blockquote>
+
+<p>
+这个定义好没意义。首先生成器函数是个「函数」，然后里面有yield的关键字，而且为了符合规范，一般方法前最好加一个「gen_」，下面定义一个：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">gen_shit</span><span style="color: #8c8c8c;">()</span>:
+    <span style="color: #b48ead;">for</span> c <span style="color: #b48ead;">in</span> <span style="color: #a3be8c;">'shit'</span>:
+        <span style="color: #b48ead;">yield</span> c
+
+<span style="color: #bf616a;">g</span> = gen_shit<span style="color: #8c8c8c;">()</span>
+
+g
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; &lt;generator object gen_shit at 0x10f843550&gt;</span>
+
+<span style="color: #d08770;">next</span><span style="color: #8c8c8c;">(</span>g<span style="color: #8c8c8c;">)</span>
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; s</span>
+<span style="color: #d08770;">next</span><span style="color: #8c8c8c;">(</span>g<span style="color: #8c8c8c;">)</span>
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; h</span>
+<span style="color: #d08770;">next</span><span style="color: #8c8c8c;">(</span>g<span style="color: #8c8c8c;">)</span>
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; i</span>
+<span style="color: #d08770;">next</span><span style="color: #8c8c8c;">(</span>g<span style="color: #8c8c8c;">)</span>
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; t</span>
+<span style="color: #d08770;">next</span><span style="color: #8c8c8c;">(</span>g<span style="color: #8c8c8c;">)</span>
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; StopIteration</span>
+</pre>
+</div>
+
+<p>
+生成器函数虽然是个函数，然而它的调用却生成了一个「生成器对象」，调用next方法时，生成器函数会向前执行yield语句并返回产出的值，如果超过范围，就会抛出StopIteration。行为和Iterator一毛一样，所以我们就可以用生成器（通过生成器函数调用产生）去替换迭代器了，不再需要迭代器的类，代码一下变得明快了很多。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MyIterable</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, n<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.n = n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__str__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">print</span> <span style="color: #b48ead;">self</span>.n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__iter__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#23454;&#29616;&#19968;&#20010;&#29983;&#25104;&#22120;</span>
+        <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">self</span>.gen_num<span style="color: #8c8c8c;">()</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">gen_num</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">for</span> i <span style="color: #b48ead;">in</span> <span style="color: #d08770;">range</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>.n, <span style="color: #d08770;">11</span>, <span style="color: #d08770;">2</span><span style="color: #8c8c8c;">)</span>:
+            <span style="color: #b48ead;">yield</span> i
+</pre>
+</div>
+
+<p>
+其实这样写更简约
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MyIterable</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, n<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.n = n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__str__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">print</span> <span style="color: #b48ead;">self</span>.n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__iter__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#23454;&#29616;&#19968;&#20010;&#29983;&#25104;&#22120;</span>
+        <span style="color: #b48ead;">for</span> i <span style="color: #b48ead;">in</span> <span style="color: #d08770;">range</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>.n, <span style="color: #d08770;">11</span>, <span style="color: #d08770;">2</span><span style="color: #8c8c8c;">)</span>:
+            <span style="color: #b48ead;">yield</span> i
+</pre>
+</div>
+
+<p>
+然而除了包含yield的生成器函数调用可以返回生成器对象之外，还有另一种方法可以返回生成器对象。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org349a9ec" class="outline-3">
+<h3 id="org349a9ec"><span class="section-number-3">2.2</span> 生成器表达式</h3>
+<div class="outline-text-3" id="text-2-2">
+<blockquote>
+<p>
+用()括起来的列表推导就是生成器表达式
+</p>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">gg</span> = <span style="color: #8c8c8c;">(</span>x <span style="color: #b48ead;">for</span> x <span style="color: #b48ead;">in</span> <span style="color: #a3be8c;">'shit'</span><span style="color: #8c8c8c;">)</span>
+gg
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; &lt;generator object gen_shit at 0x10f843550&gt;</span>
+</pre>
+</div>
+
+<p>
+和生成器函数不同的是，生成器表达式是「惰性」的，因为表达式本身并没有执行「调用」，所以下面不会运行shit方法中的任何代码，毕竟gg只是个「表达」式而已。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">gg</span> = <span style="color: #8c8c8c;">(</span>x <span style="color: #b48ead;">for</span> x <span style="color: #b48ead;">in</span> shit<span style="color: #93a8c6;">()</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+而生成器函数在产生生成器对象时就会立即执行了，原因其实很简单，生成「生成器对象」的，并不是生成器函数，而是生成器函数的调用。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MyIterable</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, n<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.n = n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__str__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">print</span> <span style="color: #b48ead;">self</span>.n
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__iter__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#23454;&#29616;&#19968;&#20010;&#29983;&#25104;&#22120;</span>
+        <span style="color: #b48ead;">return</span> <span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">for</span> i <span style="color: #b48ead;">in</span> <span style="color: #d08770;">range</span><span style="color: #93a8c6;">(</span><span style="color: #b48ead;">self</span>.n, <span style="color: #d08770;">11</span>, <span style="color: #d08770;">2</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+总结：可迭代对象的实现是因为_<sub>iter</sub>_<sub>可以返回一个迭代器或者生成器</sub>，迭代器和生成器具有相同的特性，都可以实现next(&#x2026;)方法。而迭代器需要定义一个类，实现_<sub>iter</sub>_<sub>(返回自身)</sub>和next，相对繁琐。生成器指的是生成器对象，可以通过生成器函数和生成器表达式产生，从而简化可迭代对象的实现。
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

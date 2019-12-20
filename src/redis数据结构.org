@@ -1,0 +1,346 @@
+下面为redis支持的数据结构：
+1. strings
+2. lists: strings元素的集合，顺序为插入的顺序
+3. sets: strings元素的集合，但唯一且没有顺序
+4. sorted sets: 可排序的sets，根据'score'排序
+5. hash: 和ruby的hash一样
+6. bit数组: 暂时不知道
+7. HyperLogLogs: ...
+
+** Redis Keys
+   
+   Redis Keys是binary safe的，所以可以使用任意二进制流，比如'foo'或者jpg图片，空字符串也是一种key。选择key需要注意以下几点：
+   1. 不要使用太长的key，因为会影响查询速度；占用更多内存空间。
+   2. 不要用太短的key，比如'user:1000:followers'非要写成'u:1000:flw'我的天，影响可读性。
+   3. key的名字尽量表示schema，比如'user:222'，多字符可以用'.'或者'-'来分割，比如'comment:123:reply-to'
+   #+BEGIN_QUOTE
+   和SQL数据库相比，NoSQL数据库感觉就是把SQL的table和column按照特定规则组合成string，放到NoSQL的key中
+   #+END_QUOTE
+   4. key size最大值为512MB
+   #+BEGIN_QUOTE
+   鬼能超过-_-
+   #+END_QUOTE
+   
+** Redis Strings
+
+   Redis Strings的类型和Memcached的完全一致（抢生意真开心）。可以用来缓存html页面啊什么的。
+   
+   #+BEGIN_SRC shell
+   > set mykey somevalue
+   OK
+   > get mykey
+   "somevalue"
+   #+END_SRC
+
+   通过set和get可以分别对一个key的value进行设置和读取。value的大小也不能超过512MB。set的时候有额外参数。
+   
+   #+BEGIN_SRC shell
+   > set mykey newval nx # 如果key已经存在则不set
+   (nil)
+   > set mykey newval xx # 只有key存在的时候才set
+   OK
+   #+END_SRC
+
+*** incr incrby decr decrby
+
+    #+BEGIN_SRC shell
+    > set counter 100
+    OK
+    > incr counter
+    (integer) 101
+    > incrby counter 20
+    (integer) 121
+    #+END_SRC
+   
+    当然还有decr和decrby。这两种命令是不会有竞争现象的，就是说如果两个client当前某个key的value都是10，然后同时incr，那么redis会等到两个incr操作都执行完成以后才返回值，也就是12。
+
+    mset, mget是multiple keys的操作，可以用来减少延迟。
+   
+    #+BEGIN_SRC shell
+    > mset a 10 b 20 c 30
+    Ok
+    > mget a b c # mget会返回一个array
+    "10"
+    "20"
+    "30"
+    #+END_SRC
+   
+*** exsits and del and type
+   
+    #+BEGIN_SRC shell
+    > set mykey hello
+    OK
+    > exsits mykey # 检查是否存在mykey
+    (integer) 1
+    > type mykey # 返回mykey value的类型
+    string
+    > del mykey # 删除mykey
+    (integer) 1
+    #+END_SRC
+    
+*** redis expires
+    
+    redis还有一个特性，就是可以设置数据的过期时间，时间一旦到达，则key会被自动删除。
+    1. 自动删除时redis会在硬盘上保存key的删除时间。
+    2. 过期时间默认单位是s
+
+    #+BEGIN_SRC shell
+    > set key somevalue
+    OK
+    > expire key 5
+    (integer) 1
+    > get key # 立刻
+    "somevalue"
+    > get key # 5s以后
+    (nil)
+    #+END_SRC
+
+    #+BEGIN_SRC shell
+    > set key 100 ex 10 # 可以在set的时候直接设置expire time
+    Ok
+    > ttl key # 查看total time left
+    (integer) 9
+    #+END_SRC
+    
+    还可以使用persist删除expire time的设置
+
+** Redis Lists
+   
+   Redis Lists是linked list，并不是Array，所以就算你的list有很多很多元素，增加元素时用的时间也是一样的。这是优点。缺点是，通过index所以list里的一个元素比在array里要慢不少。如果想要通过index快速获取某一个element，建议使用sorted list这种类型。
+
+*** lpush rpush
+    分别是在左边和在右边增加一个element
+
+    #+BEGIN_SRC shell
+    > rpush mylist A
+    (integer) 1
+    > lpush mylist B
+    (integer) 2
+    > lrange mylist 0 -1 # 从0到最后个元素，即所有元素
+    "B"
+    "A"
+    #+END_SRC
+
+*** lpop rpop
+    从左边或右边pop elements，例子就不举了
+
+*** use of lists
+    1. 记录最近一次的更新操作（数据的上一次变动可以放到list）
+    2. 用于构建一个生产者消费者队列（如ruby的sidekiq）
+
+    #+BEGIN_QUOTE
+    队列的实现可以用lpush rpop，但会出现rpop时list当中没有值的情况，这种情况应该多等一会再重试rpop，可以直接使用brpop，比如brpop mylist 5, 就是如果mylist可以rpop就rpop，如果mylist为空就等待5s之后再rpop
+    #+END_QUOTE
+
+*** ltrim
+    截取特定范围的lists，其余部分被remove
+    
+    #+BEGIN_SRC shell
+    > rpush mylist 1 2 3 4 5
+    (integer) 5
+    > ltrim mylist 0 2
+    OK
+    > lrange mylist 0 -1
+    "1"
+    "2"
+    "3"
+    #+END_SRC
+  
+*** keys的自动创建与删除
+    #+BEGIN_QUOTE
+    目前redis中的key都不是单独创建和删除的，而是我们直接使用set lpush等赋值命令时自动创建，然后在value为空的时候自动删除的
+    #+END_QUOTE
+
+** Redis Hashes
+
+   redis的hash就是我们熟悉的hash
+   
+   #+BEGIN_SRC shell
+   > hmset user:1000 username antirez birthyear 1977 verified 1
+   OK
+   > hget user:1000 username
+   "antirez"
+   > hget user:1000 birthyear
+   "1977"
+   > hgetall user:1000
+   "username"
+   "antirez"
+   "birthyear"
+   "1977"
+   "verified"
+   "1"
+   #+END_SRC
+   
+   hash的value没有明确的大小限制，hmset是给multiple fields赋值，hmget返回的是一个数组，此处不再举例
+   
+*** hincrby
+    
+    和incrby类似，不过是用在hash上的而已
+    
+    #+BEGIN_SRC shell
+    > hincrby user:1000 birthyear 10
+    (integer) 1987
+    > hincrby user:1000 birthyear 10
+    (integer) 1997
+    #+END_SRC
+    
+    #+BEGIN_QUOTE
+    hashes是通过一种特殊方式编码的，可以让内存读取更有效率
+    #+END_QUOTE
+
+** Redis Sets
+
+   Redis Sets是无序的字符串的集合
+   #+BEGIN_QUOTE
+   和list有什么区别？
+   #+END_QUOTE
+   
+   #+BEGIN_SRC shell
+   > sadd myset 1 2 3
+   (integer) 3
+   > smembers myset # set是没有任何order的
+   1. 3
+   2. 1
+   3. 2
+   #+END_SRC
+   
+   可以通过sismember来确定set里面有没有特定元素
+
+   #+BEGIN_SRC shell
+   > sismember myset 3
+   (integer) 1
+   > sismember myset 20
+   (integer) 0
+   #+END_SRC
+   
+   sets可以用来表示model之间的relation
+
+   #+BEGIN_SRC shell
+   > sadd news:1000:tags 1 2 5 77
+   (integer) 4
+   #+END_SRC
+
+   总之set有很多配套的方法，包括scard 可以返回set里面元素的个数，srandmember可以随机化所有的elements等
+
+** Redis Sorted Sets
+   
+   Sorted Sets某种意义上就是sets，但它也可以说是sets和hash的混合体，所有的element都被绑定了一个point value，叫做score（所以说像hash），elements是经过排序的，排序的规则如下：
+   1. 如果A.score > B.score，则A > B
+   2. 如果A.score = B.score，但A的字母顺序比B大，则A > B
+   3. 总之A和B不可能相同，因为sorted sets的element都是唯一的
+
+   #+BEGIN_SRC shell
+   > zadd hackers 1940 "Alan Kay"
+   (integer) 1
+   > zadd hackers 1957 "Sophie Wilson"
+   (integer) 1
+   > zadd hackers 1953 "Richard Stallman"
+   (integer) 1
+   > zadd hackers 1949 "Anita Borg"
+   (integer) 1
+   > zadd hackers 1965 "Yukihiro Matsumoto"
+   (integer) 1
+   > zadd hackers 1914 "Hedy Lamarr"
+   (integer) 1
+   > zadd hackers 1916 "Claude Shannon"
+   (integer) 1
+   > zadd hackers 1969 "Linus Torvalds"
+   (integer) 1
+   > zadd hackers 1912 "Alan Turing"
+   (integer) 1
+   #+END_SRC
+
+   zadd比sadd多了一个score参数
+   
+   #+BEGIN_SRC shell
+   > zrange hackers 0 -1
+   1) "Alan Turing"
+   2) "Hedy Lamarr"
+   3) "Claude Shannon"
+   4) "Alan Kay"
+   5) "Anita Borg"
+   6) "Richard Stallman"
+   7) "Sophie Wilson"
+   8) "Yukihiro Matsumoto"
+   9) "Linus Torvalds"
+   #+END_SRC
+   
+   排序是按照score来的
+
+*** operating on ranges
+    sorted sets强大的地方是可以根据score的range进行操作，比如找到1950年之后出生的人
+
+    #+BEGIN_SRC shell
+    > zrangebyscore hackers -inf 1950
+    1) "Alan Turing"
+    2) "Hedy Lamarr"
+    3) "Claude Shannon"
+    4) "Alan Kay"
+    5) "Anita Borg"
+    #+END_SRC
+
+    或者是remove 1940到1960之间出生的人
+    #+BEGIN_SRC shell
+    > zremrangebyscore hackers 1940 1960
+    (integer) 4 
+    #+END_SRC
+
+    从这个角度看，sorted sets真的就是一个hash，只不过hash的key是数字，且集成了一些固有的好用的方法
+
+    还有一个zrank可以返回value对应的位置
+
+    #+BEGIN_SRC shell
+    > zrank hackers "Anita Borg"
+    (integer) 4
+    #+END_SRC
+
+    sorted sets还可以通过首字母的顺序进行一些操作，这里不再赘述，可以查看相关资料。
+
+    #+BEGIN_QUOTE
+    sorted sets的一大优势：zadd只是O(log(N))的时间复杂度，所以如果有大量的updates，可以使用sorted sets
+    #+END_QUOTE
+    
+** Bitmaps
+   
+   bitmaps并不是一种单独的数据类型，而是基于string类型的，因为string类型的最大空间是512MB，所以可以设置最多2^32不同的bits
+
+   #+BEGIN_QUOTE
+   bitmaps的最大优点就是节约空间
+   #+END_QUOTE
+
+   #+BEGIN_SRC shell
+   > setbit key 10 1 # 10是bit number，1是bit value
+   (integer) 1
+   > getbit key 10
+   (integer) 1
+   #+END_SRC
+   
+   #+BEGIN_QUOTE
+   bitmaps一般用来储存boolean的字段
+   #+END_QUOTE
+
+** HyperlogLogs
+   
+   hll数据类型主要是用于计算唯一元素的数量。一般计算唯一元素数量要占用很大的内存，内存的使用和items的数量相关，但hll使用了独特的算法，使得内存的占用数量一定
+
+   #+BEGIN_SRC shell
+   > pfadd hll a b c
+   (integer) 1
+   > pfcount hll
+   (integer) 4
+   #+END_SRC
+   
+   pfadd实际并没有把items加入hll，hll数据类型只是包含了一种状态而非真正的元素
+
+   #+BEGIN_QUOTE
+   应该只有在数据量相当大的时候才会用到这个吧
+   #+END_QUOTE
+   
+** 总结使用场景
+   1. string 保存一个简单的值
+   2. list 生产者消费者队列，或保存更新的log
+   3. hash 保存对象类似的结构
+   4. sets 保存model之间的relation关系
+   5. sorted sets 大量的updates，或者根据score的元素操作
+   6. bitmaps boolean类型，节省内存空间的需求
+   7. hyperloglogs 大量数据计算总个数，对内存占用有很高要求

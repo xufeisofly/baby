@@ -1,0 +1,133 @@
+[[http://niltouch-1256880307.file.myqcloud.com/37/37-1.jpg]]
+
+#+BEGIN_QUOTE
+参考《流畅的python》第10章
+#+END_QUOTE
+
+** 什么是可切片的序列
+
+   Python中，像list, tuple, set等都是序列，因为他们都有序列的属性（或满足序列的协议），因此可以实现下面的代码操作
+
+   #+BEGIN_SRC python
+   a = range(10)
+   a[1]
+   # => 1
+   a[2]
+   # => 2
+   #+END_SRC
+
+   并且支持切片
+   
+   #+BEGIN_SRC python
+   a = tuple(range(10))
+
+   a[0:2]
+   # => (1, 2)
+   a[0:5:2]
+   # => (1,3,5)
+   #+END_SRC
+
+** 协议和鸭子类型
+   
+   在Ruby和Python中，如果想实现一个功能完善的序列类型，不需要使用继承，只需要实现「符合序列的协议」。这里序列的协议定义为length和[]。
+   对Python来说，序列协议就是__len__和__getitem__
+
+   #+BEGIN_SRC python
+   class Vector(object):
+       def __init__(self, items):
+           self._items = items
+
+       def __len__(self):
+           return len(self._items)
+
+       def __getitem__(self, position):
+           return self._items[position]
+
+
+   v = Vector([1, 2])
+   v[0]
+   # => 1
+   len(v)
+   # => 2
+   #+END_SRC
+
+   Ruby的实现也是神。
+   
+   #+BEGIN_SRC ruby
+   class Vector
+     attr_reader :items
+
+     def initialize(items)
+       @items = items
+     end
+
+     def length
+       items.length
+     end
+
+     def [](position)
+       items[position]
+     end
+   end
+
+   v = Vector.new([1, 2])
+   v[0]
+   # => 1
+   v.length
+   # => 2
+   #+END_SRC
+
+   协议是一种类似接口的东西（书中称为「非正式接口」），通过几个接口实现需要模拟类型的部分特性，这也叫做Duck Typing
+
+** Python切片原理
+   
+   先看一下a[1:4]这种操作的参数到底是什么。
+
+   #+BEGIN_SRC python
+   class Vector(object):
+       def __getitem__(arg):
+           return arg
+
+   v = Vector()
+   v[1:4]
+   # => slice(1, 4, None)
+   v[1:4:2]
+   # => slice(1, 4, 2)
+   #+END_SRC
+
+   这下好了，居然冒出个slice类，也就是说这两个是一回事
+   
+   #+BEGIN_SRC python
+   v[1:4] == v.__getitem__(slice(1, 4, None))
+   #+END_SRC
+
+   当然了我们只需要知道参数是个slice对象，具体对slice参数的处理方法不再深究。
+
+** 自己实现一个的可切片的Vector类
+   
+   所以我们只需要在__getitem__中对int参数和slice对象参数分别处理就好了。
+
+   #+BEGIN_SRC python
+   class Vector(object):
+       def __init__(self, items):
+           self._items = items
+
+       def __getitem__(self, index):
+           cls = type(self)
+           if isinstance(index, slice):
+               return cls(self._items[index])
+           elif isinstance(index, int):
+               return self._items[index]
+           else:
+               raise TypeError
+
+   v = Vector([1, 2, 3, 4])
+   v[1:2]
+   # => Vector([2,3])
+   #+END_SRC
+
+
+# For prev/next links
+#+BEGIN_SRC emacs-lisp :exports results :results raw
+(gen-prev-next)
+#+END_SRC

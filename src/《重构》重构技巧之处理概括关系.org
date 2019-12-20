@@ -1,0 +1,74 @@
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+#+BEGIN_QUOTE
+这一章就是讲一些方法或字段在子类和超类中的重构，比如子类中相同的方法可以放在超类中，本质上还是为了避免重复
+#+END_QUOTE
+
+** Form Template Method
+   #+BEGIN_QUOTE
+   塑造模板函数
+   当两个类中有类似的函数，哪怕不完全一样，可以通过塑造模板函数的方式提炼到超类，避免重复
+   #+END_QUOTE
+   #+BEGIN_SRC ruby
+   class TextStatement
+     def value(name)
+       result = 'hi'
+       result += "#{name} \n"
+     end
+   end
+
+   class HtmlStatement
+     def value(name)
+       result = '<p>hi</p>'
+       result += "<h1>#{name}</h1><br \>"
+     end
+   end
+   #+END_SRC
+   这只是一个极端例子，两个方法中很多重复的时候，虽然不完全一样，也需要尽量避免重复
+   可以提炼出一个超类，构造一个“模板方法”，将两个子类方法中相同的地方（即模板）放到超类中
+
+   #+BEGIN_SRC ruby
+   class Statement
+     def value(name)
+       result = greeting_string
+       result += name_string
+     end
+
+     private
+     
+     def greeting_string; end
+     def name_string; end
+   end
+
+   class TextStatement < Statement
+     private
+
+     def greeting_string
+       'hi'
+     end
+
+     def name_string
+       "#{name} \n"
+     end
+   end
+
+   class HtmlStatement < Statement
+     private
+
+     def greeting_string
+       '<p>hi</p>'
+     end
+
+     def name_string
+       "<h1>#{name}</h1><br \>"
+     end
+   end
+   #+END_SRC
+   
+** Replace Inheritance with Delegation
+   #+BEGIN_QUOTE
+   用委托取代继承
+   #+END_QUOTE
+   什么时候用委托取代继承：
+   1. 本来就不是继承关系，概念上就不对，不能为了用一个相同的name方法，就让deal继承product对吧
+   2. 只是用了另一个类里的少数方法，大多数方法都没用，这时候就可以用delegation
+

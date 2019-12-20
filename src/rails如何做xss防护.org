@@ -1,0 +1,213 @@
+xss攻击是一种十分常见的web攻击形式，它是通过在客户端注入script代码，当用户浏览页面时触发的。xss攻击一般用来获取用户的session, cookie，从而绕过登陆验证等。xss的本质并不在于html，而是在于控制浏览器生成的非法dom，所以并不在于server端，也不要通过过滤html标签的方式去预防xss。
+
+Rails自带xss防护，它会将所有的html escape掉，html需要手动标记才能正常显示。这个特性简直是爽到爆，然而只是对于全栈使用Rails的情况才能发挥功能，对于前后端分离的情况，需要探索其他方案。
+
+** 什么是HTML Escaping
+
+   对于脚本编程语言，经常会从代码中转移出一些特殊的数据。比如我们可能通过<>判断HTML，然而问题是，有的正常数据当中可能也包含这些tags。
+
+   Rails使用ERB:Util#html_escape方法来回避真正的HTML标签，这个方法可以对HTML标签进行转换。
+
+   #+BEGIN_SRC ruby
+   { '&' => '&amp;', '>' => '&gt;', '<' => '&lt;', '"' => '&quot;', "'" => '&#39;' }
+   #+END_SRC
+
+   Rails默认对HTML进行escape，从而防止带有xss攻击行为的非法dom生成，比如
+
+   #+BEGIN_SRC ruby
+   params[:name] = '<script>alert(1)</script>'
+   <b>Hello <%= params[:name] %></b>
+   #+END_SRC
+
+   Rails默认输出为
+
+   #+BEGIN_SRC ruby
+   <b> Hello &lt;script&gt;alert(1)&lt;/script&gt;gt; </b>
+   #+END_SRC
+
+
+** html_safe
+
+   如果想要正常输出html，就需要认为标记html_safe
+
+   #+BEGIN_SRC ruby
+   <b>Hello <%=params[:name].html_safe%></b>
+   #+END_SRC
+   
+   当string标记为html_safe时，会创建一个ActiveSupport::SafeBuffer类的对象，所有的字符串在进入SafeBuffer前都会被Rails编码以保证安全
+
+** 从Rails传递给HTML
+   
+*** HTML elements
+    Rails会自动编码，所以必须要标记html_safe，刚才已经说了
+
+*** Attributes or Tag Names
+    无论编码与否，attributes和tag names不允许被外部数据创建，因为这是数据html本身的一部分，如果不这样做就相当于给了外部写html的权限
+
+*** Attribute Values
+    比如src href style等，这些attributes的值不允许直接从数据中传入，rails编码后可以直接传入
+    #+BEGIN_SRC ruby
+    <b name="<%= params[:name] %>""></b>
+    #+END_SRC
+
+** 从Rails传递给JavaScript
+   
+*** 原则
+    
+    #+BEGIN_QUOTE
+    1. 传递给javascript的内容有可能是string, email, integer等等
+    2. javascript可以被当成是html的一个sub text，所以我们需要同时考虑javascript和html的注入问题
+    3. 不能有数据执行eval或其他这种类型的function，因为这种函数是直接执行传来的string，挡不住的，相关的方法有：
+       eval, setInterval, setTimeOut, execScript, write, writeLn, body.innerHtml
+    #+END_QUOTE
+
+**** 传递numbers to JavaScript
+     javascript不像html，有明显的html标签可以encode，下面的例子是个标准的注入
+
+     #+BEGIN_QUOTE
+     javascript注入貌似只存在于全栈框架，前后端分离要怎么注入javascript呢?
+     #+END_QUOTE
+     
+     #+BEGIN_SRC ruby
+     <script>current_user_id = <%= params[:id] %></script>
+     #+END_SRC
+     
+     如果参数为?id=alert(document.cookie)，那么输出就会是
+
+     #+BEGIN_SRC ruby
+     <script>current_user_id = alert(document.cookie)</script>
+     #+END_SRC
+
+     只有一种方法可以防止这种漏洞，就是确保传入的参数是个integer
+
+     #+BEGIN_SRC ruby
+     <script>current_user_id = <%= params[:id].to_i %></script>
+     #+END_SRC
+     
+     如果他是个字符串那么就会变成0
+
+**** 传递text to JavaScript
+     javascript是一种很有意思的语言，包含了大量的特殊的字符，显然这些字符全都escape掉不切实际。Rails采用的办法是。escape掉html字符，然后用单引号包裹起来。
+     
+     #+BEGIN_SRC ruby
+     <script>current_user_id = '<%=param[:id] %>' </script>
+     #+END_SRC
+     
+     如果传入?id='\+alert(1)\+'，就会变成
+     
+     #+BEGIN_SRC ruby
+     <script>current_user_id = '&#39;+alert(1)+&#39;'</script>
+     #+END_SRC
+
+     如果传入'?id="><script>alert(1)</script>'
+     
+     #+BEGIN_SRC ruby
+     <script>current_user_id = '&quot;/&gt;&lt;script&gt;alert(1)&lt;/script&gt;'</script>
+     #+END_SRC
+
+     #+BEGIN_QUOTE
+     也就是说，单引号将代码变成字符串无法执行，html_escape防止参数逃脱单引号
+     #+END_QUOTE
+
+*** 
+
+** 传递Json to HTML/JavaScript
+
+*** Json Escaping
+    Rails通过ERB::Util#json_escape编码json的特殊字符
+
+    #+BEGIN_SRC ruby
+    { '&' => '\u0026', '>' => '\u003e', '<' => '\u003c', "\u2028" => '\u2028', "\u2029" => '\u2029' }
+    #+END_SRC
+
+    #+BEGIN_SRC ruby
+    <%= json_escape (User.last.to_json) %>
+    #+END_SRC
+
+    #+BEGIN_SRC ruby
+    {"id":1,"name":"\u003cgreat\u003e","created_at":"2016-02-24T13:14:05.049Z","updated_at":"2016-02-24T13:14:05.049Z"}
+    #+END_SRC
+   
+*** Json to HTML    
+**** to HTML elements
+
+    #+BEGIN_SRC ruby
+    <b>Here is some json data:
+    <%={:name => "jack", :id => params[:id]}.to_json%>
+    </b>
+    #+END_SRC
+
+    只要是通过Rails的合理的方式创建的Json，比如Hash#to_json，上面说的字符都会自动编码，从而防止xss，'?id=<script>alert(1)</script>'就会变成
+    
+    #+BEGIN_SRC ruby
+    <b>Here is some json data: {&quot;name&quot;:&quot;jack&quot;,&quot;id&quot;:&quot;\u003cscript\u003ealert(1)\u003c/script\u003e&quot;}</b>
+    #+END_SRC
+
+**** to HTML attributes
+     json string同样也会被html_escape编码
+     
+     #+BEGIN_SRC ruby
+     <b user-info="<%={:name => "jack", :id => params[:id]}.to_json%>"</b>
+     #+END_SRC
+     
+     参数是?id=" onmouseover=alert(1)时，输出为
+     
+     #+BEGIN_SRC ruby
+     <b user-info="{&quot;name&quot;:&quot;jack&quot;,&quot;id&quot;:&quot;\&quot; onmouseover=alert(1)&quot;}"</b>
+     #+END_SRC
+     
+    
+**** 为什么要用to_json
+     如果不是用合理的方式构建json，那么json_escape没有用
+     
+     #+BEGIN_SRC ruby
+     @json_crafted = '{"name":"jack","id":”'+ params[:id] +'”}'
+
+     <script>user=<%= json_escape(@json_crafted.html_safe) %></script>
+     #+END_SRC
+     传入?id="+alert(1)+"，则不会编码
+     
+     #+BEGIN_SRC ruby
+     <script>user={"name":"jack","id":""+alert(1)+""}</script>
+     #+END_SRC
+     这种情况注入的javascript就会执行（因为双引号也被绕过了）
+     
+** 一些不安全的helpers
+*** link_to
+    link_to 是一个生成<a> dom的rails方法
+
+    #+BEGIN_SRC ruby
+    link_to "Visit Other Site", "http://www.rubyonrails.org/"
+
+    # => <a href="http://www.rubyonrails.org/" >Visit Other Site</a>
+    #+END_SRC
+
+    这个方法对于硬编码来说还是安全的，但对于参数输入就会有xss漏洞
+    
+    #+BEGIN_SRC ruby
+    link_to "Great link", params[:link]
+
+    <a href="javascript:alert(document.domain)">Great link</a>
+    #+END_SRC
+
+    解决方法也很简单，只要保证参数一定是个http或者https打头的就行了
+    #+BEGIN_QUOTE
+    不太行吧，为什么非要http打头，而且http="alert(1)"呢
+    #+END_QUOTE
+    可以使用URI.parse方法，具体范例如下
+    
+    #+BEGIN_SRC ruby
+    $ bundle exec rails c
+
+    Running via Spring preloader in process 39287
+
+    Loading development environment (Rails 4.2.5.1)
+
+    2.1.1 :001 > URI.parse("javascript:alert(1)")
+
+    => #<URI::Generic:0x00000101bf1970 URL:javascript:alert(1)>
+
+    2.1.1 :002 > URI.parse("javascript:alert(1)").scheme
+
+    => "javascript"
+    #+END_SRC

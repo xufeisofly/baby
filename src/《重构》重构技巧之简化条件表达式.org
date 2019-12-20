@@ -1,0 +1,76 @@
+** Decompose Conditional
+   #+BEGIN_QUOTE
+   分解条件表达式
+   #+END_QUOTE
+   #+BEGIN_SRC ruby
+   if date.before(START_DATE) || date.after(END_DATE) then
+     do_something
+   end
+   #+END_SRC
+   将条件中的表达式提取出来，可以大大降低复杂程度
+   #+BEGIN_SRC ruby
+   def not_proper_time
+     date.before(START_DATE) || date.after(END_DATE)
+   end
+   #+END_SRC
+   #+BEGIN_EXAMPLE
+   有时候尽管条件代码很短，但代码意图和代码自身之间往往存在着不小的差距
+   #+END_EXAMPLE
+   
+** Consolidate Conditional Expression
+   #+BEGIN_QUOTE
+   合并条件表达式
+   当几种条件执行的行为都一样，则可以合并成一种条件
+   #+END_QUOTE
+
+** Introduce Null Object
+   #+BEGIN_QUOTE
+   引入Null对象，可以删除条件语句
+   #+END_QUOTE
+   只有大多数代码都要求空对象做出相同响应的时，使用Null对象才有意义
+   比如
+   #+BEGIN_SRC ruby
+   if deal.customer.blank? then
+     customer_name = 'occupant'
+   else
+     customer_name = customer.name
+   end
+   #+END_SRC
+   就可以单独建一个Null类
+   #+BEGIN_SRC ruby
+   class Customer::Null
+     def name
+       'occupant'
+     end
+   end
+
+   class Customer::Normal
+     def name
+       super
+     end
+   end
+   
+   class Deal
+     def customer
+       super.blank ? Customer::Null.new : Customer::Normal.new
+     end
+   end
+   #+END_SRC
+   这样就可以去掉条件语句，变成
+   #+BEGIN_SRC ruby
+   customer_name = customer.name
+   #+END_SRC
+   #+BEGIN_EXAMPLE
+   这么做有两个前提，
+   一个是有很多地方用到了对customer是否为空的判断，
+   另一个是null类型的customer和正常的customer大部分行为保持一致
+   #+END_EXAMPLE
+
+** Introduce Assertion
+   #+BEGIN_QUOTE
+   引入断言
+   #+END_QUOTE
+   这个ruby貌似没有必要
+   什么是断言，就是断言某个条件一定成立，否则抛出异常，没有必要用它，因为：
+   1. 可以使用测试代码，健壮程序，使这种可能不会发生
+   2. raise ERROR if xxx 就是这个意思啊

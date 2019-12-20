@@ -1,0 +1,62 @@
+** non-data和data descriptors
+#+BEGIN_SRC python
+class property2(object):
+
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, ins, owner):
+        return self.fget(ins)
+
+    def __set__(self, ins, value):
+        self.ins = value
+
+class K(object):
+
+    def value(self):
+        return 'shiiiiit'
+
+    value = property2(value)
+#+END_SRC
+
+#+BEGIN_SRC python
+class property2(object):
+
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, ins, owner):
+        return self.fget(ins)
+
+class K(object):
+
+    def value(self):
+        return 'shiiiiit'
+
+    value = property2(value)
+#+END_SRC
+
+
+** cached_property
+
+#+BEGIN_SRC python
+class cached_property(object):
+    """Copied from Django.
+    Decorator that converts a method with a single self argument into a
+    property cached on the instance.
+    Optional ``name`` argument allows you to make cached properties of other
+    methods. (e.g.  url = cached_property(get_absolute_url, name='url') )
+    """
+
+    def __init__(self, func, name=None):
+        self.func = func
+        self.__doc__ = getattr(func, '__doc__')
+        self.name = name or func.__name__
+
+    def __get__(self, instance, type=None):
+        if instance is None:
+            return self
+        res = instance.__dict__[self.name] = self.func(instance)
+        return res
+   
+#+END_SRC

@@ -1,0 +1,146 @@
+#+BEGIN_QUOTE
+第二部分将介绍进程的衍生(fork)，进程等待，以及僵尸进程的产生和规避
+#+END_QUOTE
+
+** 进程皆可衍生
+
+   进程衍生采用的方法是fork，它会产生一个和原始进程一模一样的新进程。fork出来的进程是原进程的子进程。fork产生的子进程的一些特性如下：
+   - 拥有全新的pid，ppid为被fork的进程
+   - fork出的子进程和父进程共享所有的文件描述符，两个进程可以共享打开的资源（如文件，socket）
+   - 子进程继承父进程内存中的所有内容，自己拥有一套内存副本，随意更改不会影响父进程
+
+   #+BEGIN_SRC ruby
+   if fork
+     puts "for parent"
+   else
+     puts "for child"
+   end
+   #+END_SRC
+
+   输出为
+   
+   #+BEGIN_SRC ruby
+   for child
+   for parent
+   #+END_SRC
+   
+   if 和 else的代码都得到了执行，因为fork的调用实际会返回两次，父进程返回一次，子进程返回一次，而父进程因为确实被fork了，所以进入if，子进程的fork却返回nil，因此进入else，下面的例子可以看出这点
+
+   #+BEGIN_SRC ruby
+   puts fork
+   
+   #=>
+   21423
+   nil
+   #+END_SRC
+
+   fork的好处：可以衍生出多个进程，有可能分配到多个CPU中，从而实现多核并发。
+   fork的坏处：内存完全备份，因此内存的占用也是成倍增加
+
+   ruby中可以给fork方法传递block
+
+   #+BEGIN_SRC ruby
+   fork do
+     # 子进程执行
+   end
+   
+   # 父进程执行
+   #+END_SRC
+
+** 孤儿进程
+
+   之所以叫孤儿进程，是因为
+
+   #+BEGIN_QUOTE
+   The Parent is dead...
+   #+END_QUOTE
+
+   而父进程结束并不会对子进程造成任何影响，它还是开心的或者，比如你可以irb中试试，会发现irb关了，但是terminal会继续输出"I'm an orphan!"，很诡异。
+
+   #+BEGIN_SRC ruby
+   fork do
+     5.times do
+       sleep 1
+       puts "I'm an orphan!"
+     end
+   end
+
+   abort "Sorry puppy, dad is gone..."
+   #+END_SRC
+
+** 避免孤儿进程
+
+   避免的方式可以想见，就是父进程结束之前查询并等待所有子进程结束之后自己再结束。方法是Process.wait
+   
+   #+BEGIN_SRC ruby
+   fork do 
+     5.times do
+       sleep 1
+       puts "I am an orphan!"
+     end
+   end
+
+   Process.wait
+   abort "Parent process died..."
+   #+END_SRC
+
+   还有个方法是Process.wait2，会返回pid，status两个值，这样我们就能知道子进程退出时的状态了。这也是进程之间通信的一种方式。
+
+   #+BEGIN_SRC ruby
+   5.times do 
+     fork do
+       if rand(5).even?
+         exit 111
+       else
+         exit 112
+       end
+     end
+   end
+
+   5.times do 
+     pid, status = Process.wait2
+
+     if status.exitstatus == 111
+       puts "#{pid} encountered an even number"
+     else
+       puts "#{pid} encountered an odd number"
+     end
+   end
+   #+END_SRC
+
+   同时还有Process.waitpid和Process.waitpid2，和wait的区别在于不是等待任意的子进程，而是可以指定pid
+
+   #+BEGIN_QUOTE
+   注意，如果不存在子进程，那么Process.wait会抛出Errno::ECHILD异常。
+   #+END_QUOTE
+
+*** 竞争条件
+
+    思考，如果Process.wait执行之前子进程就中止了怎么办
+    
+    #+BEGIN_SRC ruby
+    2.times do 
+      fork do
+        abort
+      end
+    end
+
+    Process.wait
+    sleep 5
+
+    Process.wait
+    #+END_SRC
+    
+    结果是一切正常，第二个Process.wait也没有报错，原因是子进程退出时的状态会加入队列，父进程可以从队列中提取子进程的信息。但这里有个问题，如果子进程退出很久之后父进程才Process.wait，那么子进程的状态会一直被内核保留，是在浪费内核资源，这就是僵尸进程。
+
+** 僵尸进程
+
+   僵尸进程生成的原因就是：子进程结束了，却不去读取子进程状态。（死不瞑目，没良心的）
+
+   可以使用Process.detach(pid)，它的作用是生成一个专门用来等待子进程退出的新进程。
+
+   #+BEGIN_QUOTE
+   任何已经结束的进程，如果它的状态一直未被读取，那么它就是一个僵尸进程。
+   #+END_QUOTE
+
+   

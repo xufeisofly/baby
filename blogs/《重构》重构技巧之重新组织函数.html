@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgab6fd22">1. 1. Replace Temp with Query</a>
+<ul>
+<li><a href="#orgf499350">1.1. 它们只在函数里使用，因此会驱使你写出更长的函数</a></li>
+<li><a href="#org77f7448">1.2. 局部变量会增大Extract Method的难度</a></li>
+<li><a href="#org0306cd3">1.3. 所谓的性能问题可以先不去管它，等真的出现性能问题再去优化</a></li>
+</ul>
+</li>
+<li><a href="#org5e68488">2. Split Temporary Variable</a></li>
+<li><a href="#org792ba57">3. Remove Assignments to Parameters</a></li>
+<li><a href="#org8d9dc12">4. Replace Method with Method Object</a></li>
+<li><a href="#org27f5bb0">5. </a></li>
+</ul>
+</div>
+</div>
+<blockquote>
+<p>
+只摘出来一些不看书不容易知道的重构方法，像Extract Method那些就不说了
+</p>
+</blockquote>
+
+<div id="outline-container-orgab6fd22" class="outline-2">
+<h2 id="orgab6fd22"><span class="section-number-2">1</span> 1. Replace Temp with Query</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+将临时变量的表达式提取到一个方法中，从而去掉临时变量。
+临时变量的用处主要是对一些复杂的表达式做解释，但一般还是建议将表达式Extract Method出来, 只有当 <br />
+表达式是拥有大量局部变量的算法时，Extract Method很难，才使用临时变量表示表达式
+临时变量的问题：
+</p>
+</div>
+<div id="outline-container-orgf499350" class="outline-3">
+<h3 id="orgf499350"><span class="section-number-3">1.1</span> 它们只在函数里使用，因此会驱使你写出更长的函数</h3>
+</div>
+<div id="outline-container-org77f7448" class="outline-3">
+<h3 id="org77f7448"><span class="section-number-3">1.2</span> 局部变量会增大Extract Method的难度</h3>
+</div>
+<div id="outline-container-org0306cd3" class="outline-3">
+<h3 id="org0306cd3"><span class="section-number-3">1.3</span> 所谓的性能问题可以先不去管它，等真的出现性能问题再去优化</h3>
+</div>
+</div>
+
+<div id="outline-container-org5e68488" class="outline-2">
+<h2 id="org5e68488"><span class="section-number-2">2</span> Split Temporary Variable</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+<p>
+分解临时变量
+</p>
+</blockquote>
+<p>
+只有当使用“循环变量”，如for循环，或者结果收集变量，如某个数组用于收集结果时，才可以将一个临时变量赋值多次
+</p>
+</div>
+</div>
+
+<div id="outline-container-org792ba57" class="outline-2">
+<h2 id="org792ba57"><span class="section-number-2">3</span> Remove Assignments to Parameters</h2>
+<div class="outline-text-2" id="text-3">
+<blockquote>
+<p>
+不要对参数赋值，因为降低了代码清晰度，混用了按值传递和按引用传递两种参数传递方式
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span><span style="color: #8c8c8c;">(</span>input<span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">if</span> a_condition
+    input = <span style="color: #d08770;">1</span>
+  <span style="color: #b48ead;">else</span>
+    input = <span style="color: #d08770;">2</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+应当给设置一个临时变量，比如result，给这个变量赋值
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8d9dc12" class="outline-2">
+<h2 id="org8d9dc12"><span class="section-number-2">4</span> Replace Method with Method Object</h2>
+<div class="outline-text-2" id="text-4">
+<blockquote>
+<p>
+用函数对象取代函数
+本质上是：当临时变量过多，无法使用Extract Method的时候，可以新建一个类，把临时变量变成另一个类的全局变量
+</p>
+</blockquote>
+<p>
+范例：只是一个简单的例子
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">A</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span><span style="color: #8c8c8c;">(</span>arg1, arg2<span style="color: #8c8c8c;">)</span>
+    temp1 = arg1 - arg2 + a_method
+    temp2 = temp1 * <span style="color: #d08770;">2</span> + arg1
+    temp1 + temp2
+  <span style="color: #b48ead;">end</span> 
+
+  <span style="color: #d08770;">private</span> 
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">a_method</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+这只是一个简单情况，但我想Extract Method还是有些困难，因为临时变量较多，所以可以创建一个Temp的类，然后这些局部变量都会变成这个类的实例变量
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Temp</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>a_instance, arg1, arg2<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@a_instance</span> = a_instance
+    <span style="color: #bf616a;">@arg1</span> = arg1
+    <span style="color: #bf616a;">@arg2</span> = arg2
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">compute</span>
+    <span style="color: #bf616a;">@temp1</span> = <span style="color: #bf616a;">@arg1</span> - <span style="color: #bf616a;">@arg2</span> + <span style="color: #bf616a;">@a_instance</span>.a_method
+    <span style="color: #bf616a;">@temp2</span> = <span style="color: #bf616a;">@temp1</span> * <span style="color: #d08770;">2</span> + <span style="color: #bf616a;">@arg1</span>
+    <span style="color: #bf616a;">@temp1</span> + <span style="color: #bf616a;">@temp2</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">A</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span><span style="color: #8c8c8c;">(</span>arg1, arg2<span style="color: #8c8c8c;">)</span>
+    <span style="color: #c0c5ce;">Temp</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, arg1, arg2<span style="color: #8c8c8c;">)</span>.compute
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+现在Temp类中之前的临时变量都变成全局变量了，就可以使用Extract Method
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Temp</span>
+  <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">...</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">compute</span>
+    temp1_method + temp2_method
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #d08770;">private</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">temp1_method</span>
+    <span style="color: #bf616a;">@temp1</span> = <span style="color: #bf616a;">@arg1</span> - <span style="color: #bf616a;">@arg2</span> + <span style="color: #bf616a;">@a_instance</span>.a_method
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">temp2_method</span>
+    <span style="color: #bf616a;">@temp1</span> * <span style="color: #d08770;">2</span> + <span style="color: #bf616a;">@arg1</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+大概就是这个意思
+</p>
+</div>
+</div>
+
+<div id="outline-container-org27f5bb0" class="outline-2">
+<h2 id="org27f5bb0"><span class="section-number-2">5</span> </h2>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

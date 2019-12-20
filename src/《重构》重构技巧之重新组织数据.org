@@ -1,0 +1,104 @@
+** Self Encapsulate Field
+   #+BEGIN_QUOTE
+   自封装字段
+   就是把某个类中的字段通过方法去取得，这样的好处是在子类中就可以任意复写超类中的这个字段，而不会去改变超累中的值
+   #+END_QUOTE
+   #+BEGIN_QUOTE
+   感觉用的不多啊，除非子类和超类这两个字段定义确实不一样
+   #+END_QUOTE
+
+** Change Value to Reference
+   #+BEGIN_QUOTE
+   将值对象改为引用对象
+   特么什么意思
+   #+END_QUOTE
+   #+BEGIN_SRC ruby
+   class Customer
+     def initialize(name)
+       @name = name
+     end
+
+     def name
+       @name
+     end
+   end
+
+   class Order
+     def initialize(customer_name)
+       @customer = Customer.new customer_name
+     end
+
+     def customer
+       @customer
+     end
+   end
+   #+END_SRC
+   目前为止，一个order对应一个customer, 哪怕customer的name是一样的，对于不同的order来说，也是一个order对应一个customer实例。
+   但我现在想让name一样的customer就是一个对象，怎么办，我就不能传值对象到order，而应该传引用对象到order
+   #+BEGIN_SRC ruby
+   class Customer
+     @@customer_hash = Hash.new
+
+     def initialize(name)
+       @name = name
+     end
+
+     def self.create(name)
+       @@customer_hash[name] ||= self.new(name)
+     end
+
+     def name
+       @name
+     end
+   end
+
+   class Order
+     def initialize(customer_name)
+       @customer = Customer.create(customer_name)
+     end
+
+     def customer
+       @customer
+     end
+   end
+   #+END_SRC
+   将新建的customer对象存在一个类变量里，每次创建order对象的时候，都先看看有没有现成的customer对象
+   #+BEGIN_QUOTE
+   一般谁会这么用啊，rails都是存在数据库里的，可以使用find_or_create_by哈哈
+   #+END_QUOTE
+
+** Replace Array with Object
+   #+BEGIN_QUOTE
+   用对象取代数组（或者哈希）
+   数组应该只用于容纳相似的对象，对于不同的对象，应该放到Hash里面或者自定义的一个类里面
+   可以定义一个类存放，但在ruby里面，可以用Struct.new定义一个类
+   #+END_QUOTE
+   #+BEGIN_SRC ruby
+   row[0] = 'Liverpool'
+   row[1] = 15
+   #+END_SRC
+   改为
+   #+BEGIN_SRC ruby
+   Performance = Struct.new(:name, :win)
+   row = Performance.new
+   row.name = 'Liverpool'
+   row.win = 15
+   #+END_SRC
+
+** Change Unidirectional Association to Bidirectional
+   #+BEGIN_QUOTE
+   将单向关联改为双向关联
+   #+END_QUOTE
+
+** Replace Type Code With Class
+   #+BEGIN_QUOTE
+   以类取代类型码
+   之前已经写过了
+   #+END_QUOTE
+
+** Replace Subclasses with Fields
+   #+BEGIN_QUOTE
+   当子类中返回的内容超级少时，可以删掉，在父类中用方法代替
+   #+END_QUOTE
+
+

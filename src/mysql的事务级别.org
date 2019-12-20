@@ -1,0 +1,90 @@
+#+BEGIN_QUOTE
+mysql的四种事务隔离级别和实践
+#+END_QUOTE
+
+** 事务的特性（ACID）
+
+   - 原子性：事务作为执行单位，内部的sql是一起执行的，要么都做，要么都不做
+   - 一致性：事务的执行结果从一个正确的状态到另一个正确的状态（这个正确的状态是什么由应用层定义，比如银行转账但总数不变）
+   - 隔离型：事务和事务之间不能互相干扰（要看具体的隔离级别）
+   - 持续性：事务commit之后对数据的影响是永久的
+
+** 四种隔离级别
+   
+*** RU (Read Uncommitted，读取未提交)
+    
+    一个事务在提交之前作出的数据改变，另一个事务当时就可以读取到。
+
+    比如我们创建一个表
+
+    #+BEGIN_SRC sql
+    create table test (
+      `id` int(11) not null auto_increment,
+      `num` int(11)
+    )
+    #+END_SRC
+
+    然后插入三条数据
+
+| id | num |
+|----+-----|
+|  1 |   1 |
+|  2 |   2 |
+|  3 |   3 |
+
+    A:启动事务
+    
+    #+BEGIN_SRC sql
+    start transaction;
+    #+END_SRC
+
+    B:启动事务，更新数据，但不提交
+
+    #+BEGIN_SRC sql
+    start transaction;
+    update test set num=10 where id=1;
+    #+END_SRC
+     
+    A:select，发现数据已经修改了
+
+    #+BEGIN_SRC sql
+    select num from test where id = 1
+    
+    # => 10
+    #+END_SRC
+
+    这叫做脏读（dirty read）
+
+    
+*** RC (Read Committed，读取已提交)
+
+    还是上面的步骤，但A select时候会发现数据没有修改，因为B还没有提交
+    但此时如果B提交了，尽管A还在事务里面，A的数据也会被更新
+
+    B:commit transaction
+
+    #+BEGIN_SRC sql
+    commit;
+    #+END_SRC
+
+    A:select 发现数据已经修改
+
+    #+BEGIN_SRC sql
+    select num from test where id = 1
+    
+    # => 10
+    #+END_SRC
+    
+    这叫做不可重复读（在同一个事务里读取两次发现结果不一样），虽然RC比RU级别高，但对于一般并发来说，还是会有在事务中数据发生变化的问题。
+
+*** RR (Repeatable Read，可重复读)
+
+    顾名思义，肯定是在事务中数据不会收到其他事务的影响（无论其他事务是否提交），才能重复读取
+
+    B:更新数据后commit
+
+    A:select 但数据并没有更新
+
+*** S (Serializable，可串行)
+
+    不采用并发，如果有一个事务正在执行，其他事务需要等待这个事务结束才能执行

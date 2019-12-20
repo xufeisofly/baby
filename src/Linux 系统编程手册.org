@@ -1,0 +1,66 @@
+#+TITLE: The Linux Programming Interface
+#+Html_head: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+
+* Kernel
+
+** Tasks
+
+**** process scheduling, kernel decides which process obtain access to cpu
+**** memory management
+**** file system
+**** process creation and termination
+**** access to device
+**** network
+**** api
+
+** The Shell
+   
+  shell, c shell, bourn shell, bourn again shell
+  
+** Single Directory Hierarchy
+
+   all directories are children of /root 
+   
+** Stack and Stack Frame
+  kernel stack is not user stack
+  
+*** User stack
+	contains:
+   - local variables, function args
+   - call linkage info: pointers of embedded functions etc.
+
+** argc argv
+   
+   - argv terminated by NULL
+   - only usable for func main
+
+** Env list
+
+* Memory Allocation
+
+** on the heap
+
+** on the stack
+
+* Users and Groups
+
+** /etc/passwd
+
+** /etc/shadow
+   privileged can see this
+
+** /etc/group
+
+   users to groups multi_to_multi relationship
+
+* Process Credentials
+
+** Real User ID
+
+** Effective User ID
+
+** Set-User-ID
+   
+   If setuid is enabled, executed file is runned with its owner user id
+   
+   [[https://stackoverflow.com/questions/32455684/unix-linux-difference-between-real-user-id-effective-user-id-and-saved-user][Unix / Linux: Difference between Real User ID, Effective User ID and Saved User ID - Stack Overflow]]

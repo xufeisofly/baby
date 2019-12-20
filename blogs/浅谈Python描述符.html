@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python 描述符</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Python 描述符</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org9ba3592">1. 什么是描述符</a>
+<ul>
+<li><a href="#org4353522">1.1. 举个例子</a></li>
+<li><a href="#orgaf05a7f">1.2. 一个疑问</a></li>
+<li><a href="#orgd3c4d71">1.3. 覆盖型和非覆盖型描述符</a>
+<ul>
+<li><a href="#orgc37bcf2">1.3.1. 覆盖型</a></li>
+<li><a href="#org5a6a919">1.3.2. 非覆盖型描述符</a></li>
+</ul>
+</li>
+<li><a href="#org0a72b77">1.4. 使用描述符的具体实例</a>
+<ul>
+<li><a href="#org13cfbcb">1.4.1. property</a></li>
+<li><a href="#org25cd632">1.4.2. lotan 的 Field</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgcb658ea">2. 其他语言的实现</a>
+<ul>
+<li><a href="#org83100b5">2.1. Ruby</a></li>
+</ul>
+</li>
+<li><a href="#orgd76a4f5">3. 几个使用建议</a></li>
+</ul>
+</div>
+</div>
+
+<div class="figure">
+<p><img src="http://niltouch-1256880307.file.myqcloud.com/41/411.jpeg" alt="411.jpeg" />
+</p>
+</div>
+
+<blockquote>
+<p>
+描述符是 python 独有的特性，很多ORM如SQLAlchemy都是通过描述符实现的，其他的库如formatter工具poseidon也是，可见这是很多框架喜欢用的玩意儿，因此学会了描述符，至少能让你更快的阅读各种框架的源码。
+</p>
+</blockquote>
+
+<div id="outline-container-org9ba3592" class="outline-2">
+<h2 id="org9ba3592"><span class="section-number-2">1</span> 什么是描述符</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+一个python的类中有各种属性和各种方法，那么如何去描述一个属性呢？就是 get<sub>value</sub> 和 set<sub>value</sub> (为了简化理解，此处不讨论delete)，从这个角度看，属性也是「对象」。如果给属性定义一个interface，就是下面这样。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-go"><span style="color: #b48ead;">interface</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #b48ead;">func</span> <span style="color: #8fa1b3;">set</span>
+  <span style="color: #b48ead;">func</span> <span style="color: #8fa1b3;">get</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+
+<p>
+所谓的描述符，就是把属性描述成一个对象，在它的类中有  <span class="underline"><span class="underline">set</span></span> 和 <span class="underline"><span class="underline">get</span></span> 方法，那么这个对象就完全可以充当属性了，这也是一种duck typing的表现，有了这个类，我们就可以重新定义一个属性的get和set，让它表现各种各样你想要的情形。说了这么多可能还不太懂，下面举个例子。
+</p>
+</div>
+
+<div id="outline-container-org4353522" class="outline-3">
+<h3 id="org4353522"><span class="section-number-3">1.1</span> 举个例子</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+类Product存在两个实例属性，price和amount，我们可以初始化它们的值，但必须满足一个条件，两个值都需要大于0。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Product</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, price, amount<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.price = price
+        <span style="color: #b48ead;">self</span>.amount = amount
+</pre>
+</div>
+
+<p>
+我们可能马上会想到一个做法，就是定义方法进行验证
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Product</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:       
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, price, amount<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.price = <span style="color: #b48ead;">self</span>.get_price<span style="color: #8c8c8c;">(</span>price<span style="color: #8c8c8c;">)</span>
+        <span style="color: #b48ead;">self</span>.amount = <span style="color: #b48ead;">self</span>.get_amount<span style="color: #8c8c8c;">(</span>amount<span style="color: #8c8c8c;">)</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">total</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">self</span>.price * <span style="color: #b48ead;">self</span>.amount
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">get_price</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, price<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">if</span> price &lt; <span style="color: #d08770;">0</span>:
+            <span style="color: #b48ead;">raise</span>
+        <span style="color: #b48ead;">return</span> price
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">get_amount</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, amount<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">if</span> amount &lt; <span style="color: #d08770;">0</span>:
+            <span style="color: #b48ead;">raise</span>
+        <span style="color: #b48ead;">return</span> amount
+</pre>
+</div>
+
+<p>
+当然，如果验证逻辑相同，我们也可以提取出来一个验证的方法，对于读属性来说也是一样的。既然我们能提取方法，为什么不能提取出来一个类呢？就像下面这样。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Quantity</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, name<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.name = name
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__set__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, instance, value<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">if</span> value &gt; <span style="color: #d08770;">0</span>:
+            <span style="color: #bf616a;">instance.__dict__</span><span style="color: #8c8c8c;">[</span><span style="color: #b48ead;">self</span>.name<span style="color: #8c8c8c;">]</span> = value
+        <span style="color: #b48ead;">else</span>:
+            <span style="color: #b48ead;">raise</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Product</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #bf616a;">price</span> = Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'price'</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">amount</span> = Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'amount'</span><span style="color: #8c8c8c;">)</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, price, amount<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.price = price
+        <span style="color: #b48ead;">self</span>.amount = amount
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">total</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">self</span>.price * <span style="color: #b48ead;">self</span>.amount
+</pre>
+</div>
+
+<p>
+本来是Product实例属性的price和amount变成了Quantity类的实例，因此price和price=就是Quantity()._<sub>get</sub>_<sub>和Quantity</sub>()._<sub>set</sub>__。当然描述符不止可以应用于属性，还可以应用于方法，比如property就是使用描述符实现并作用于func上的。将实例属性或实例方法委托给另一个类的对象，这个类的对象就叫做「描述符」。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaf05a7f" class="outline-3">
+<h3 id="orgaf05a7f"><span class="section-number-3">1.2</span> 一个疑问</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+想必很多人有个疑问，为什么要用类属性，而不是实例属性嵌入描述符类呢？原因很简单，实例属性，只有在类实例化的时候才会有啊，如果我们在 <span class="underline"><span class="underline">init</span></span> 写一个下面的代码
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">self</span>.price = Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'price'</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">self</span>.amount = Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'amount'</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+那么就真的只是给price 和 amount属性赋值了两个Quantity对象而已，并没有重新定义 price= 和 price 方法。而使用描述符的原因，就是为了重新定义 price= 和 price 方法。那为什么使用类属性可以实现呢？因为python有个匪夷所思的特性，self.price会优先认为是实例属性，但如果python发现对象不存在price这个属性值，就会从类中寻找对应属性。而在我们每次_<sub>init</sub>_<sub>中self.price时</sub>，因为从类中找到了对应的属性，因此就不会重新生成一个实例属性放在_<sub>dict</sub>_<sub>中了</sub>。从此self.price就变成了Quantity('price')，产生了下面的对应关系：
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">Product.price</span> =&gt; Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'price'</span><span style="color: #8c8c8c;">)</span>
+
+<span style="color: #bf616a;">product.price</span> =&gt; Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'price'</span><span style="color: #8c8c8c;">)</span>.__get__<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #bf616a;">product.price</span> = <span style="color: #bf616a;">value</span> =&gt; Quantity<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'price'</span><span style="color: #8c8c8c;">)</span>.__set__<span style="color: #8c8c8c;">(</span>product, value<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+说了这么多绕口令，描述符用一个词来描述就是「委托」，用一句话来描述就是：重新定义value和value=，而且是批量修改所有属性的定义。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd3c4d71" class="outline-3">
+<h3 id="orgd3c4d71"><span class="section-number-3">1.3</span> 覆盖型和非覆盖型描述符</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+根据有没有_<sub>set</sub>_<sub>方法</sub>，描述符可以分为这两种类型。在这里不需要多么关注定义，理解了「覆盖」两个字即可。
+</p>
+</div>
+
+<div id="outline-container-orgc37bcf2" class="outline-4">
+<h4 id="orgc37bcf2"><span class="section-number-4">1.3.1</span> 覆盖型</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+如果描述符类中定义了_<sub>set</sub>_<sub>方法</sub>，那么无论是读还是写，描述符都会覆盖_<sub>dict</sub>_<sub>当中的属性</sub>。如
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">price</span> = Quantity<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #b48ead;">self</span>.price =&gt; &lt;Quantity&gt;
+
+<span style="color: #b48ead;">self</span>.price = <span style="color: #d08770;">1</span>
+
+<span style="color: #b48ead;">self</span>.price =&gt; &lt;Quantity&gt;
+</pre>
+</div>
+
+<p>
+只要class Quantity中定义了_<sub>set</sub>_<sub>方法</sub>，即使self._<sub>dict</sub>_<sub>新增了price属性</sub>，price也会被Quantity()覆盖
+</p>
+</div>
+</div>
+
+<div id="outline-container-org5a6a919" class="outline-4">
+<h4 id="org5a6a919"><span class="section-number-4">1.3.2</span> 非覆盖型描述符</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<p>
+反之，如果Quantity类中没有定义_<sub>set</sub>__，只定义了_<sub>get</sub>_<sub>等其他方法</sub>，那么描述符就很容易被属性值覆盖，如
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">price</span> = Quantity<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #b48ead;">self</span>.price =&gt; &lt;Quantity&gt;
+
+<span style="color: #b48ead;">self</span>.price = <span style="color: #d08770;">1</span>
+
+<span style="color: #b48ead;">self</span>.price =&gt; <span style="color: #d08770;">1</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0a72b77" class="outline-3">
+<h3 id="org0a72b77"><span class="section-number-3">1.4</span> 使用描述符的具体实例</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+描述符是python的独门武器，为什么其他的语言就没有描述符呢，那没有描述符其他语言又是如何实现的相关功能呢？想要解决这个问题，我们先研究一下python中使用描述符实现的一些经典功能。
+</p>
+</div>
+
+<div id="outline-container-org13cfbcb" class="outline-4">
+<h4 id="org13cfbcb"><span class="section-number-4">1.4.1</span> property</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<p>
+内置的property也是描述符，为了方便，我们实现一个
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">property</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, func<span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">self</span>.func = func
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__get__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, ins, cls=<span style="color: #d08770;">None</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #bf616a;">res</span> = <span style="color: #b48ead;">self</span>.func<span style="color: #8c8c8c;">(</span>ins<span style="color: #8c8c8c;">)</span>
+        <span style="color: #b48ead;">return</span> res
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Mine</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">age</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">return</span> <span style="color: #d08770;">1</span>
+
+    <span style="color: #bf616a;">age</span> = <span style="color: #d08770;">property</span><span style="color: #8c8c8c;">(</span>age<span style="color: #8c8c8c;">)</span>
+
+Mine<span style="color: #8c8c8c;">()</span>.age
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; 1</span>
+</pre>
+</div>
+
+<p>
+接下来有点像公式推导了
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">mine</span> = Mine<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #bf616a;">mine.age</span> = Mine.age<span style="color: #8c8c8c;">(</span>mine<span style="color: #8c8c8c;">)</span>
+
+<span style="color: #bf616a;">age</span> = <span style="color: #d08770;">property</span><span style="color: #8c8c8c;">(</span>age<span style="color: #8c8c8c;">)</span>
+
+Mine.age<span style="color: #8c8c8c;">(</span>mine<span style="color: #8c8c8c;">)</span> = Mine.<span style="color: #d08770;">property</span><span style="color: #8c8c8c;">(</span>age<span style="color: #8c8c8c;">)(</span>mine<span style="color: #8c8c8c;">)</span> = <span style="color: #d08770;">property</span>.__get__<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">property</span><span style="color: #93a8c6;">(</span>age<span style="color: #93a8c6;">)</span>, mine, Mine<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+这里要注意，在类外调用的话_<sub>get</sub>_<sub>中需要有一个cls参数</sub>，原因就是实际上调用的是 Mine.age(mine)，而在类内调用如前面对类属性price的装饰则不必，因为一般是在类内调用的只是 self.price, 即price(ins)，并没有涉及到类。所以可以把cls=None。类外调用会传，类内调用则不会。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org25cd632" class="outline-4">
+<h4 id="org25cd632"><span class="section-number-4">1.4.2</span> lotan 的 Field</h4>
+<div class="outline-text-4" id="text-1-4-2">
+<p>
+lotan 是一个用于构建model层的库，与之前我常用的Rails的ActiveRecord不同，很多Model层和DAO层是分离的，通过DAO层操作数据库，然后Model层构建model对象供业务使用，lotan的目的就是隔离DAO，通过一个key构建出一个数据完备的model对象，比如。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Book</span><span style="color: #8c8c8c;">(</span>BaseModel<span style="color: #8c8c8c;">)</span>:
+    <span style="color: #d08770;">id</span> = models.IntField<span style="color: #8c8c8c;">(</span>is_key=<span style="color: #d08770;">True</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">title</span> = models.StringField<span style="color: #8c8c8c;">()</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">resolve_by_id</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>:
+        <span style="color: #b48ead;">return</span> DAO.get_data_by_id<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #bf616a;">book</span> = Lotan<span style="color: #8c8c8c;">()</span>.create_session<span style="color: #8c8c8c;">()</span>.build_model<span style="color: #8c8c8c;">(</span>Book, <span style="color: #d08770;">id</span>=<span style="color: #d08770;">1</span><span style="color: #8c8c8c;">)</span>
+book
+=&gt; &lt;Book <span style="color: #d08770;">id</span>=<span style="color: #d08770;">1</span> <span style="color: #bf616a;">title</span>=<span style="color: #a3be8c;">'ThreeBody'</span>&gt;    
+</pre>
+</div>
+
+<p>
+很明显，lotan使用描述符实现，并且还定义了描述符的子类描述符，不难想到存在一个Field描述符类，而IntField的StringField都继承自Field。而当给self.id赋值时，会调用Field中的_<sub>set</sub>_<sub>方法</sub>，_<sub>set</sub>_<sub>方法会寻找resolve</sub><sub>by</sub><sub>id方法</sub>，使用其返回值对model进行初始化。
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcb658ea" class="outline-2">
+<h2 id="orgcb658ea"><span class="section-number-2">2</span> 其他语言的实现</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+这里还有一个疑问，既然python使用描述符来实现ORM等特性，而且描述符还是其「独家」的功能，那么其他语言是如何解决相同问题的呢，为什么其他语言不能实现描述符？下面浅谈一下Ruby。
+</p>
+</div>
+
+<div id="outline-container-org83100b5" class="outline-3">
+<h3 id="org83100b5"><span class="section-number-3">2.1</span> Ruby</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Ruby能否实现描述符？答案是不能，原因如下：
+</p>
+
+<ol class="org-ol">
+<li>Ruby实例属性不是公开的，@price无法从外部作用域访问，只能通过方法self.price访问</li>
+<li>self.price只会寻找方法，并不会寻找类变量</li>
+<li>到头来只需要定义self.price和self.price=方法即可</li>
+</ol>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Product</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>price<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@price</span> = price
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">price</span>
+    <span style="color: #d08770;">raise</span> <span style="color: #b48ead;">if</span> <span style="color: #bf616a;">@price</span> &lt; <span style="color: #d08770;">0</span>
+    <span style="color: #bf616a;">@price</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">price=</span><span style="color: #8c8c8c;">(</span>value<span style="color: #8c8c8c;">)</span>
+    <span style="color: #d08770;">raise</span> <span style="color: #b48ead;">if</span> value &lt; <span style="color: #d08770;">0</span>
+    <span style="color: #bf616a;">@price</span> = value
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+当然上面这个python也很容易实现，描述符本来就是针对批量属性的，不过对于多属性的get set修改，Ruby及其灵活的元编程特性应该可以很容易的实现。比如使用 missing<sub>method</sub>, 或者直接define<sub>method</sub> "#{variable}"来动态定义get和set方法，这是ruby的风格，具体就不深究。
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd76a4f5" class="outline-2">
+<h2 id="orgd76a4f5"><span class="section-number-2">3</span> 几个使用建议</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+最后附上《Fluent Python》中的几条描述符使用的建议。
+</p>
+
+<ul class="org-ul">
+<li>只读描述符必须有_<sub>set</sub>_<sub>方法</sub>。</li>
+</ul>
+
+<p>
+不然self.price会被新的属性赋值覆盖，而且这样你才能够在_<sub>set</sub>_<sub>报错来禁止写入</sub>
+</p>
+
+<ul class="org-ul">
+<li>用于验证的描述符可以只有_<sub>set</sub>_<sub>方法</sub></li>
+</ul>
+
+<p>
+因为只会在set时候验证，而读取时读取_<sub>dict</sub>_<sub>中的值就行了</sub>，速度还快，不用_<sub>get</sub>_<sub>方法</sub>
+</p>
+
+<ul class="org-ul">
+<li>仅有_<sub>get</sub>_<sub>方法的描述符可以实现高效缓存</sub></li>
+</ul>
+
+<p>
+因为可覆盖，第一次走_<sub>get</sub>__，在_<sub>get</sub>_<sub>中定义</sub>_<sub>dict</sub>__[price]，以后就可以通过_<sub>dict</sub>_<sub>方法获取</sub>
+</p>
+
+<ul class="org-ul">
+<li>特殊方法不受影响</li>
+</ul>
+
+<p>
+只有_<sub>get</sub>_<sub>方法时虽然属性可以被覆盖</sub>，但特殊方法不会，即如果_<sub>get</sub>_<sub>中你做了这件事</sub>
+<span class="underline"><span class="underline">dict</span></span>[_<sub>repr</sub>__] = 1
+后面调用_<sub>repr时还是会走</sub>_<sub>class</sub>__._<sub>repr</sub>_<sub>方法</sub>，而不是1
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

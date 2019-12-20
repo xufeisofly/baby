@@ -1,0 +1,306 @@
+[[http://niltouch-1256880307.file.myqcloud.com/42/42.jpg]]
+
+#+BEGIN_QUOTE
+这篇文章简单的讲述了实现多态的各种方式，后面的装饰器注册和 meta class 都很有 python 风格，能够辅助我们更好的理解 python，并实现常见的业务场景，这是我决定翻译它的原因。
+#+END_QUOTE
+
+[[https://medium.com/@vadimpushtaev/python-choosing-subclass-cf5b1b67c696][原文链接]]
+
+我们来研究一个很常见的情况。你有很多子类，你需要根据用户传入的参数选择其中一个（一般是根据 type 参数）。
+
+举个例子：用户通过你的 service 发送了一条 message，根据 type 和其他的参数获取 Message 的实例。
+
+#+BEGIN_SRC python
+def send_message(message_type, params):
+    message = None
+	if message_type == 'chat':
+	    message = ChatMessage(params)
+	elif message_type == 'email':
+	    message = EmailMessage(params)
+	elif message_type == 'phone':
+	    message = PhoneMessage(params)
+	else:
+	    raise ValueError('Bad message type {}'.format(message_type_))
+
+	message.send()
+
+
+class BaseMessage():
+    # ...
+
+
+class ChatMessage(BaseMessage):
+    # ...
+
+
+class EmailMessage(BaseMessage):
+    # ...
+
+
+class PhoneMessage(BaseMessage):
+    # ...
+#+END_SRC
+
+这段代码漂亮的满足了我们的要求，不过用一些手段可以让它变得更好。
+
+** 工厂
+
+   首先，我希望有个单独的方法来创建 message 实例，纵观程序世界我们有两种常用的方法：工厂类和工厂函数
+
+*** 工厂类
+
+	#+BEGIN_SRC python
+	def send_message(message_type, params):
+	    message = MessageFactory().create(message_type, params)
+		message.send()
+
+		
+	class MessageFactory():
+	    def create(self, message_type, params):
+		    message = None
+			if message_type == 'chat':
+			    message = ChatMessage(params)
+			elif message_type == 'email':
+			    message = EmailMessage(params)
+			elif message_type == 'phone':
+			    message = PhoneMessage(params)
+			else:
+			    raise ValueError('Bad message type {}'.format(message_type))
+
+			return message
+
+	
+	class BaseMessage():
+	    # ...
+	#+END_SRC
+   
+*** 工厂函数
+
+	#+BEGIN_SRC python
+	def send_message(message_type, params):
+	    message = BaseMessage.create(message_type, params)
+		message.send()
+
+
+	class BaseMessage():
+	    @classmethod
+		def create(cls, message_type, params):
+		    message = None
+			if message_type == 'chat':
+			    message = ChatMessage(params)
+			elif message_type == 'email':
+			    message = EmailMessage(params)
+			elif message_type == 'phone':
+			    message = PhoneMessage(params)
+			else:
+			    raise ValueError('Bad message type {}'.format(message_type))
+
+			return message		    
+	#+END_SRC
+
+	对我来说，工厂类在这实在有些多余，所以我更倾向于用工厂函数，并对它进行进一步优化。
+
+** 使用类，而不是对象
+
+	现在我们来优化工厂函数的代码。因为在 python 中类是一等公民，所以我们不需要实例化对象出来，用工厂制造出来一个类就好了。
+
+	#+BEGIN_SRC python
+	def send_message(message_type, params):
+	    message = BaseMessage.create(message_type, params)
+		message.send()
+
+
+	class BaseMessage():
+	    @classmethod
+		def create(cls, message_type, params):
+		    message_class = None
+			if message_type == 'chat':
+			    message_class = ChatMessage
+			elif message_type == 'email':
+			    message_class = EmailMessage
+			elif message_type == 'phone':
+    			message_class = PhoneMessage
+			else:
+			    raise ValueError('Bad message type {}'.format(message_type))
+
+			return message_class(params)
+	#+END_SRC
+
+	#+BEGIN_QUOTE
+	实际上没有太大区别，作者这样是为了给后面的使用 mapping 的优化方法做铺垫
+	#+END_QUOTE
+	
+** 使用 mapping
+
+   很明显，我们不得不处理一大堆无聊的条件语句，我们可以尝试把 if 换成 mapping 映射：
+
+   #+BEGIN_SRC python
+   class BaseMessage():
+       @classmethod
+	   def create(cls, message_type, params):
+	       MESSAGE_TYPE_TO_CLASS_MAP = {
+		       'chat': ChatMessage,
+			   'email': EmailMessage,
+			   'phone': PhoneMessage,
+		   }
+
+		   if message_type not in MESSAGE_TYPE_TO_CLASS_MAP:
+		       raise ValueError('Bad message type {}'.format(message_type))
+
+		   return MESSAGE_TYPE_TO_CLASS_MAP[message_type](params)
+   #+END_SRC
+
+   注意，我们不能把 MESSAGE_TYPE_TO_CLASS_MAP 定义为类属性，因为这些子类是在 BaseMessage 声明之后才定义的，因此 BaseMessage 创建的时候 ChatMessage 等根本找不到。
+
+** 动态生成类名（不要这么做）
+
+   你可能已经注意到了，这些子类的名字和对应 type 的值很像，我们可以通过 type 来生成类名，而不用单独保存一个 mapping。
+
+   #+BEGIN_SRC python
+   class BaseMessage():
+       @classmethod
+	   def create(cls, message_type, params):
+	       class_name = message_type[0].upper() + message_type[1:] + 'Message'
+
+		   if class_name not in globals():
+		       raise ValueError('Bad message type {}'.format(message_type))
+
+		   return globals()[class_name](params)
+   #+END_SRC
+
+   不过，你最好不要这样做，这种方法有很多问题，第一，你不能保证所有的子类都叫做 SomethingMessage，第二，你，第三，和你的 IDE 都很难理解这段代码在说什么。如果你非要这么写，那你至少要检查一下结果是否是 BaseMessage 的子类。
+
+** 注册子类
+
+   简单的使用 mapping 并不是最好的方法，如果你增加了一个新的 message 子类，除了定义它你还要记得把它加到 mapping 里面。如果我们能用某种方法标记一下子类，然后子类就能自动加到 mapping 里面就好了。没错，这就是亮瞎人眼的 python 装饰器。
+
+   还记得我上面说不能把 mapping 定义成 BaseMessage 的类属性吗，因为子类是后定义的，然而现在我们可以用装饰器让子类加载的瞬间就自动加入到 mapping 中。
+
+   我们需要定义一个 subclasses 的类属性， 再定义一个 register_subclass 的装饰器方法把子类当作参数，动态的添加到 subclasses 中。
+
+   #+BEGIN_SRC python
+   class BaseMessage():
+       subclasses = {}
+
+	   @classmethod
+	   def register_subclasses(cls, message_type):
+	       def decorator(subclass):
+		       cls.subclasses[message_type] = subclass
+			   return subclass
+
+		   return decorator
+
+	   @classmethod
+	   def create(cls, message_type, params):
+	       if message_type not in cls.subclasses:
+		       raise ValueError('Bad message type {}'.format(message_type))
+			   
+		   return cls.subclasses[message_type](params)
+
+	   
+	@BaseMessage.register_subclass('chat')
+	class ChatMessage(BaseMessage):
+	    # ...
+		
+		
+	@BaseMessage.register_subclass('email')
+	class EmailMessage(BaseMessage):
+	    # ...
+
+
+	@BaseMessage.register_subclass('phone')
+	class PhoneMessage(BaseMessage):
+	    # ...
+   #+END_SRC
+
+   这个方法我使用了很长时间，每次想添加一个新的 message 类时，只需要复制粘贴一下之前的子类格式，然后加上装饰器就好了。
+
+** Metaclass
+
+   一个类的 metaclass 同样会被它的子类继承，所以我们可以通过给 BaseMessage 写 metaclass 的方式来自动注册所有的子类。
+
+   子类同样需要保存一个类型值，我们把它放在 _MESSAGE_TYPE 属性中。另外，metaclass 需要知道哪个是 BaseMessage，我们只要看哪个类是是第一个通过 metaclass 创建的就行了。
+
+   下面是它的实现：
+
+   #+BEGIN_SRC python
+   class MessageRegistrator(type):
+       ROOT_CLASS = None
+
+	   @classmethod
+	   def _save_root_class(meta, cls):
+	       if meta.ROOT_CLASS is None:
+		       meta.ROOT_CLASS = cls
+
+	   @classmethod
+	   def __init__(cls, names, bases, dct):
+	       cls._save_root_class(cls)
+
+		   if cls is cls.ROOT_CLASS:
+		       @classmethod
+			   def create(cls, message_type, params):
+			       if message_type not in cls.subclasses:
+				       raise ValueError('Bad message type {}'.format(message_type))
+				   return cls.subclasses[message_type][params]
+
+			   cls.subclasses = {}
+			   cls.create = create
+
+		   elif hasattr(cls, '_MESSAGE_TYPE') and cls.ROOT_CLASS is not None:
+		       cls.ROOT_CLASS.subclasses[cls._MESSAGE_TYPE] = cls
+
+
+   class BaseMessage(metaclass=MessageRegistrator):
+       def __init__(self, params):
+	       pass
+
+
+   class ChatMessage(BaseMessage):
+       _MESSAGE_TYPE = 'chat'
+
+
+   class EmailMessage(BaseMessage):
+       _MESSAGE_TYPE = 'email'
+
+
+   class PhoneMessage(BaseMessage):
+       _MESSAGE_TYPE = 'phone'
+   #+END_SRC
+
+   如果你对上面这段代码感到蒙圈，很正常。使用 metaclass 来解决问题一般都会过分复杂，让人很难理解。不过我们可以发现：metaclass 还是需要定义一个 _MESSAGE_TYPE，并不比 @register 装饰器简单多少。
+
+   另外，自定义 metaclass 会让类变得很难被继承。如果你想继承两个类，那么这两个类的 metaclass 要么完全一样，要么其中一个 metaclass 继承自另一个，否则就会产生「元类冲突」的问题。
+
+** 初始化子类钩子
+
+   从 Python3.6 开始我们不使用 metaclass 也可以 hook 子类的创建，方法是使用 __init_subclass__ 魔法方法：
+
+   #+BEGIN_SRC python
+   class BaseMessage:
+       subclasses = {}
+
+	   def __init_subclass__(cls, **kwargs):
+	       super().__init_subclass__(**kwargs)
+		   cls.subclasses[cls._MESSAGE_TYPE] = cls
+
+	   @classmethod
+	   def create(cls, message_type, params):
+	       if message_type not in cls.subclasses:
+		       raise ValueError('Bad message type {}'.format(message_type))
+
+		   return cls.subclasses[message_type](params)
+
+
+   class ChatMessage(BaseMessage):
+       _MESSAGE_TYPE = 'chat'
+
+
+   class EmailMessage(BaseMessage):
+       _MESSAGE_TYPE = 'email'
+
+
+   class PhoneMessage(BaseMessage):
+       _MESSAGE_TYPE = 'phone'
+   #+END_SRC
+
+   很难说它和使用装饰器的方法哪个更优雅。

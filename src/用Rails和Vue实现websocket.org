@@ -1,0 +1,127 @@
+    之前做项目的时候使用http短轮询实现了消息发送功能。因为系统用户量也比较小，除了感觉比较low之外，功能也都实现了。分别是消息栏展示，消息栏消息处理, 桌面通知等。然而最明显的问题就是调试变得十分困难，每次在console里面调试request都会被messages的request刷掉，在staging环境查看后台log时候也会被messages的查询请求刷屏，所以终于还是决定尝试一下websocket。
+
+    websocket原理之前的文章已经写过，犯贱的说，“不过就是一个协议而已”，虽然能想出这个协议才是真正牛逼的事情。Rails 5之后增加了Action Cable，但我还是决定从websocket-rails入手，复写消息更新的功能。
+
+** 安装Websocket-rails
+   
+   安装教程参考：https://github.com/websocket-rails/websocket-rails/wiki/Installation-and-Setup
+
+    websocket-rails使用的是webserver的事件监听，然而我的app使用的是puma，生产环境使用了passenger，都不是event-based，需要开启websocket-rails的standalone模式，开启这个模式之后，websocket-rails会使用redis-server。理论上也并不会和redis产生冲突（然而事实并非如此，稍后会详细描述），websocket-rails默认寻找localhost的6379端口，我们生产环境redis不是这么玩的，还好，在initializer里可以更换端口选项。
+
+
+    随后启动server
+    
+    #+BEGIN_SRC ruby
+    rake websocket_rails:start_server
+    #+END_SRC
+
+    可以通过查看log实时检测接口状态
+
+    #+BEGIN_SRC ruby
+    tail -f log/websocket_rails_server.log
+    #+END_SRC
+
+** server端
+   
+   我需要实现的功能是，当更新或创建一条message时，消息栏立刻更新。根据websocket-rails的介绍，需要创建一个channel实例，并不需要一个单独的websocket接口，通过这个channel广播事件，然后再在前端监听。那么不妨创建一个concern，创建一个Websocket::Message模块。
+
+   #+BEGIN_SRC ruby
+   module Websocket
+     module Message
+       extend ActiveSupport::Concern
+
+       included do
+         after_save :deliver_websocket
+       end
+
+       def deliver_websocket
+         data = {
+           messages: self.class.with_recipient(recipient).with_status(:unfinished).order(created_at: :desc).limit(20)
+         }
+         
+         WebsocketRails[channel_name].trigger('change', data)
+       end
+
+       def channel_name
+         'message'
+       end
+     end
+   end
+   #+END_SRC
+   
+   当然这里可以写一个更通用的Websocketable之类的module，然后里面用元编程写的动态一点，但注意，不同的model可能websocket的内容和方式都不一样，比如message可以再加一个after_create的时候发送桌面通知。可能就又是一个新的channel和event。所以最好再创建一个websocket_channel的class之类的，具体参考我前面一篇讲webhook的学习笔记。
+
+   在message model里面include这个module就可以了
+
+   #+BEGIN_SRC ruby
+   class Message < ApplicationRecord
+     include Websocket::Message
+
+     belongs_to :recipient
+
+     scope :with_recipient, ->(recipient) { where(recipient: recipient) }
+     scope :with_status, ->(status) { where(status: status) }
+   end
+   #+END_SRC
+
+   每次save message之后，都会在message channel中广播change event，只要前端监听了这个channel的这个event，就可以做任何想做的事情。
+
+** javascript端
+   
+   websocket-rails应该只计划用于Rails全栈框架搭建的应用，为什么呢，因为它的javascript端都是用coffeescript写的。我们的项目使用了Vue框架，还好把coffee转成pure js的网站遍布全网，google一下捡一个就行了。这里我参考了这篇文章，所以这里就使用人家的转换的结果了(https://github.com/karimbutt/websocket-rails-for-js-frameworks)。
+
+   接下来在index.html中引入这几个文件(这里Vue应该有自己的引入方式)，注意引入顺序。
+   
+   #+BEGIN_SRC javascript
+   <script src="/static/scripts/websocket_rails.js"></script>
+   <script src="/static/scripts/event.js"></script>
+   <script src="/static/scripts/abstract_connection.js"></script>
+   <script src="/static/scripts/http_connection.js"></script>
+   <script src="/static/scripts/websocket_connection.js"></script>
+   <script src="/static/scripts/channel.js"></script>
+   #+END_SRC
+   
+   之后完成server的握手绑定，channel的创建和event的监听。并在回调函数中更新message
+
+   #+BEGIN_SRC javascript
+   let websocketChannel = function(server, channel_name) {
+     let dispatcher = new WebSocketRails(server)
+
+     return dispatcher.subscribe(channel_name)
+   }
+
+   let websocketBindEvent = function(channel) {
+     channel.bind('change', data => {
+       dispatchMessages(data) // 分发消息
+     })
+   }
+
+   let channel = websocketChannel('localhost:4040/websocket', 'message') // server端口是在rails定义的
+   websocketBindEvent(channel)
+   #+END_SRC
+
+** 一个redis的坑
+   
+   顺利调试通过的我抑制不住自己兴奋的心情，但又觉得太过顺利，其实自己有一个地方一直是一知半解，就是websocket-rails为什么要使用event-abased的webserver，为什么要使用redis，会不会影响redis的正常使用。于是我打开rails console，输入
+   
+   #+BEGIN_SRC ruby
+   Redis.current.set('a', 1)
+
+   #=> RuntimeError: eventmachine not initialized: evma_connect_to_server
+   #+END_SRC
+   
+   果然呵呵哒了，解决方法见https://github.com/websocket-rails/websocket-rails/issues/29
+   
+   大概意思是
+   
+   #+BEGIN_QUOTE
+   changing driver from Synchrony to Hiredis fix the problem
+   $redis = Redis.new(:host => host, :port => port, :driver => :hiredis)
+   #+END_QUOTE
+
+   果然解决，不过不明就里，什么是hiredis，synchrony，这应该是接下来我应该解决的问题。
+   
+
+** 参考文章
+
+   - https://medium.com/@karimbutt/integrating-websocket-rails-with-angularjs-or-other-js-frameworks-256729e95a86

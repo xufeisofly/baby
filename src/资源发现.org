@@ -1,0 +1,75 @@
+[[http://niltouch-1256880307.file.myqcloud.com/36/36.jpeg]]
+
+** 资源注入的艰难历程
+
+   一个web项目中常常用到很多资源，如MySQL，Redis等，通常这些资源是由资源提供方提供地址，然后应用程序通过一个该地址进行连接。使用方法再简单不过，但维护和多环境适配往往遇到很多问题。
+
+   比如我上一家公司由于项目只占用一台服务器节点，使用的方法是将资源地址放在.env文件中导入linux，这样在不同的环境上配置不同的环境变量就行了。然而带来的问题就是需要手动复制，因为都是手动维护的，如果节点变多了，就要维护很多份，另外如果服务变多了，不同的服务使用的环境变量KEY也并没有统一，这个叫「mysql_env」，另一个叫「MYSQL_ADDR」，维护起来是一件很头疼的事。
+
+   现在这家公司由于服务很多，因此专门拿出来一个项目去维护所有的资源信息。所有服务的资源地址都需要在该平台上进行编辑、增加、删除。这样的确解放了应用开发者，因为他们无需在项目中维护这些环境变量，也不会产生多份资源文件。但这同时也带来了一个问题，自己的项目越来越依赖另一个项目，而且是从根儿上依赖，平台上的环境变量一堆，维护起来也愈发困难。另外两个项目耦合缺少约定层，平台环境变量的格式对本地项目来说是不可见的，也就是说本地项目去获取资源时，根本不知道会拿到什么格式的东西。
+
+   #+BEGIN_SRC python
+   config = conf('project_name')
+   #+END_SRC
+
+   如果你不去平台项目看一眼，鬼才知道project_name的config是个什么格式对吧。
+
+   还有，平台项目中只适配了生产环境和测试环境，如果我们想加一个本地环境就十分费劲，明明就是一个环境变量，却要到另一个项目中修改代码。
+
+   总结一下上面两种注入资源的方式的问题。
+
+   #+BEGIN_EXAMPLE
+   前者：依赖人肉维护，不适用于多项目多节点，缺少第三方平台作为中间层；
+   后者：有了第三方平台但不应该聚合所有的环境变量，降低应用资源配置的自由度   
+   #+END_EXAMPLE
+
+   因此提出对后者进行改进，提出资源发现架构。
+
+** 资源发现
+
+   资源发现的特点是
+   #+BEGIN_EXAMPLE
+   存在资源平台，但资源平台只提供「发现资源」的逻辑代码，顶多再负责前期的注入，不负责管理资源信息
+   #+END_EXAMPLE
+   既然只提供规则，那么就得限制死环境变量的格式，有点「约定大于配置」的意思。
+
+   从而实现
+   1. 应用开发者无需手动复制粘贴资源信息，资源信息由资源发现平台统一注入（环境变量）；
+   2. 应用开发者不用再区分不同的环境，这一步交给资源发现平台根据不同环境注入来实现；
+   3. 资源提供方在资源发现平台统一注册资源信息，避免直接与应用开发者互通，接口统一了，方便升级维护
+
+** 资源发现实现
+   
+   下面为发现资源的伪代码：
+   #+BEGIN_SRC python
+   def get_database_config(name):
+     """获取db的地址"""
+     config = discover(RESOURCE_MYSQL, name)
+     return 'mysql+pymysql://' + config.instances[0].addr + '?charset=utf8'
+
+   def discover(kind, name):
+     # 根据不同的资源发现不同的环境变量
+     if kind == RESOURCE_MYSQL:
+       f = discover_mysql
+     return f(name)
+
+   def discover_mysql(name):
+     return MySQLResource.discover(name)
+
+   class MySQLResource(BaseResource):
+     kind = 'mysql'
+
+   class BaseResource(object):
+     # 约定环境变量格式
+     RES_ENV_ADDR_TPL = 'ZAE_RES_{}_{}_ADDR'
+
+     @classmethod
+     def discover(cls, name):
+       return cls._load(name)
+
+     @classmethod
+     def _load(name):
+       key = RES_ENV_ADDR_TPL.format(cls.kind.upper(), name)
+       value = getenv(key)
+       return "%s://%s" % (cls.kind, value)
+   #+END_SRC

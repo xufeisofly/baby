@@ -1,0 +1,428 @@
+#+TITLE: 高性能 MYSQL
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+
+* 架构优化
+
+** 索引优化
+
+*** 聚集索引
+
+	  #+BEGIN_QUOTE
+	  聚集索引不是一种单独的索引类型，而是一种存储数据的方式。
+	  #+END_QUOTE
+
+	  #+BEGIN_QUOTE
+	  正文内容按照一个特定维度排序存储，这个特定的维度就是聚集索引。因为行记录只能按照一个纬度进行排序，所以一张表只能有一个聚集索引。
+	  #+END_QUOTE
+
+	  聚集索引叶子页保存真是数据行，非聚集索引保存主键。
+
+|               | MyISAM | InnoDB |
+|---------------+--------+--------|
+| Primary Key   | 行指针 | 数据行 |
+| Secondary Key | 行指针 | 主键   |
+
+	  #+CAPTION: 聚集和非聚集对比图
+[[file:/Users/norris/projects/baby/src/images/clustered_index.png]]
+
+	  #+BEGIN_SRC sql
+	  select * from student where id >5000 and id <20000;
+	  #+END_SRC
+
+	  顺序查询
+
+	  #+BEGIN_SRC sql
+	  select * from student where name > 'Alie' and name < 'John';
+	  #+END_SRC
+
+	  随机IO，比聚集索引增加了一次 IO 开销
+
+****  InnoDB 主键插入顺序
+
+	#+BEGIN_QUOTE
+	最好避免随机聚集键，它使聚集索引插入是随机的，这是最坏的情形，会使数据聚集完全没有帮助
+	#+END_QUOTE
+
+	例子图：
+
+| primary key | row count | time (s) | index size (MB) |
+|-------------+-----------+----------+-----------------|
+| id          |   1000000 |      137 |             342 |
+| uuid        |   1000000 |      180 |             544 |
+
+    #+BEGIN_QUOTE
+
+由于新行主键不一定比起那一个大，因此不能总是把新行索引插到最后，不得不为新行寻找合适的位置，并为它分配空间，大量的额外工作导致不优化的数据布局
+#+END_QUOTE
+
+	- 随机 IO
+	- 重新分页
+	- 不规则填充，导致碎片
+
+    并发顺序插入会带来「单点竞争」
+
+
+*** 前缀索引
+
+
+	  对于  *TEXT* 和比较长的 *VARCHAR* ，必须定义前缀索引，否则索引过大会影响性能。通常选取前几个字符，可节约空间，得到更好的性能，但会降低选择性。
+
+	  #+BEGIN_SRC sql
+	  ALTER TABLE table_name ADD KEY(column_name(prefix_length));
+	  #+END_SRC
+
+	  索引选择性 = 不重复的个数 / 总个数
+
+	  #+BEGIN_SRC sql
+	  SELECT COUNT(*) AS cnt, city FROM city_demo GROUP BY city ORDER BY cnt DESC LIMIT 4;
+	  #+END_SRC
+
+      | cnt | city      |
+      |-----+-----------|
+      |  65 | London    |
+      |  59 | Hiroshima |
+      |  48 | Pak Kret  |
+      |  47 | Shimoga   |
+
+	  #+BEGIN_SRC sql
+	  SELECT COUNT(*) AS cnt, LEFT(city, 3) AS pref FROM city_demo GROUP BY pref ORDER BY cnt DESC LIMIT 4;
+	  #+END_SRC
+
+      | cnt | city |
+      |-----+------|
+      | 483 | Lon  |
+      | 195 | Hir  |
+      | 177 | Pak  |
+      | 167 | Shi  |
+
+	  #+BEGIN_SRC sql
+	  SELECT COUNT(*) AS cnt, LEFT(city, 7) AS pref FROM city_demo GROUP BY pref ORDER BY cnt DESC LIMIT 4;
+	  #+END_SRC
+
+      | cnt | city    |
+      |-----+---------|
+      | 70  | London  |
+      | 68  | Hiroshi |
+      | 65  | Pak Kre |
+      | 61  | Shimoga |
+
+	  前缀索引能很好的减小索引大小和提高速度，但不能在 *ORDER BY* 和 *GROUP BY* 中使用，也不能用作覆盖索引。
+
+*** 覆盖索引
+
+	#+BEGIN_QUOTE
+	避免读取行数据，能满足查询数据需要的索引叫覆盖索引
+	#+END_QUOTE
+
+	#+BEGIN_SRC sql
+	key (`sku_id`, `type`)
+
+	select sku_id, type from sku where sku_id in (1,2,3)
+	#+END_SRC
+
+	- 索引记录通常远小于全行大小，覆盖索引可以极大的减小数据访问量。对于缓存也能减小拷贝数据的时间
+    - 索引是按照索引值顺序排序的，因此 IO 密集型访问比随机从磁盘上读取数据快得多
+	- 大部分存储引擎缓存索引比缓存数据更好，如 *MyISAM*
+	- 对 *InnoDB* 尤其有用，因为第二索引保存了主键值，覆盖索引避免了二次索引查找
+
+	应用：
+
+**** LIKE 使用索引
+
+	#+BEGIN_SRC sql
+	KEY (`status`, `title`)
+
+	SELECT * FROM live WHERE status = 0 AND title LIKE '%长得丑怎么办%'
+	#+END_SRC
+
+	#+BEGIN_SRC sql
+	KEY (`status`, `title`, `sku_id`)
+
+	SELECT * FROM live
+	  JOIN (
+	    SELECT sku_id FROM live
+		WHERE status = 0 AND title LIKE '%长得丑怎么办%'
+	  ) AS t1 ON (t1.sku_id=live.sku_id)
+	#+END_SRC
+
+**** 优化 OFFSET LIMIT
+
+	  偏移量很大会扫描多行数据， ~LIMIT 10000, 20~ 会产生 10020 条数据，并去掉前 10000 行。
+
+	  使用覆盖索引进行偏移会减少开销，避免二次 IO，如
+
+	  #+BEGIN_SRC sql
+	  SELECT * FROM live ORDER BY name LIMIT 1000, 10
+	  #+END_SRC
+
+	  #+BEGIN_SRC sql
+	  KEY (`id`, `name`)
+
+	  SELECT * FROM live
+	    INNER JOIN (
+		  SELECT id FROM live
+		  ORDER BY name LIMIT 1000, 10
+		) AS tmp USING(id)
+	  #+END_SRC
+
+
+*** 联合索引
+
+	最左原则
+
+	- 文件排序
+	- 扫描有序的索引
+	  尽量使用覆盖索引，避免随机 IO，顺序扫描表比顺序读取索引慢得多
+
+	遵循最左前缀原则
+
+	#+BEGIN_SRC sql
+	KEY (`type`, `status`, `publish_time`)
+
+	SELECT type, status FROM live
+	WHERE type = 'video'
+	ORDER BY status, publish_time
+	#+END_SRC
+
+	范围查询不遵循最左前缀
+
+	#+BEGIN_SRC sql
+	SELECT type, status FROM live
+	WHERE type = 'video' AND status != 0
+	ORDER BY publish_time
+	#+END_SRC
+
+	索引是统一顺序存储的，不支持两种不同的排序方向
+
+	#+BEGIN_SRC sql
+	SELECT type, status FROM live
+	WHERE type = 'video'
+	ORDER BY status ASC, publish_time DESC
+	#+END_SRC
+
+----------------------------------------
+
+	#+BEGIN_EXAMPLE
+	题：设计一个约会网站，用来排序筛选用户
+	(sex, country, age, city)
+	#+END_EXAMPLE
+
+	- 最常用的，筛选数据最多的字段放在最左侧
+    - 范围查询会终结使用索引，索引放到最后，如 age
+	  	- LIKE '%xxx'
+    	- > < != not NULL
+    - 避免给选择性低的字段建立单独索引，如 sex
+
+
+	#+BEGIN_SRC sql
+	select * from where sex in (0,1) and ...
+	#+END_SRC
+
+
+
+
+
+
+
+
+* 查询优化
+
+** 为什么慢？
+
+   #+BEGIN_QUOTE
+   查询性能低下最基本的原因就是访问了太多的数据。大部分性能欠佳的查询都可以用减少数据访问的方式进行修改。
+   #+END_QUOTE
+
+*** 查询了不需要的数据
+
+	#+BEGIN_SRC sql
+	SELECT *
+	#+END_SRC
+
+	坏处：覆盖索引失效，增加磁盘 IO，内存和 CPU 的开销
+	好处：简化开发
+
+*** 检查了太多的数据
+
+	~examine_rows~
+
+	~sent_rows~
+
+	~query_time~
+
+
+
+	- 添加索引
+
+	Full Table Scan > Index Scan > Range Scan > Unique Index Scan > Constant
+
+	例子
+
+	#+BEGIN_SRC sql
+	EXPLAIN SELECT * FROM employees WHERE birth_date = '1953-11-07';
+	#+END_SRC
+
+	#+BEGIN_SRC sql
+	ALTER TABLE employees ADD INDEX `idx_birth_date` (`birth_date`);
+	EXPLAIN SELECT * FROM employees WHERE birth_date = '1953-11-07';
+	#+END_SRC
+
+	不能减少检查行数的查询
+
+	#+BEGIN_SRC sql
+	EXPLAIN SELECT birth_date, count(*) FROM employees GROUP BY birth_date;
+	#+END_SRC
+
+	- 使用覆盖索引
+
+	  #+BEGIN_SRC sql
+	  EXPLAIN SELECT birth_date, count(*) FROM employees
+	  INNER JOIN (
+	      SELECT DISTINCT(birth_date) FROM `employees`
+	  ) AS t1 USING (birth_date) GROUP BY birth_date;
+	  #+END_SRC
+
+	- 优化架构，新建汇总表，或缓存之类
+	- 重写复杂的查询，使用 MYSQL 优化器优化
+
+   #+BEGIN_QUOTE
+   传统设计理论强调尽可能用少的查询做多的事情，对 MYSQL 并不适用
+   #+END_QUOTE
+
+   #+BEGIN_SRC sql
+   SELECT * FROM tag
+       JOIN tag_post ON tag_post.tag_id = tag.id
+	   JOIN post ON tag_post.post_id = post.id
+   WHERE tag.tag = 'mysql'
+   #+END_SRC
+
+   分解联接
+
+   #+BEGIN_SRC sql
+   SELECT * FROM tag WHERE tag='mysql';
+   SELECT * FROM tag_post WHERE tag_id = 1234;
+   SELECT * FROM post WHERE post.id in (123,456,789);
+   #+END_SRC
+
+   - 缓存效率更高
+   - 应用程序可以更方便的扩展数据库
+   - 减少多余行的访问，应用程序端的哈希联接方式比 mysql 内部的嵌套循环算法效率更高
+
+** 查询执行过程
+
+#+CAPTION: mysql process
+[[file:/Users/norris/projects/baby/src/images/mysql_process.png]]
+
+*** 客户端/服务端协议
+
+	半双工，不能同时发送和接受
+
+	必须接受完整的结果集，不能要求服务端停止发送数据
+
+*** 查询缓存
+
+**** 缓存命中
+
+	- 保存了 ~SELECT~ 语句的完成结果集，存在 *HashMap*
+
+	- 哈希值通过查询本身计算得到
+
+	- 如果有阻止缓存的因素存在，就把查询标记为不可缓存
+
+
+
+**** 缓存失效
+
+	表发生任何改变都会导致缓存失效。
+
+	- 有些改变并不会影响返回的数据集
+	- *InnoDB* 事务期间的修改依然会使缓存失效，因此长时间的事务会降低缓存命中率
+
+	缓存数据多对写的消耗巨大，每次写会使缓存失效，查询缓存存在全局锁，会阻塞所有访问缓存的查询。
+
+	收益最大：大查询，小结果
+
+	- 大表不要使用缓存
+	- 批量插入，减少插入次数
+	- 合理控制缓存空间大小
+    - ~query_cache_type=DEMAND~
+
+#+CAPTION: live cache status
+[[file:/Users/norris/projects/baby/src/images/live_cache_status.png]]
+
+**** 缓存如何使用内存
+
+	 - 在缓存查询结果时，服务器会为查询分配一块空间。
+	 - 服务器不能精确分配，因为分配发生在产生结果之前。
+	 - 服务器不会在内存中生成最终的结果然后才发送到客户端，而是每产生一行数据，就发送一行，这造成的结果是：当服务器开始缓存结果的时候，它无法知道结果最终有多大。
+
+	 #+CAPTION: query cache memory
+[[file:/Users/norris/projects/baby/src/images/query_cache_memory.png]]
+
+	 #+BEGIN_QUOTE
+	 Update: MySQL query cache is deprecated as of MySQL 5.7.20, and is removed in MySQL 8.0
+	 #+END_QUOTE
+
+	 #+BEGIN_QUOTE
+	 Assuming that scalability could be improved, the limiting factor of the query cache is that since only queries that hit the cache will see improvement; it is unlikely to improve predictability of performance.  For user facing systems, reducing the variability of performance is often more important than improving peak throughput:
+	 #+END_QUOTE
+
+	 #+BEGIN_EXAMPLE
+	 1. 性能不可预测
+	 2. 性能分配不均匀
+	 #+END_EXAMPLE
+
+*** 查询优化
+
+	查询优化考虑的是开销，并非速度
+
+	- 覆盖索引
+	- 早期终结
+	- 优化 COUNT
+
+	  统计值的数量。非 *NULL*
+
+	  统计行的数量。当表达式永远不可能是 *NULL* 时会统计行的数量，如 ~COUNT(*)~ , 它不会把 * 展开成所有的列，而是会忽略所有的列并统计行数，并得到很好的性能。
+
+	  使用 *COUNT* 的查询很难优化，统计很多行。 *MyISAM* 简单优化
+
+	  #+BEGIN_SRC sql
+	  SELECT COUNT(*) FROM city WHERE id > 5
+	  #+END_SRC
+
+	  #+BEGIN_SRC sql
+	  SELECT (SELECT COUNT(*) FROM city) - COUNT(*) FROM city WHERE id <= 5
+	  #+END_SRC
+
+	  自查询总行数是常量，不用遍历表
+    - IN。 排序 + 二分法
+
+	- 优化关联查询
+
+	  #+BEGIN_QUOTE
+	  任何一个查询都可以看成是一个关联查询
+	  #+END_QUOTE
+
+	  #+BEGIN_SRC sql
+	  SELECT tbl1.col1, tbl2.col2 FROM tbl1
+	  INNER JOIN tbl2 USING (col3)
+	  WHERE tbl1.col1 IN (5,6)
+	  #+END_SRC
+
+	  #+BEGIN_SRC python
+	  tbl1_rows = [row for row in tbl1 if tbl1.col1 in [5,6]]
+
+	  for tbl1_row in tbl1_rows:
+	      tbl2_rows = [row for row in tbl2 if tbl2.col3 = tbl1_row.col3]
+
+		  for tbl2_row in tbl2_rows:
+		      # 拼接结果
+	  #+END_SRC
+
+	  单表查询只需要完成最外层
+
+	  tbl2.col3 需要有索引，而 tbl1.col3 不需要
+
+	  任何 ~GROUP BY~ 和 ~ORDER BY~ 不允许跨表，否则无法利用索引
+
+	- 优化 OFFSET LIMIT

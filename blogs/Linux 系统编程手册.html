@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Linux Programming Interface</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">The Linux Programming Interface</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org5b79ef1">1. Kernel</a>
+<ul>
+<li><a href="#org6b38756">1.1. Tasks</a></li>
+<li><a href="#org0bbf040">1.2. The Shell</a></li>
+<li><a href="#orgc5c55ff">1.3. Single Directory Hierarchy</a></li>
+<li><a href="#org64df6ed">1.4. Stack and Stack Frame</a>
+<ul>
+<li><a href="#org0e8e9e7">1.4.1. User stack</a></li>
+</ul>
+</li>
+<li><a href="#orgda9c267">1.5. argc argv</a></li>
+<li><a href="#org8d05a61">1.6. Env list</a></li>
+</ul>
+</li>
+<li><a href="#org7c9d090">2. Memory Allocation</a>
+<ul>
+<li><a href="#orgd7e2164">2.1. on the heap</a></li>
+<li><a href="#org0ca0e37">2.2. on the stack</a></li>
+</ul>
+</li>
+<li><a href="#orgae8ee1e">3. Users and Groups</a>
+<ul>
+<li><a href="#orgcadb39d">3.1. /etc/passwd</a></li>
+<li><a href="#orge21840e">3.2. /etc/shadow</a></li>
+<li><a href="#org9d7d553">3.3. /etc/group</a></li>
+</ul>
+</li>
+<li><a href="#orgdbd9abf">4. Process Credentials</a>
+<ul>
+<li><a href="#orgaab59c7">4.1. Real User ID</a></li>
+<li><a href="#org3248a3b">4.2. Effective User ID</a></li>
+<li><a href="#orgec38bc3">4.3. Set-User-ID</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5b79ef1" class="outline-2">
+<h2 id="org5b79ef1"><span class="section-number-2">1</span> Kernel</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org6b38756" class="outline-3">
+<h3 id="org6b38756"><span class="section-number-3">1.1</span> Tasks</h3>
+<div class="outline-text-3" id="text-1-1">
+</div>
+<ol class="org-ol">
+<li><a id="org91bccda"></a>process scheduling, kernel decides which process obtain access to cpu<br /></li>
+<li><a id="orgc347874"></a>memory management<br /></li>
+<li><a id="orge5e4541"></a>file system<br /></li>
+<li><a id="orgcce34d8"></a>process creation and termination<br /></li>
+<li><a id="org3a92b13"></a>access to device<br /></li>
+<li><a id="org60d60ad"></a>network<br /></li>
+<li><a id="org19d845b"></a>api<br /></li>
+</ol>
+</div>
+
+<div id="outline-container-org0bbf040" class="outline-3">
+<h3 id="org0bbf040"><span class="section-number-3">1.2</span> The Shell</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+shell, c shell, bourn shell, bourn again shell
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc5c55ff" class="outline-3">
+<h3 id="orgc5c55ff"><span class="section-number-3">1.3</span> Single Directory Hierarchy</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+all directories are children of /root 
+</p>
+</div>
+</div>
+
+<div id="outline-container-org64df6ed" class="outline-3">
+<h3 id="org64df6ed"><span class="section-number-3">1.4</span> Stack and Stack Frame</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+kernel stack is not user stack
+</p>
+</div>
+
+<div id="outline-container-org0e8e9e7" class="outline-4">
+<h4 id="org0e8e9e7"><span class="section-number-4">1.4.1</span> User stack</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<p>
+contains:
+</p>
+<ul class="org-ul">
+<li>local variables, function args</li>
+<li>call linkage info: pointers of embedded functions etc.</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgda9c267" class="outline-3">
+<h3 id="orgda9c267"><span class="section-number-3">1.5</span> argc argv</h3>
+<div class="outline-text-3" id="text-1-5">
+<ul class="org-ul">
+<li>argv terminated by NULL</li>
+<li>only usable for func main</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org8d05a61" class="outline-3">
+<h3 id="org8d05a61"><span class="section-number-3">1.6</span> Env list</h3>
+</div>
+</div>
+
+<div id="outline-container-org7c9d090" class="outline-2">
+<h2 id="org7c9d090"><span class="section-number-2">2</span> Memory Allocation</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgd7e2164" class="outline-3">
+<h3 id="orgd7e2164"><span class="section-number-3">2.1</span> on the heap</h3>
+</div>
+
+<div id="outline-container-org0ca0e37" class="outline-3">
+<h3 id="org0ca0e37"><span class="section-number-3">2.2</span> on the stack</h3>
+</div>
+</div>
+
+<div id="outline-container-orgae8ee1e" class="outline-2">
+<h2 id="orgae8ee1e"><span class="section-number-2">3</span> Users and Groups</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgcadb39d" class="outline-3">
+<h3 id="orgcadb39d"><span class="section-number-3">3.1</span> /etc/passwd</h3>
+</div>
+
+<div id="outline-container-orge21840e" class="outline-3">
+<h3 id="orge21840e"><span class="section-number-3">3.2</span> /etc/shadow</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+privileged can see this
+</p>
+</div>
+</div>
+
+<div id="outline-container-org9d7d553" class="outline-3">
+<h3 id="org9d7d553"><span class="section-number-3">3.3</span> /etc/group</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+users to groups multi<sub>to</sub><sub>multi</sub> relationship
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdbd9abf" class="outline-2">
+<h2 id="orgdbd9abf"><span class="section-number-2">4</span> Process Credentials</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgaab59c7" class="outline-3">
+<h3 id="orgaab59c7"><span class="section-number-3">4.1</span> Real User ID</h3>
+</div>
+
+<div id="outline-container-org3248a3b" class="outline-3">
+<h3 id="org3248a3b"><span class="section-number-3">4.2</span> Effective User ID</h3>
+</div>
+
+<div id="outline-container-orgec38bc3" class="outline-3">
+<h3 id="orgec38bc3"><span class="section-number-3">4.3</span> Set-User-ID</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+If setuid is enabled, executed file is runned with its owner user id
+</p>
+
+<p>
+<a href="https://stackoverflow.com/questions/32455684/unix-linux-difference-between-real-user-id-effective-user-id-and-saved-user">Unix / Linux: Difference between Real User ID, Effective User ID and Saved User ID - Stack Overflow</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

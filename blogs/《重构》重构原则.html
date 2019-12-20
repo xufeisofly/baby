@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf8b8590">1. 什么时候重构</a></li>
+<li><a href="#org8467d98">2. 什么地方重构</a>
+<ul>
+<li><a href="#orgceec9a4">2.1. 重复代码</a></li>
+<li><a href="#org963005b">2.2. 过长的函数</a>
+<ul>
+<li><a href="#org52106c9">2.2.1. Replace Temp with query</a></li>
+<li><a href="#org1197b1b">2.2.2. Introduce Parameter Object</a></li>
+<li><a href="#orgd3d4755">2.2.3. Preserve Whole Object</a></li>
+</ul>
+</li>
+<li><a href="#orgee36450">2.3. 过长的参数</a></li>
+<li><a href="#org727ef6c">2.4. 不同方向的变化</a></li>
+<li><a href="#orgd7d78bc">2.5. 散弹式修改</a></li>
+<li><a href="#orgae31ca3">2.6. 依恋情结</a></li>
+<li><a href="#org2b3caa7">2.7. 使用对象封装参数和行为</a></li>
+<li><a href="#orgc911aee">2.8. switch语句</a>
+<ul>
+<li><a href="#org853ace1">2.8.1. 1. Replace Type Code with Subclasses</a></li>
+<li><a href="#org79c0035">2.8.2. 2. Replace Type Code with State/Strategy</a></li>
+</ul>
+</li>
+<li><a href="#org30b812d">2.9. 没用的类</a></li>
+<li><a href="#orgb50d7c1">2.10. “未来性”的代码</a></li>
+<li><a href="#orgeb543e7">2.11. 类之间过于复杂的引用关系</a></li>
+<li><a href="#orge5711c9">2.12. 不该继承的子类和超类</a></li>
+<li><a href="#org4ae6f51">2.13. 过多的注释</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+这本书最好的一点是通俗易懂，不是上来就整那么多让人恶心的代码，看完还都记不住
+</p>
+<blockquote>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">没有人能一次就写出最优雅的代码</td>
+<td class="org-left">因此重构必须实时进行</td>
+<td class="org-left">因此必须有健壮的，可信的，全覆盖的测试</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<div id="outline-container-orgf8b8590" class="outline-2">
+<h2 id="orgf8b8590"><span class="section-number-2">1</span> 什么时候重构</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+“重构绝不是为了重构而重构”，这句话是什么意思，好像是说不要特意去重构一些代码，否则会被那些进度控的产品经理活埋。
+作者更倾向于在做新功能的时候，看到不爽的代码顺手改之，或者，在阅读别人代码的时候，通过尝试重构的方式去了解这部分设计，从而一举两得。
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org8467d98" class="outline-2">
+<h2 id="org8467d98"><span class="section-number-2">2</span> 什么地方重构</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgceec9a4" class="outline-3">
+<h3 id="orgceec9a4"><span class="section-number-3">2.1</span> 重复代码</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+方法基本就是提取出来重复的部分，放到一个何时的地方，大家一起调用
+</p>
+</div>
+</div>
+
+<div id="outline-container-org963005b" class="outline-3">
+<h3 id="org963005b"><span class="section-number-3">2.2</span> 过长的函数</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+小函数会造成函数变多，这时候需要起个好名字
+</p>
+<blockquote>
+<p>
+关键不在于函数的长度，而在于函数“做什么”和“如何做”之间的语义距离
+</p>
+</blockquote>
+<p>
+如果函数有很多参数和临时变量，会加大拆解的难度，这个时候可以用下面几种方法：
+</p>
+</div>
+
+<div id="outline-container-org52106c9" class="outline-4">
+<h4 id="org52106c9"><span class="section-number-4">2.2.1</span> Replace Temp with query</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+去掉临时变量，虽然有时候会重复执行函数，影响性能，但值得
+</p>
+</div>
+</div>
+
+<div id="outline-container-org1197b1b" class="outline-4">
+<h4 id="org1197b1b"><span class="section-number-4">2.2.2</span> Introduce Parameter Object</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+将特定组合的参数封装成一个对象，如
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">method<span style="color: #8c8c8c;">(</span>start_date, end_date<span style="color: #8c8c8c;">)</span> =&gt; method<span style="color: #8c8c8c;">(</span>date_range<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+<p>
+date<sub>range是一个对象</sub>
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd3d4755" class="outline-4">
+<h4 id="orgd3d4755"><span class="section-number-4">2.2.3</span> Preserve Whole Object</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<p>
+保持对象完整，如果参数只是某个对象的几个属性，可以改为传递整个对象
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">method<span style="color: #8c8c8c;">(</span>deal.destination, deal.days<span style="color: #8c8c8c;">)</span> =&gt; method<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgee36450" class="outline-3">
+<h3 id="orgee36450"><span class="section-number-3">2.3</span> 过长的参数</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+如果参数列可以属于一个对象，可以将同一个对象的参数收集起来，将对象本身传进去
+</p>
+</div>
+</div>
+
+<div id="outline-container-org727ef6c" class="outline-3">
+<h3 id="org727ef6c"><span class="section-number-3">2.4</span> 不同方向的变化</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+针对某一个外界的变化的所有相应修改，都应该只发生在单一的类中，而这个新类的所有内容都应该反应此变化
+</p>
+<blockquote>
+<p>
+具体怎么实现不知道，姑且先记下这个标准吧
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgd7d78bc" class="outline-3">
+<h3 id="orgd7d78bc"><span class="section-number-3">2.5</span> 散弹式修改</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+出现某种变化时，不得不在不同的类中进行修改。应该一些列的相关行为放到一个类中。
+</p>
+<blockquote>
+<p>
+拿unicrm权限系统举例，应该在前端的权限key和后端的权限之间加一个translator类，这样在修改前端key名称或者增加新的权限时 <br />
+就不用全局搜来搜去了
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgae31ca3" class="outline-3">
+<h3 id="orgae31ca3"><span class="section-number-3">2.6</span> 依恋情结</h3>
+<div class="outline-text-3" id="text-2-6">
+<ul class="org-ul">
+<li>某个函数从另一个对象那里调用了很多数据，那这个函数应该在另一个类里面。</li>
+<li>如果一个函数用到几个类的功能，那么哪个类拥有最多的被此函数调用的数据，这个函数就应该在那个类里面。</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org2b3caa7" class="outline-3">
+<h3 id="org2b3caa7"><span class="section-number-3">2.7</span> 使用对象封装参数和行为</h3>
+<div class="outline-text-3" id="text-2-7">
+<p>
+创造更多的小对象，对象可以打包参数，也可以打包参数和行为，我们可以把start<sub>date和end</sub><sub>data就搞成</sub> <br />
+一个对象
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc911aee" class="outline-3">
+<h3 id="orgc911aee"><span class="section-number-3">2.8</span> switch语句</h3>
+<div class="outline-text-3" id="text-2-8">
+<blockquote>
+<p>
+switch语句造成的问题是重复。可能要在不同的地方不断的加switch语句。
+实际上switch语句想要表达的意思是：不同的情况下有不同的行为。只要把这些行为封装到各自的类里，然后通过switch单纯的判断使用哪个对象就好了，这就是多态！
+</p>
+</blockquote>
+<p>
+有两种处理方法：
+</p>
+</div>
+<div id="outline-container-org853ace1" class="outline-4">
+<h4 id="org853ace1"><span class="section-number-4">2.8.1</span> 1. Replace Type Code with Subclasses</h4>
+<div class="outline-text-4" id="text-2-8-1">
+<blockquote>
+<p>
+将类型码替换为可拥有多态行为的继承体系，以类型码的宿主类作为基类，然后针对每一种类型码创建子类
+不过有两种情况不能这么做：
+</p>
+<ul class="org-ul">
+<li>类型码的值在对象创建之后发生变化</li>
+<li>类型码的宿主类已经有了子类</li>
+</ul>
+</blockquote>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>blood_type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@blood_type</span> = blood_type
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">talk</span>
+    <span style="color: #b48ead;">case</span> <span style="color: #bf616a;">@blood_type</span>
+    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:a</span>
+      balabala_a
+    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:b</span>
+      balabala_b
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+改成如下
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Blood</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@type</span> = type
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">instance</span>
+    <span style="color: #b48ead;">case</span> <span style="color: #bf616a;">@type</span>
+    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:a</span>
+      <span style="color: #c0c5ce;">BloodA</span>.new
+    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:b</span>
+      <span style="color: #c0c5ce;">BloodB</span>.new
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodA</span> &lt; <span style="color: #c0c5ce;">Blood</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodB</span> &lt; <span style="color: #c0c5ce;">Blood</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>blood_instance<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@blood_instance</span> = blood_instance
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">talk</span>
+    <span style="color: #bf616a;">@blood_instance</span>.balabala
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+blood_instance = <span style="color: #c0c5ce;">Blood</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:a</span><span style="color: #8c8c8c;">)</span>.instance
+person = <span style="color: #c0c5ce;">Person</span>.new<span style="color: #8c8c8c;">(</span>blood_instance<span style="color: #8c8c8c;">)</span>
+person.talk
+</pre>
+</div>
+<blockquote>
+<p>
+这样的好处是，以后再有根据类型码区分的行为，就可以在BloodA和BloodB中增加了
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org79c0035" class="outline-4">
+<h4 id="org79c0035"><span class="section-number-4">2.8.2</span> 2. Replace Type Code with State/Strategy</h4>
+<div class="outline-text-4" id="text-2-8-2">
+<blockquote>
+<p>
+当宿主类不能被继承，或者类型码在生命周期中发生变化时，使用这种方法。
+本方法原理就是创建一个状态对象，即，将类型码对象化
+</p>
+</blockquote>
+<pre class="example">
+基本方法：
+1. 新建一个子类，根据类型码用途为它命名，这就是一个状态对象
+2. 为这个新类添加子类，每个子类对应一种类型码
+</pre>
+
+<p>
+还是刚才的例子，但我们假设这个person对象的血型是可以变的&#x2026;明显不能用刚才的Person.new(blood<sub>instance</sub>)
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodType</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@type</span> = type
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">new_type</span>
+    <span style="color: #b48ead;">case</span> <span style="color: #bf616a;">@type</span>
+    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:a</span>
+      <span style="color: #c0c5ce;">BloodA</span>.new
+    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:b</span>
+      <span style="color: #c0c5ce;">BloodB</span>.new
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodA</span> &lt; <span style="color: #c0c5ce;">BloodType</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type</span>
+    <span style="color: #c0c5ce;">BloodType</span>::<span style="color: #c0c5ce;">A</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodB</span> &lt; <span style="color: #c0c5ce;">BloodType</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type</span>
+    <span style="color: #c0c5ce;">BloodType</span>::<span style="color: #c0c5ce;">B</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@type</span> = type
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type</span>
+    <span style="color: #bf616a;">@type</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type=</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@type</span> = <span style="color: #c0c5ce;">BloodType</span>.new<span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>.new_type
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">talk</span>
+    <span style="color: #bf616a;">@type</span>.balabala
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+person = <span style="color: #c0c5ce;">Person</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:a</span><span style="color: #8c8c8c;">)</span>
+person.talk
+<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&#25913;&#21464;&#34880;&#22411;</span>
+person.type = <span style="color: #d08770;">:b</span>
+person.talk
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org30b812d" class="outline-3">
+<h3 id="org30b812d"><span class="section-number-3">2.9</span> 没用的类</h3>
+<div class="outline-text-3" id="text-2-9">
+<blockquote>
+<p>
+类的维护是要花钱的，如果某个类长时间没有做到足够的工作，就应该砍掉
+砍掉的方式有：
+</p>
+<ul class="org-ul">
+<li>合并到它的超类里</li>
+<li>将两个类合并成一个，如Telephone类的方法合并到Person中</li>
+</ul>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgb50d7c1" class="outline-3">
+<h3 id="orgb50d7c1"><span class="section-number-3">2.10</span> “未来性”的代码</h3>
+<div class="outline-text-3" id="text-2-10">
+<blockquote>
+<p>
+总有一天要做某件事写出来的代码容易臭
+不要为了某个不切实际的边边角角的可能性，去复杂化设计
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgeb543e7" class="outline-3">
+<h3 id="orgeb543e7"><span class="section-number-3">2.11</span> 类之间过于复杂的引用关系</h3>
+<div class="outline-text-3" id="text-2-11">
+<blockquote>
+<p>
+举个栗子，cure项目中表之间的关系，其实就是不同model对象的相互引用，如果引用关系过于复杂，<br />
+只要一个对象发生变化，会改死你的。
+</p>
+</blockquote>
+<blockquote>
+<p>
+解决方法：hide delegate（隐藏这种委托关系）
+</p>
+<ol class="org-ol">
+<li>减少这种关联</li>
+<li>创建委托函数，隐藏这种委托关系</li>
+</ol>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby">deal.customer.name
+</pre>
+</div>
+<p>
+可以改为
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">deal.customer_name
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer_name</span>
+  customer.name
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+这样的好处是customer.name的实现原理对deal隐藏了，减少耦合，如果日后name字段迁移，则不用大面积修改
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge5711c9" class="outline-3">
+<h3 id="orge5711c9"><span class="section-number-3">2.12</span> 不该继承的子类和超类</h3>
+<div class="outline-text-3" id="text-2-12">
+<blockquote>
+<p>
+超类应该只持有子类共享的东西。
+</p>
+</blockquote>
+<p>
+如果超类中有些东西子类不愿意继承或者不适合继承，我们有两种做法：
+</p>
+<ol class="org-ol">
+<li>将不愿意被继承的内容单独摘出去构建一个类</li>
+<li>将继承改为委托</li>
+</ol>
+<p>
+下面为第二种方法举例
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">A</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">m_accepted</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">m_refused</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">B</span> &lt; <span style="color: #c0c5ce;">A</span>
+  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">only need m_accepted</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+应该将B改为这样
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">B</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>a_instance<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@_a_instance</span> = a_instance
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">m_accepted</span>
+    <span style="color: #bf616a;">@_a_instance</span>.m_accepted
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+用一个方法则定义一个相应的委托方法，而不是使用继承
+</p>
+<blockquote>
+<p>
+就像unicrm的deal和travel互相delegate一样，不能为了共用方法，就让Deal &lt; Travel吧
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org4ae6f51" class="outline-3">
+<h3 id="org4ae6f51"><span class="section-number-3">2.13</span> 过多的注释</h3>
+<div class="outline-text-3" id="text-2-13">
+<ol class="org-ol">
+<li>先使用Extract Method</li>
+<li>再使用Rename Method</li>
+<li>不行再使用注释</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

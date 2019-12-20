@@ -1,0 +1,96 @@
+** Move Method
+   #+BEGIN_QUOTE
+   搬移函数
+   这里的move method方法并不是让你什么重构都这样用，这是最基本的方法，但大多数重构方法都比这个更好, \\
+   它解决的本质问题就是：方法要放到正确的类里
+   #+END_QUOTE
+   举个unicrm系统里的例子，是一个用于生产销售漏斗log的类的，由于deal对象有两种travel_type，//
+   所以我们根据这个进行举例。
+   #+BEGIN_SRC ruby
+   class SalesPipelineAnalyticListener
+     TYPE = ...
+     STAGES = ...
+
+     def discuss_proposal(deal)
+       prepare_proposal(deal)
+       if deal.travel_type == TYPE[:tailor]
+         add_transitions_log(deal, STAGES[:prepare_proposal], STAGES[:tailor_discuss])
+       else
+         add_transitions_log(deal, STAGES[:prepare_proposal], STAGES[:tour_discuss])
+       end
+       add_process_log(deal)
+     end
+
+     def prepare_proposal(deal); end
+     def add_transitions_log(deal, from, to); end
+     def add_process_log(deal); end
+   end
+   #+END_SRC
+   其实这个例子用多态代替if更好，但我们现在就单纯的把discuss_proposal执行Move Method
+   因为里面用到了deal的travel_type，所以应该在deal类中
+   #+BEGIN_SRC ruby
+   class Deal
+     TYPE = ...
+     STAGES = ...
+
+     def discuss_proposal(analytic_instance)
+       analytic_instance.prepare_proposal(self)
+       if travel_type == TYPE[:tailor]
+         analytic_instance.add_transitions_log(self, STAGE...)
+       else
+         analytic_instance.add_transitions_log(self, STAGE...)
+       end
+       analytic_instance.add_process_log(self)
+     end
+   end
+
+   class SalesPipelineAnalyticListener
+     def discuss_proposal(deal)
+       deal.discuss_proposal(self)
+     end
+   end
+   #+END_SRC
+   将SalesPipelineAnalyticListener的discuss_proposal改为委托函数，如果想彻底删掉它，\\
+   就需要找出所有调用这个函数的地方，一一改正
+   
+** Extract Class
+   #+BEGIN_QUOTE
+   拆分类
+   #+END_QUOTE
+   没有什么好说的，但书中有个遗留问题值得思考，拆分出一个新类以后，这个类的方法要不要公开？\\
+   还是隐藏？书中有三种选择我就直接抄了
+   #+BEGIN_QUOTE
+   1. 允许任何对象修改这个类的任何部分，这就使得新类的对象成为引用对象 \\
+      应该考虑使用Change Value to Reference
+   2. 不公开这个类，将新类设为不可修改的
+   3. 先复制一个新类的对象，然后将复制得到的新对象传递给旧类的对象。但这 \\
+      可能造成一定程度的迷惑，因为人们会认为它们可以修改新类的对象值。 \\
+      此外，如果同一个新类的对象被传递给多个旧类对象，也可能在用户间造成别名问题
+   #+END_QUOTE
+   上面的新类和旧类举个例子：分别对应Telephone类和Person类
+
+** Hide Delegate
+   #+BEGIN_QUOTE
+   隐藏委托关系，每个对象都尽量少了解别的类
+   (这里感觉和rails有点相悖，rails的association关联两个对象后，彼此可以使用对方的全部内容)
+   主要目的就是减少耦合
+   #+END_QUOTE
+   #+BEGIN_SRC ruby
+   deal.customer.name
+   #+END_SRC
+   不如换成
+   #+BEGIN_SRC ruby
+   deal.customer_name
+
+   def customer_name
+     customer.name
+   end
+   #+END_SRC
+   这样，假设以后customer.name改名了，改叫customer.username，只需要改一个customer_name方法就行了
+   #+BEGIN_QUOTE
+   但Hide Delegate的前提是需要委托的关系不是很多，如果很多，那就直接调用另一个对象就好了，否则没有意义，还难以维护
+   #+END_QUOTE
+
+#+BEGIN_QUOTE
+书中这一章还有外加函数，本地扩展之类的，原因都是因为java无法修改这个类，ruby中不存在，不写了
+#+END_QUOTE

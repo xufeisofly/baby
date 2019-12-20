@@ -1,0 +1,19 @@
+* 开发环境下Rails Cache导致的undefined class/module问题
+  参考： https://aaronvb.com/articles/rails-caching-and-undefined-class-module.html
+
+  #+BEGIN_QUOTE
+  Rails cache已经用到cache的一些gem会在开发环境下触发这个问题。（如rails_event_store）, 生产环境下不会有，因为environments/production.rb中有  
+  #+END_QUOTE
+  #+BEGIN_SRC ruby
+  config.cache_class = true  
+  #+END_SRC`
+
+  解决方法就是在initializer里针对development加载一下所需要的class
+  #+BEGIN_SRC ruby
+  if Rails.env.development?
+    require_dependency 'user.rb'
+    require_dependency '../events/price_check_form_submitted.rb'
+  end  
+  #+END_SRC
+
+

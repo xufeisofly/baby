@@ -1,0 +1,39 @@
+首先要明确几个点
+#+BEGIN_QUOTE
+1. javascript是单线程的，但这样实在是太慢了，所以发明了异步来解决这个问题
+2. 什么是同步，什么是异步。同步就是下一个东西是否执行需要依赖于上一个东西是否执行完，对于单线程实在不是一个好方法
+#+END_QUOTE
+要熟悉javascript单线程的异步编程，让程序可以同时处理很多事情
+为了能够异步编程，有以下两种方法
+#+BEGIN_QUOTE
+1. 回调函数
+2. promise
+#+END_QUOTE
+下面重点讲一下promise
+promise有点类似于事件，但不一样的是，事件一般是多次触发的事情，比如keyup, click，对于“一次定胜负”的东西，并不适用，概念上也不是事件
+比如如果要做以下事情
+1.先获取客户信息
+2.再用客户信息去获取他的排班情况
+
+首先这两个必须要异步，为什么呢，不为什么，因为现在接口都特么是异步的，写成同步的也可以
+这个东西你写成事件就不好了
+另外事件更像是一个中断，发生的时候才去运行，不发生的时候或触发失败的时候压根没有其他的逻辑去处理，但promise有，catch啊什么的
+
+官方对promise和事件的区别描述是
+#+BEGIN_QUOTE
+promise 只能成功或失败一次，而不能成功或失败两次，也不能从成功转为失败或从失败转为成功。
+如果 promise 已成功或失败，且您之后添加了成功/失败回调，则将会调用正确的回调，即使事件发生在先。
+#+END_QUOTE
+
+promise的基本结构
+#+BEGIN_SRC javascript
+var promise = new Promise(function(resolve, reject) {
+  // 做一个异步的事情
+  if (/* 事情成功 */) {
+    resolve('worked')
+  } else {
+    reject(Error('broke'))
+  }
+})
+#+END_SRC
+平时使用的then catch就是这个的变形吧

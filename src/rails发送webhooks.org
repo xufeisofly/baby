@@ -1,0 +1,288 @@
+#+BEGIN_QUOTE
+今天看到一篇文章，手把手教你如何使用rails具体实现webhook，感觉写代码的思路值得学习，所以在这里大概摘抄下来。
+#+END_QUOTE
+
+原文如下：https://benediktdeicke.com/2017/09/sending-webhooks-with-rails/
+
+#+BEGIN_EXAMPLE
+webhook其实就是：让别人在你这里注册一个终端地址，并在发生事件的时候给他们发送消息。通过这种方式把别人的服务集成到你的应用中。
+#+END_EXAMPLE
+
+** 注册webhook endpoints
+
+   首先应当有个model，允许通过页面让别人输入他们需要收到通知的url，表单很简单就不写了。我们定义一个Webhook::Endpointmodel。
+   每个endpoint都应该有一个target url, 一组events，一个account表示endpoint属于它（比如uniqueway就是udesk的一个account），为了简单，使用postgresql的array columns存储events。
+   
+   #+BEGIN_SRC ruby
+   class CreateWebhookEndpoints < ActiveRecord::Migration[5.2]
+     def change
+       create_table :webhook_endpoints do |t|
+         t.string :target_url, null: false # null: false不允许是null
+         t.string :events, null: false, array: true
+         t.references :acount, foreign_key: true, null: false # 储存account_id
+         t.timestamps
+         t.index :events # 设置events为索引
+       end
+     end
+   end
+   #+END_SRC
+
+   然而我们把model定义为Endpoint，Webhook只是它的一个namespace，防止webhook在endpoint里名称重复。
+   
+   #+BEGIN_SRC ruby
+   module Webhook
+     class Endpoint < ApplicationRecord
+       attribute :events, :string, array: true, default: [] # 定义events为array
+       
+       validates :target_url, presence: true, format: URI.regexp(%w(http https))
+       validates :events, presence: true
+
+       def self.table_name_prefix
+         'webhook_'
+       end
+     end
+   end
+   #+END_SRC
+
+   然后我们定义一个scope，帮助endpoints快速筛选出包含某几个events的endpoints
+
+   #+BEGIN_SRC ruby
+   scope :for_event, -> (events){ where('events @> ARRAY[?]::varchar[]', Array(events)) }
+   #+END_SRC
+
+   然后，我们复写一下events=方法，做一些value的标准化
+   
+   #+BEGIN_SRC ruby
+   def events=(events)
+     events = Array(events).map { |event|.to_s.underscore }
+     super(WebhookL::Event::EVENT_TYPES & events)
+   end
+   #+END_SRC
+   
+   然后我们写一个deliver方法，用来deliver一个event to 这个endpoint，我们暂时不写这个方法
+   
+   #+BEGIN_SRC ruby
+   def deliver(event)
+   end
+   #+END_SRC
+   
+   #+BEGIN_QUOTE
+   好吧，这些真的都不重要
+   #+END_QUOTE
+
+** 构建events
+   
+   设想一下event的对象应该是个什么样，大概这样
+   #+BEGIN_SRC ruby
+   {
+     "event_name": "project_created",
+     "project": {
+       "name": "Example Project"
+     }
+   }
+   #+END_SRC
+
+   所以定义一个model，这个类没必要集成ApplicationRecord
+
+   #+BEGIN_SRC ruby
+   module Webhook
+     class Event
+       EVENT_TYPS = %w(
+         project_created
+         project_updated
+         project_destroyed
+       ).freeze
+
+       attr_reader :event_name, :payload
+
+       def initialize(event_name, payload = {})
+         @event_name = event_name # event名字
+         @payload = payload # hash project 
+       end
+
+       # 我们想把events转成上面我们想要的json格式，可以定义一个as_json
+       def as_json(*args)
+         hash = payload.transform_values do |value|
+           serialize_resource(value).as_json(*args)
+         end
+
+         hash[:event_name] = event_name
+         hash
+       end
+
+       private
+       
+       def serialize_resource(resource) # 可以在serializer的class中定义包含的字段，这样就不是所有字段都会有了
+         ActiveModelSerializers::SerializableResource.new(resource, {})
+       end
+     end
+   end
+   #+END_SRC
+
+   这样就可以这么定义event了
+
+   #+BEGIN_SRC ruby
+   Webhook::Event.new(:project_created, { project: project })
+   #+END_SRC
+   
+** 触发事件
+   
+   我们把触发事件的方法放入一个module中，这样想触发事件的model只需要include这个module就好了。
+   我们首先定义webhhook_scope，这个方法必须在不同的model重新定义
+
+   #+BEGIN_SRC ruby
+   module Webhook
+     module Delivery
+       extend ActiveSupport::Concern
+       
+       def webhook_scope
+         raise NotImplementedError
+       end
+     end
+   end
+   #+END_SRC
+   
+   接下来定义发布事件的方法deliver_webhook_event，用来让所有已经注册这个事件的endpoint发布事件
+   
+   #+BEGIN_SRC ruby
+   def deliver_webhook_event(event_name, payload)
+     event = Webhook::Event.new(event_name, payload || {})
+     webhook_scope.webhook_endpoints.for_event(event_name).each do |endpoint|
+       endpoint.deliver(event)
+     end
+   end
+   #+END_SRC
+   
+   可以进一步优化代码，让它更简洁
+
+   #+BEGIN_SRC ruby
+   def webhook_payload # 这个方法明显需要在model当中重新定义
+     {}
+   end
+
+   def deliver_webhook(action)
+     event_name = "#{self.class.name.underscore}_#{action}"
+     deliver_webhook_event(event_name, webhook_payload)
+   end
+   #+END_SRC
+
+   那么我们现在就可以在model中引用这些方法
+   
+   #+BEGIN_SRC ruby
+   class Project < ApplicationRecord
+     include Webhook::Delivery
+
+     after_commit on: :create do
+       deliver_webhook(:created)
+     end
+
+     belongs_to :account
+
+     private
+
+     def webhook_scope
+       account
+     end
+
+     def webhook_payload
+       { project: self }
+     end
+   end
+   #+END_SRC
+
+   其实我们可以把这些回调函数放到另一个module里面
+   #+BEGIN_QUOTE
+   这个操作可以借鉴一下
+   #+END_QUOTE
+
+   #+BEGIN_SRC ruby
+   module Webhook
+     module Observable
+       extend ActiveSupport::Concern
+       include Webhook::Delivery
+
+       included do
+         after_commit on: :create do
+           deliver_webhook(:created)
+         end
+
+         after_commit on: :update do
+           deliver_webhook(:updated)
+         end
+
+         after_commit on: :destroy do
+           deliver_webhook(:destroyed)
+         end
+       end
+     end
+   end
+   #+END_SRC
+   
+   #+BEGIN_QUOTE
+   此处注意回调函数用到是after_commit，因为必须保证webhook是在数据已经储存到database之后才发出的。这样可以避免not found error。
+   #+END_QUOTE
+   
+   这样model就简化成了这样
+
+   #+BEGIN_SRC ruby
+   class Project < ApplicationRecord
+     include Webhook::Observable
+
+     belongs_to :account
+
+     private
+
+     def webhook_scope
+       account
+     end
+
+     def webhook_payload
+       { project: self }
+     end
+   end
+   #+END_SRC
+
+** 发送webhooks
+   
+   这里强烈建议使用异步任务来发送webhook，因为你是给第三方发送请求，你丫根本没法保证会发生什么。在这里我们就用sidekiq。
+
+   #+BEGIN_SRC ruby
+   require 'net/http'
+
+   module Webhook
+     class DeliveryWorker
+       include Sidekiq::Worker
+
+       def perform(endpoint_id, payload)
+         return unless endpoint = Webhook::Endpoint.find(endpoint_id)
+         response = request(endpoint.target_url, payload)
+
+         case response.code
+         when 410
+           endpoint.destroy
+         when 400..599
+           raise response.to_s
+         end
+       end
+     end
+   end
+   #+END_SRC
+   
+   #+BEGIN_QUOTE
+   这里根据不同的response.code做了不同的操作，可以学习一下
+   #+END_QUOTE
+
+   我们还需要定义request方法，不过就是发送一个http，这里就不写了。
+   最后，我们需要在model中定义deliver方法
+   
+   #+BEGIN_SRC ruby
+   def deliver(event)
+     Webhook::DeliveryWorker.perform_async(id, event.to_json)
+   end
+   #+END_SRC
+
+** 总结
+   
+   1. deliver_webhook_event方法是关键，把当前model的endpoints包含event_name的全都执行，作用域很重要
+   2. 使用异步任务，防止第三方的问题
+   3. 使用好module封装，这是这篇文章很好的一点

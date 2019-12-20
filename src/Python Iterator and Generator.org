@@ -1,0 +1,208 @@
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+
+http://niltouch-1256880307.file.myqcloud.com/38/38-1.jpg]]
+
+#+BEGIN_QUOTE
+    入职知乎以后，虽然是早十晚六的油腻生活，但不知道时间都去哪了，还是只能在地铁上学Python。《Fluent Python》这本书是我精心挑选，豆瓣评分9.x的大作，买来一看果然没让我失望，基本看不懂，但我坚信它是好书，因为里面涉及很多底层的实现和Python的思想，而非简单的语法。
+今天看到了Iterator和Generator。
+#+END_QUOTE
+
+** Iterator(迭代器)
+
+*** 可迭代对象
+   
+   Python中有很多类型有迭代的属性，我们称之为「迭代对象」(Iterable)，比如:
+   
+   #+BEGIN_SRC python
+   for i in [1,2,3]:
+       print i
+
+   for k, v in {'a': 1, 'b': 2, 'c': 3}:
+       print v
+
+   for i in (1,2,3):
+       print i
+
+   for i in 'abc':
+       print i
+   #+END_SRC
+
+   for循环就是迭代属性的一种表现。而序列可以迭代的原因，是因为iter函数。
+   
+*** 迭代器协议
+
+    解释器需要迭代对象x时，会自动调用iter(x)，而iter函数有以下作用：
+    
+    1. 检查对象是否有__iter__方法，如果有就调用，获取一个迭代器
+    2. 如果没有__iter__方法，但是有__getitem__方法，则创建一个迭代器
+   
+    也就是说__iter__或__getitem__方法的实现是这些类型可以被迭代调用的原因，因为他们都会提供一个「迭代器」。那么不禁要问，如何实现一个迭代器？实现一个迭代器只需要支持两个方法：
+    
+    1. __iter__ 返回一个迭代器，也就是自身
+    2. next 获取下一个元素
+
+    #+BEGIN_SRC python
+    class MyIterator(object):
+        def __init__(self, n):
+            self.n = n
+
+        def __iter__(self):
+            return self
+
+        def next(self):
+            # 以2为step迭代
+            if self.n < 10:
+                self.n += 2
+                return self.n
+            else:
+                # 超出迭代上限抛出StopIteration
+                raise StopIteration
+    #+END_SRC
+
+    然后再实现一个可迭代对象
+
+    #+BEGIN_SRC python
+    class MyIterable(object):
+        def __init__(self, n):
+            self.n = n
+
+        def __str__(self):
+            print self.n
+
+        def __iter__(self):
+            # 返回一个迭代器
+            return MyIterator(self.n)
+    #+END_SRC
+
+    然后就可以实现下面的迭代效果
+
+    #+BEGIN_SRC python
+    i = MyIterable(2)
+    for x in i:
+        print x
+
+    # => 4, 6, 8, 10    
+    #+END_SRC
+    
+    由于迭代器也实现了__iter__方法，因此迭代器也可以迭代，一句话说明
+
+    #+BEGIN_QUOTE
+    迭代器是可迭代对象，但可迭代对象不是迭代器
+    #+END_QUOTE
+
+    看到这里我有个疑惑，为什么不直接在MyIterable类中实现next方法，让可迭代对象也是迭代器。书中的解释是这样的：
+    
+    #+BEGIN_QUOTE
+    为了支持对聚合对象的多种遍历
+    #+END_QUOTE
+
+    也就是说可能需要不同的遍历方式，一个对象也就需要支持提供多种迭代器，如果把对象自己变成迭代器，那迭代的方式就只有next方法实现的那一种了。
+
+** Generator(生成器)
+
+   上面的代码中为了实现可迭代的MyIterable对象居然写了两个类，为了用更加函数式的操作简化这个方式，我们有了「生成器」。生成器指的是生成器对象，然而这个对象却不是通过实例化一个类产生的，这个特别Python。有两种生成生成器对象的方式，分别是「生成器函数」和「生成器表达式」
+
+*** 生成器函数
+   
+   #+BEGIN_QUOTE
+   生成器函数就是拥有「yield」关键字的函数
+   #+END_QUOTE
+
+   这个定义好没意义。首先生成器函数是个「函数」，然后里面有yield的关键字，而且为了符合规范，一般方法前最好加一个「gen_」，下面定义一个：
+
+   #+BEGIN_SRC python
+   def gen_shit():
+       for c in 'shit':
+           yield c
+
+   g = gen_shit()
+   
+   g
+   # => <generator object gen_shit at 0x10f843550>
+
+   next(g)
+   # => s
+   next(g)
+   # => h
+   next(g)
+   # => i
+   next(g)
+   # => t
+   next(g)
+   # => StopIteration
+   #+END_SRC
+
+   生成器函数虽然是个函数，然而它的调用却生成了一个「生成器对象」，调用next方法时，生成器函数会向前执行yield语句并返回产出的值，如果超过范围，就会抛出StopIteration。行为和Iterator一毛一样，所以我们就可以用生成器（通过生成器函数调用产生）去替换迭代器了，不再需要迭代器的类，代码一下变得明快了很多。
+
+   #+BEGIN_SRC python
+    class MyIterable(object):
+        def __init__(self, n):
+            self.n = n
+
+        def __str__(self):
+            print self.n
+
+        def __iter__(self):
+            # 实现一个生成器
+            return self.gen_num()
+
+        def gen_num(self):
+            for i in range(self.n, 11, 2):
+                yield i
+   #+END_SRC
+
+   其实这样写更简约
+
+   #+BEGIN_SRC python
+    class MyIterable(object):
+        def __init__(self, n):
+            self.n = n
+
+        def __str__(self):
+            print self.n
+
+        def __iter__(self):
+            # 实现一个生成器
+            for i in range(self.n, 11, 2):
+                yield i
+   #+END_SRC
+
+   然而除了包含yield的生成器函数调用可以返回生成器对象之外，还有另一种方法可以返回生成器对象。
+
+*** 生成器表达式
+
+    #+BEGIN_QUOTE
+    用()括起来的列表推导就是生成器表达式
+    #+END_QUOTE
+
+    #+BEGIN_SRC python
+    gg = (x for x in 'shit')
+    gg
+    # => <generator object gen_shit at 0x10f843550>
+    #+END_SRC
+
+    和生成器函数不同的是，生成器表达式是「惰性」的，因为表达式本身并没有执行「调用」，所以下面不会运行shit方法中的任何代码，毕竟gg只是个「表达」式而已。
+
+    #+BEGIN_SRC python
+    gg = (x for x in shit())
+    #+END_SRC
+
+    而生成器函数在产生生成器对象时就会立即执行了，原因其实很简单，生成「生成器对象」的，并不是生成器函数，而是生成器函数的调用。
+
+   #+BEGIN_SRC python
+    class MyIterable(object):
+        def __init__(self, n):
+            self.n = n
+
+        def __str__(self):
+            print self.n
+
+        def __iter__(self):
+            # 实现一个生成器
+            return (for i in range(self.n, 11, 2))
+   #+END_SRC
+
+   #+BEGIN_QUOTE
+   总结：可迭代对象的实现是因为__iter__可以返回一个迭代器或者生成器，迭代器和生成器具有相同的特性，都可以实现next(...)方法。而迭代器需要定义一个类，实现__iter__(返回自身)和next，相对繁琐。生成器指的是生成器对象，可以通过生成器函数和生成器表达式产生，从而简化可迭代对象的实现。
+   #+END_QUOTE

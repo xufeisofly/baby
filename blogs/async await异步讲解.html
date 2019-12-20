@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<p>
+首先要明确几个点
+</p>
+<blockquote>
+<ol class="org-ol">
+<li>javascript是单线程的，但这样实在是太慢了，所以发明了异步来解决这个问题</li>
+<li>什么是同步，什么是异步。同步就是下一个东西是否执行需要依赖于上一个东西是否执行完，对于单线程实在不是一个好方法</li>
+</ol>
+</blockquote>
+<p>
+要熟悉javascript单线程的异步编程，让程序可以同时处理很多事情
+为了能够异步编程，有以下两种方法
+</p>
+<blockquote>
+<ol class="org-ol">
+<li>回调函数</li>
+<li>promise</li>
+</ol>
+</blockquote>
+<p>
+下面重点讲一下promise
+promise有点类似于事件，但不一样的是，事件一般是多次触发的事情，比如keyup, click，对于“一次定胜负”的东西，并不适用，概念上也不是事件
+比如如果要做以下事情
+1.先获取客户信息
+2.再用客户信息去获取他的排班情况
+</p>
+
+<p>
+首先这两个必须要异步，为什么呢，不为什么，因为现在接口都特么是异步的，写成同步的也可以
+这个东西你写成事件就不好了
+另外事件更像是一个中断，发生的时候才去运行，不发生的时候或触发失败的时候压根没有其他的逻辑去处理，但promise有，catch啊什么的
+</p>
+
+<p>
+官方对promise和事件的区别描述是
+</p>
+<blockquote>
+<p>
+promise 只能成功或失败一次，而不能成功或失败两次，也不能从成功转为失败或从失败转为成功。
+如果 promise 已成功或失败，且您之后添加了成功/失败回调，则将会调用正确的回调，即使事件发生在先。
+</p>
+</blockquote>
+
+<p>
+promise的基本结构
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">var</span> <span style="color: #bf616a;">promise</span> = <span style="color: #b48ead;">new</span> <span style="color: #c0c5ce;">Promise</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">function</span><span style="color: #93a8c6;">(</span><span style="color: #bf616a;">resolve</span>, <span style="color: #bf616a;">reject</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">{</span>
+  <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">&#20570;&#19968;&#20010;&#24322;&#27493;&#30340;&#20107;&#24773;</span>
+  <span style="color: #b48ead;">if</span> <span style="color: #b0b1a3;">(</span><span style="color: #c0c5ce;">/* </span><span style="color: #65737e;">&#20107;&#24773;&#25104;&#21151; */</span><span style="color: #b0b1a3;">)</span> <span style="color: #b0b1a3;">{</span>
+    resolve<span style="color: #97b098;">(</span><span style="color: #a3be8c;">'worked'</span><span style="color: #97b098;">)</span>
+  <span style="color: #b0b1a3;">}</span> <span style="color: #b48ead;">else</span> <span style="color: #b0b1a3;">{</span>
+    reject<span style="color: #97b098;">(</span>Error<span style="color: #aebed8;">(</span><span style="color: #a3be8c;">'broke'</span><span style="color: #aebed8;">)</span><span style="color: #97b098;">)</span>
+  <span style="color: #b0b1a3;">}</span>
+<span style="color: #93a8c6;">}</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+<p>
+平时使用的then catch就是这个的变形吧
+</p>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

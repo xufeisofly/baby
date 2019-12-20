@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org8c41d8a">1. 资源注入的艰难历程</a></li>
+<li><a href="#org769da1e">2. 资源发现</a></li>
+<li><a href="#org901d0aa">3. 资源发现实现</a></li>
+</ul>
+</div>
+</div>
+
+<div class="figure">
+<p><img src="http://niltouch-1256880307.file.myqcloud.com/36/36.jpeg" alt="36.jpeg" />
+</p>
+</div>
+
+<div id="outline-container-org8c41d8a" class="outline-2">
+<h2 id="org8c41d8a"><span class="section-number-2">1</span> 资源注入的艰难历程</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+一个web项目中常常用到很多资源，如MySQL，Redis等，通常这些资源是由资源提供方提供地址，然后应用程序通过一个该地址进行连接。使用方法再简单不过，但维护和多环境适配往往遇到很多问题。
+</p>
+
+<p>
+比如我上一家公司由于项目只占用一台服务器节点，使用的方法是将资源地址放在.env文件中导入linux，这样在不同的环境上配置不同的环境变量就行了。然而带来的问题就是需要手动复制，因为都是手动维护的，如果节点变多了，就要维护很多份，另外如果服务变多了，不同的服务使用的环境变量KEY也并没有统一，这个叫「mysql<sub>env</sub>」，另一个叫「MYSQL<sub>ADDR</sub>」，维护起来是一件很头疼的事。
+</p>
+
+<p>
+现在这家公司由于服务很多，因此专门拿出来一个项目去维护所有的资源信息。所有服务的资源地址都需要在该平台上进行编辑、增加、删除。这样的确解放了应用开发者，因为他们无需在项目中维护这些环境变量，也不会产生多份资源文件。但这同时也带来了一个问题，自己的项目越来越依赖另一个项目，而且是从根儿上依赖，平台上的环境变量一堆，维护起来也愈发困难。另外两个项目耦合缺少约定层，平台环境变量的格式对本地项目来说是不可见的，也就是说本地项目去获取资源时，根本不知道会拿到什么格式的东西。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #bf616a;">config</span> = conf<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'project_name'</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+如果你不去平台项目看一眼，鬼才知道project<sub>name的config是个什么格式对吧</sub>。
+</p>
+
+<p>
+还有，平台项目中只适配了生产环境和测试环境，如果我们想加一个本地环境就十分费劲，明明就是一个环境变量，却要到另一个项目中修改代码。
+</p>
+
+<p>
+总结一下上面两种注入资源的方式的问题。
+</p>
+
+<pre class="example">
+   前者：依赖人肉维护，不适用于多项目多节点，缺少第三方平台作为中间层；
+   后者：有了第三方平台但不应该聚合所有的环境变量，降低应用资源配置的自由度   
+</pre>
+
+<p>
+因此提出对后者进行改进，提出资源发现架构。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org769da1e" class="outline-2">
+<h2 id="org769da1e"><span class="section-number-2">2</span> 资源发现</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+资源发现的特点是
+</p>
+<pre class="example">
+   存在资源平台，但资源平台只提供「发现资源」的逻辑代码，顶多再负责前期的注入，不负责管理资源信息
+</pre>
+<p>
+既然只提供规则，那么就得限制死环境变量的格式，有点「约定大于配置」的意思。
+</p>
+
+<p>
+从而实现
+</p>
+<ol class="org-ol">
+<li>应用开发者无需手动复制粘贴资源信息，资源信息由资源发现平台统一注入（环境变量）；</li>
+<li>应用开发者不用再区分不同的环境，这一步交给资源发现平台根据不同环境注入来实现；</li>
+<li>资源提供方在资源发现平台统一注册资源信息，避免直接与应用开发者互通，接口统一了，方便升级维护</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org901d0aa" class="outline-2">
+<h2 id="org901d0aa"><span class="section-number-2">3</span> 资源发现实现</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+下面为发现资源的伪代码：
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">get_database_config</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>:
+  <span style="color: #a3be8c;">"""&#33719;&#21462;db&#30340;&#22320;&#22336;"""</span>
+  <span style="color: #bf616a;">config</span> = discover<span style="color: #8c8c8c;">(</span>RESOURCE_MYSQL, name<span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">return</span> <span style="color: #a3be8c;">'mysql+pymysql://'</span> + config.instances<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">0</span><span style="color: #8c8c8c;">]</span>.addr + <span style="color: #a3be8c;">'?charset=utf8'</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discover</span><span style="color: #8c8c8c;">(</span>kind, name<span style="color: #8c8c8c;">)</span>:
+  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#26681;&#25454;&#19981;&#21516;&#30340;&#36164;&#28304;&#21457;&#29616;&#19981;&#21516;&#30340;&#29615;&#22659;&#21464;&#37327;</span>
+  <span style="color: #b48ead;">if</span> kind == RESOURCE_MYSQL:
+    <span style="color: #bf616a;">f</span> = discover_mysql
+  <span style="color: #b48ead;">return</span> f<span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discover_mysql</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>:
+  <span style="color: #b48ead;">return</span> MySQLResource.discover<span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MySQLResource</span><span style="color: #8c8c8c;">(</span>BaseResource<span style="color: #8c8c8c;">)</span>:
+  <span style="color: #bf616a;">kind</span> = <span style="color: #a3be8c;">'mysql'</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseResource</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">object</span><span style="color: #8c8c8c;">)</span>:
+  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#32422;&#23450;&#29615;&#22659;&#21464;&#37327;&#26684;&#24335;</span>
+  <span style="color: #bf616a;">RES_ENV_ADDR_TPL</span> = <span style="color: #a3be8c;">'ZAE_RES_{}_{}_ADDR'</span>
+
+  <span style="color: #c0c5ce;">@classmethod</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discover</span><span style="color: #8c8c8c;">(</span>cls, name<span style="color: #8c8c8c;">)</span>:
+    <span style="color: #b48ead;">return</span> cls._load<span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+
+  <span style="color: #c0c5ce;">@classmethod</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">_load</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>:
+    <span style="color: #bf616a;">key</span> = RES_ENV_ADDR_TPL.<span style="color: #d08770;">format</span><span style="color: #8c8c8c;">(</span>cls.kind.upper<span style="color: #93a8c6;">()</span>, name<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">value</span> = getenv<span style="color: #8c8c8c;">(</span>key<span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">return</span> <span style="color: #a3be8c;">"%s://%s"</span> % <span style="color: #8c8c8c;">(</span>cls.kind, value<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

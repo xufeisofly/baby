@@ -1,0 +1,79 @@
+之前做unicrm系统的时候做了一个消息的通知功能，当时真不知道websocket，所以我们神奇的选用了http短轮训的方式。作为一生的污点，说什么也要把他kill掉。
+
+我分为三个部分学习websocket
+** 握手
+   websocket是全双工的协议，但有没有想过，它走的还是网线。网线有只有一组Tx Rx啊。所以如果要实现全双工，就必须先实现握手。
+   （否则每次协议都要带一个）
+   握手就是客户端发一个握手请求，接收端回应成功，就意味着客户端和接收端建立了联系。
+   客户端发送的协议格式
+
+   #+BEGIN_EXAMPLE
+   GET / HTTP/1.1
+   Upgrade: websocket
+   Connection: Upgrade
+   Host: example.com
+   Origin: null
+   Sec-WebSocket-Key: sN9cRrP/n9NdMgdcy2VJFQ==
+   Sec-WebSocket-Version: 13   
+   #+END_EXAMPLE
+
+   服务端返回
+
+   #+BEGIN_EXAMPLE
+   HTTP/1.1 101 Switching Protocols
+   Upgrade: websocket
+   Connection: Upgrade
+   Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+   #+END_EXAMPLE
+
+   Sec-WebSocket-Accept很有意思，他是根据Sec-WebSocket-Key生成的，具体生成规则此处不描述背下来没有意义
+
+   #+BEGIN_QUOTE
+   So if the Key was "dGhlIHNhbXBsZSBub25jZQ==", the Accept will be "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=". Once the server sends these headers, the handshake is complete and you can start swapping data!
+   #+END_QUOTE
+
+   
+
+** 数据传输
+*** 格式
+    抄下mozilla的格式，无非就是一种协议格式而已，没必要知道那么细
+
+    #+BEGIN_EXAMPLE
+    Frame format:  
+​​
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
+    #+END_EXAMPLE
+    
+    总之通过这个协议，你可以知道:
+    1. payload length: 获取内容的长度
+    2. mask：可以解密内容
+    3. FIN和opcode: 可以处理消息碎片
+*** 心跳
+    握手之后，客户端或服务端可以选择发送一个ping，接收到ping之后，立刻返回一个pong，ping和pong的内容是一样的，只是opcode不同，这样就知道websocket仍处于连接状态
+    #+BEGIN_QUOTE
+    If you have gotten more than one ping before you get the chance to send a pong, you only send one pong.
+    #+END_QUOTE
+*** 关闭连接
+    客户端或服务端会发送一个close的特定格式的数据，接收到之后也返回一个close的数据，这样就关闭了连接，之后的内容都会被discarded掉
+** socket.io
+   socket.io是websocket的一个js封装框架
+** websocket-rails源码学习
+
+参考连接：https://github.com/abbshr/abbshr.github.io/issues/22

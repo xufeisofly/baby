@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org207a830">1. javascript的执行顺序</a></li>
+<li><a href="#org02985d7">2. 函数声明的提升</a></li>
+<li><a href="#orgf6fc9fc">3. 提升规则</a>
+<ul>
+<li><a href="#orgaa6852d">3.1. 函数优先</a></li>
+<li><a href="#org2cdcf90">3.2. 函数声明覆盖原则</a></li>
+<li><a href="#orga0d3269">3.3. 声明不受条件控制</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org207a830" class="outline-2">
+<h2 id="org207a830"><span class="section-number-2">1</span> javascript的执行顺序</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+javascript的执行顺序是什么样子的，举下面的例子
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">a = <span style="color: #d08770;">2</span>
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span>
+console.log<span style="color: #8c8c8c;">(</span>a<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+答案是2
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">console.log<span style="color: #8c8c8c;">(</span>a<span style="color: #8c8c8c;">)</span>
+
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span> = <span style="color: #d08770;">2</span>
+</pre>
+</div>
+
+<p>
+答案是undefined（不是Reference Error），为什么呢？
+</p>
+
+<p>
+对于var a = 2，编辑器会将其看成两个声明，第一个是定义声明会在编译阶段执行，第二个赋值声明会等待执行阶段执行，所以第一段代码对于编译器来说是这个样子。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span>
+a = <span style="color: #d08770;">2</span>
+console.log<span style="color: #8c8c8c;">(</span>a<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+而第二段代码是
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span>
+console.log<span style="color: #8c8c8c;">(</span>a<span style="color: #8c8c8c;">)</span>
+a = <span style="color: #d08770;">2</span>
+</pre>
+</div>
+
+<p>
+我们把这个叫做“提升”
+</p>
+</div>
+</div>
+
+<div id="outline-container-org02985d7" class="outline-2">
+<h2 id="org02985d7"><span class="section-number-2">2</span> 函数声明的提升</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+声明有变量声明，如var a = 2，还有函数声明。函数声明也会提升，其实这个我们都熟，函数声明放在前面和后面都是一样的，因为实际编译时发生了提升。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">foo<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span>a<span style="color: #93a8c6;">)</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">undefined</span>
+
+  <span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span> = <span style="color: #d08770;">2</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+
+<p>
+但是函数表达式不会提升，因为函数表达式实际上是一个赋值操作
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">foo<span style="color: #8c8c8c;">()</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">TypeError, &#32780;&#19981;&#26159;ReferenceError</span>
+
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">foo</span> = <span style="color: #b48ead;">function</span> bar<span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf6fc9fc" class="outline-2">
+<h2 id="orgf6fc9fc"><span class="section-number-2">3</span> 提升规则</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgaa6852d" class="outline-3">
+<h3 id="orgaa6852d"><span class="section-number-3">3.1</span> 函数优先</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+当函数和变量同名时，提升遵循函数优先的规则，如下
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">foo<span style="color: #8c8c8c;">()</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">1</span>
+
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">foo</span>
+
+<span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">1</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+
+foo = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">2</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+
+<p>
+尽管var foo出现在function foo()之前，但function foo()声明会提升到最前面，因为是重复声明，所以var foo被忽略。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">1</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+
+foo<span style="color: #8c8c8c;">()</span>
+
+foo = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">2</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2cdcf90" class="outline-3">
+<h3 id="org2cdcf90"><span class="section-number-3">3.2</span> 函数声明覆盖原则</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+对于函数声明，当出现重复的声明时，后面的函数声明会覆盖前面的函数声明
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">foo<span style="color: #8c8c8c;">()</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">3</span>
+
+<span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">1</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">foo</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">2</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+
+<span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  console.log<span style="color: #93a8c6;">(</span><span style="color: #d08770;">3</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga0d3269" class="outline-3">
+<h3 id="orga0d3269"><span class="section-number-3">3.3</span> 声明不受条件控制</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+下面的声明并不受if else控制，因为除了声明之外其他语句并不“提升”，只能等待执行阶段
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">foo<span style="color: #8c8c8c;">()</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">b</span>
+
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span> = <span style="color: #d08770;">true</span>
+
+<span style="color: #b48ead;">if</span><span style="color: #8c8c8c;">(</span>a<span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #93a8c6;">()</span> <span style="color: #93a8c6;">{</span> console.log<span style="color: #b0b1a3;">(</span><span style="color: #a3be8c;">"a"</span><span style="color: #b0b1a3;">)</span> <span style="color: #93a8c6;">}</span>
+<span style="color: #8c8c8c;">}</span> <span style="color: #b48ead;">else</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">foo</span><span style="color: #93a8c6;">()</span> <span style="color: #93a8c6;">{</span> console.log<span style="color: #b0b1a3;">(</span><span style="color: #a3be8c;">"b"</span><span style="color: #b0b1a3;">)</span> <span style="color: #93a8c6;">}</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

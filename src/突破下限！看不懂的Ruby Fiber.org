@@ -1,0 +1,72 @@
+** Fiber基本使用
+
+   fiber使用一个block创造一个实例，block中的代码可以自行控制执行过程，类似javascript的Generator，下面是个例子。
+
+** Fiber作用
+
+   #+BEGIN_QUOTE
+   Fibers are primitives for implementing light weight cooperative concurrency in Ruby. Basically they are a means of creating code blocks that can be paused and resumed, much like threads
+   #+END_QUOTE
+
+*** 对于线程（thread）
+
+   Fiber是thread的辅助，可以说是一种调度模式，fiber目的是可以更灵活的分配concurrency(并发)资源，虽然无法实现真正的parallelism(并行)。
+   这里额外说一下，对于使用GIL的ruby来说，只允许一个时间中有一个唯一的进程，所以ruby没有并行处理任务的优势。记得Matz也说过进程问题是ruby的最大错误，然而已经不能回头了。
+
+   #+BEGIN_QUOTE
+   并发：逻辑上的同时发生，并不一定要同时发生
+   并行：物理上的同时发生，同时发生两个并发事件
+   并行必是并发，而并发不一定并行
+   #+END_QUOTE
+
+   #+BEGIN_QUOTE
+   Ruby never allows more than one of its native threads to run at the same time. Now the GIL is the bottleneck, and Ruby will never take advantage of multiple cores!
+   #+END_QUOTE
+   
+   如果开启多个线程(thread)，ruby会平均分配时间，意味着每个线程都会占用相同的时间运行自己的任务，这显然造成了资源的浪费。fiber功能的提供给我我们手动调节这种时间分配的入口，虽然会让程序更为复杂，但是灵活度增加了很多。
+   
+*** 对于事件驱动（EventMachine）
+    
+    和多线程对应的另一套方案是EventMachine(以下简称EM)。EM允许我们用异步的方式执行程序，从而处理一些io事物（如http request）,问题就是会有许多前套的callback，即callback hell（这里跟javascript简直太像）。
+
+    #+BEGIN_SRC ruby
+    http = EventMachine::HttpRequest.new('http://niltouch.cn/')
+    
+    http.callback do |response|
+      # ...
+    end
+
+    http.errback do |error|
+      # ...
+    end
+
+    http.start
+    #+END_SRC
+    
+    如果callback中还有其他io操作，callback代码占满屏，除了酷炫之外只会降低代码的可理解性，借助fiber的yield挂起和resume功能，可以把异步代码写的跟同步代码一样和谐。
+    #+BEGIN_QUOTE
+    这里可以顺便看一下es6的Generator，应该是类似的。
+    #+END_QUOTE
+
+    #+BEGIN_SRC ruby
+    require 'fiber'
+
+    def async_fetch(url)
+      f = Fiber.current
+      http = EventMachine::HttpRequest.new(url).get timeout: 10
+      http.callback { f.resume(http) }
+      http.errback { f.resume(http) }
+
+      return Fiber.yield
+    end
+
+    EventMachine.run do
+      Fiber.new do
+        data = async_fetch('http://niltouch.cn')
+
+        EventMachine.stop
+      end.resume
+    end
+    #+END_SRC
+    
+    

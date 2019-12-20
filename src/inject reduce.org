@@ -1,0 +1,25 @@
+inject和reduce互为别名，它们解决了一个我经常会使用，并且代码写的很脏的问题
+#+BEGIN_SRC ruby
+result = []
+[1, 2, 3].each do |item|
+  result << item
+end
+result
+# => [1, 2, 3]
+#+END_SRC
+就可以变成
+#+BEGIN_SRC ruby
+[1, 2, 3].inject([]) do |result, item|
+  result << item
+end
+# => [1, 2, 3]
+#+END_SRC
+或者使用reduce是一样的
+当没有指定参数的时候，result默认为数组的第一个值
+#+BEGIN_SRC ruby
+[1, 2, 3].inject { |result, item| result + item }
+# => 6
+#+END_SRC
+#+BEGIN_QUOTE
+比each好的地方在于，inject是有返回值的！用了好长时间，真真学习了
+#+END_QUOTE

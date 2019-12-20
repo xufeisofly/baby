@@ -1,0 +1,314 @@
+
+#+BEGIN_QUOTE
+原文链接：http://kyrylo.hatenablog.com/entry/2013/05/29/so-what-is-binding-pry-exactly
+#+END_QUOTE
+
+你一定知道"binding.pry"，因为你到处在用并且越用越兴奋。确实，binding.pry能让程序员的日子好过很多，但是你有没有想过"binding.pry"究竟是什么？果然没有。当我第一次看到binding.pry的时候，我觉得它好像是一种不可思议的魔法，但其实这些新鲜的东西并没有我们想的那么玄幻，读完这篇文章，你就会对pry有趣的特性有一个深刻的了解。
+
+** 简单的表达背后的强大力量
+
+   binding.pry可以用在很多地方，比如，我们通过命令行进入Pry的时候默认上下文是"main"。Pry会显示出一个"[1]pry(main)>"，对吧。这玩意儿可以反映出你当前的上下文。
+   下面的三个例子在不同的地方插入了binding.pry，因此反应出的上下文是不同的。
+
+   #+BEGIN_SRC ruby
+   class Song
+     binding.pry # pry(Song)
+
+     def play
+       puts 'Ground control to Major Tom...'
+     end
+   end
+   #+END_SRC
+
+   #+BEGIN_SRC ruby
+   class Song
+     def play
+       binding.pry # pry(#<Song>)
+       puts 'Ground control to Major Tom...'
+     end
+   end
+   #+END_SRC
+
+   #+BEGIN_SRC ruby
+   class Song
+     def play
+       puts 'Ground control to Major Tom...'
+     end
+   end
+
+   binding.pry # pry(main)
+   #+END_SRC
+
+** "binding"和"pry"
+   
+   现在让我们来揭开她的神秘面纱。估计有些人知道Ruby中的Binding类，但我猜也有一些人压根没有听过。这并不是每个Ruby程序员都必须知道的那种东西，但"binding.pry"就是它赋予的神力。下面我们详细分析一下。
+
+** "binding"
+
+   "binding"是一个method，是Binding类的对象实例。
+
+   #+BEGIN_SRC ruby
+   binding.class #=> Binding
+   binding #=> #<Binding:0xa9dcefc>
+   binding #=> #<Binding:0xa9ee490>
+   #+END_SRC
+
+   因为它是Kernel module中的方法，所以你可以把它用在任何对象身上。需要说明的是，Binding类不能被initialize，binding是产生其对象的唯一入口。
+
+   那么究竟什么是"binding"？binding就像是一个“快照”，这个“快照”记录了当前实例所有可见的的内容，比如：self，本地变量，方法，实例变量等等。你可以把它想像成一个充满了各种东西的房间，这种房间有很多，每一个房间都有自己的小玩意儿和一个窗户。在Pry的间隙这种地方叫做“上下文”，但是现在如果想要从房间中拿到一个东西，我们需要用pry打开这扇窗户，悄悄潜入房间，看一看周围有什么可以顺的。
+
+   多亏了Binding类，这个所谓的窗户可以用一个方法表示，假设我们叫它"Room#window"，我们放进去一个玩具熊，然后我们要再拿出来。
+
+   #+BEGIN_SRC ruby
+   class Room
+     def initialize
+       @items = [:teddy_bear]
+     end
+
+     def window
+       binding
+     end
+   end
+
+   backpack = []
+   bedroom = Room.new
+
+   bedroom.window.eval('@items') #=> [:teddy_bear]
+   backpack << bedroom.window.eval('@items.pop')
+   backpack.inspect #=> [:teddy_bear]
+   bedroom.window.eval('@items') #=> []
+   #+END_SRC
+
+   你还可以让Maria同学把玩具熊放回去，"binding"可以让我们在Maria的上下文中运行Room的代码，于是大家都很满意。
+   
+   #+BEGIN_SRC ruby
+   module Maria
+     def self.tack_back(item, from, to)
+       eval("@items << #{ from.delete(item).inspect }", to)
+     end
+   end
+
+   Maria.take_back(:teddy_bear, backpack, bedroom.window)
+   backpack.inspect #=> []
+   bedroom.window.eval('@items') #=> [:teddy_bear]
+   #+END_SRC
+
+** "pry"
+
+   下面来看另一半，"pry"。实际上任何Ruby对象都可以调用pry方法，因为它是定义在Object类中的，而Object类是所有Ruby类的祖先。这个方法会针对当前对象的上下文开启一个“pry”的会话。
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> ['andrew', 'alexander', 'vladimir'].pry
+   [1] pry(#<Array>)> map &:capitalize
+   => ["Andrew", "Alexander", "Vladimir"]
+   [2] pry(#<Array>)> exit
+   => nil
+   [2] pry(main)> "do you hear me?".pry
+   [1] pry("do you hear me?")> upcase
+   => "DO YOU HEAR ME?"
+   [2] pry("do you hear me?")> exit
+   => nil
+   [3] pry(main)>
+   #+END_SRC
+
+   你可能还记得文章刚开始的例子，看到这里你可能会想：我们能不能直接把"binding"去掉，就写"pry"行不行。行啊。但是你在哪个对象的身上开启这个pry会话呢，"binding.pry"和"pry"不能互换，因为他们针对的上下文是不一样的。
+
+   下面这个例子用了"binding.pry"，在Song对象上创建了一个Pry会话，然后我们可以获取到"music"的值。
+
+   #+BEGIN_SRC ruby
+   class Song
+     def play
+       music = 'rock & roll'
+       "I love #{ binding.pry }"
+     end
+   end
+
+   Song.new.play
+   #+END_SRC
+
+   #+BEGIN_SRC ruby
+   [1] pry(#<Song>)> music
+   => "rock & roll"
+   #+END_SRC
+
+   然后我们稍微改一下"Song#play"这个方法，我们用"pry"替换掉"binding.pry"，于是又一次在Song对象上创建了一个Pry会话，但这次有点奇怪，居然拿不到"music"！虽然我们在"Song#play"方法中调用了pry，但Pry的"read-eval-print"(REPL)循环并没有像我们想的那样执行，这是因为pry并没有作用在"Song#play"方法的binding窗口上，而是直接作用在了对象上，相当于"self.pry"。
+
+   #+BEGIN_SRC ruby
+   class Song
+     def play
+       music = 'rock & roll'
+       "I love #{pry}"
+     end
+   end
+
+   song = Song.new #=> #<Song:0x9d89588>
+   $old_id = song.object_id #=> 82594500
+   song.play
+   #+END_SRC
+
+   #+BEGIN_SRC ruby
+   [1] pry(#<Song>)> music
+   NameError: undefined local variable or method `music` for #<Song:0xbd2fe00> from (pry):7:in `__pry__`
+   [2] pry(#<Song>)> whereami
+   Inside #<Song>.
+   [3] pry(#<Song>)> object_id == $old_id
+   => true
+   #+END_SRC
+
+   "self"从Object类中继承了"pry"方法(不是真正的继承，毕竟它只是一个Ruby对象的placeholder)。所以"self.pry"和"pry"是一回事。
+
+   有一个小问题需要说明一下，由于Pry不是BasicObject对象，而BasicObject是Object的超类，在祖先链中高于Object，这意味着BasicObject对象中并没有pry方法，所以你不能在它上面调用pry。我们也不能把pry方法单纯的移到BasicObject中，因为里面并没有"binding"方法。
+
+   #+BEGIN_SRC ruby
+   basic = BasicObject.new #=> #<BasicObject:0x512c30c>
+   basic.pry #=> NoMethodError: undefined method `pry` for #<BasicObject:0xa258618>
+   #+END_SRC
+
+   按照Ruby的设计，"binding"取自于Kernel module，Object是它唯一的类。有些人希望"binding"同样支持BasicObject，但目前看来这不会发生。有一些这方面的努力，但没有什么实质性的进展。
+
+   虽然Pry不支持BasicObject的对象，但支持BasicObject类，因为类没有binding.
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> BasicObject.pry
+   [1] pry(BasicObject)> __id__
+   => 81839890
+   #+END_SRC
+
+   pry另外一个有趣的特性是它支持参数，所以pry, self.pry, pry(self)是一样的。除了self之外，pry也支持其他Ruby的对象作为参数。惊喜吧，这么一个方法被赋予了多大的力量！
+
+   看下面的例子，"pry"并不像"cd"那样，它不会保存一个bindings的链（或者bindings栈），而是每次都会创建一个新的会话，包含一个只属于自己的bindings栈（看下面的[1]，后面的标记并没有延续之前的，而是在不改变已有标记的前提下创建一个新的）
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> pry 1337
+   [1] pry(1337) pry ''
+   [1] pry("") pry :awesome!
+   [1] pry(:awesome!)>
+   [1] pry(:awesome!) nesting
+   Nesting status:
+   --
+   0. :awesome! (Pry top level)
+   [2] pry(:awesome!)> exit
+   => nil
+   [1] pry("")> nesting
+   Nesting status:
+   --
+   0. "" (Pry top level)
+   #+END_SRC
+
+   "pry"方法还支持第二个参数：hash options。虽然你一般不会需要这个参数，但是多知道一些对你没坏处。你可以在"pry_instance.rb"文件中找到一份options列表，不过列表有点大。下面只介绍两个有意思的option：":output"和":extra_sticky_locals"。
+
+   下面的例子中做了几件事情。首先我把所有Pry会话输出的内容都重定向到了一个叫"output_history"的变量上，这样就可以打印输出这些内容了，然后，我插入了一个粘性局部变量，它可以在所有的Pry会话中访问到并且共享数据。需要知道的是，每当一个新的Pry会话创建之后，hash options并不会影响之前的会话，只在当前的会话中有效。
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> output_history = StringhIO.new
+   => #<StringIO:0xab8978c>
+   [2] pry(main)> :universe.pry :output => output_history, :extra_sticky_locals => { :time => Time.now }
+   [1] pry(:universe)> whereami
+   [2] pry(:universe)> ls
+   [3] pry(:universe)> time
+   [4] pry(:universe)> Help me out!
+   [5] pry(:universe)> exit
+   => nil
+   [3] pry(main)> puts output_history.string
+   Inside :universe.
+   Comparable#methods: <  <=  >  >=  between?
+   Symbol#methods: 
+     <=>  =~       capitalize  empty?    inspect  match               size   swapcase  to_sym
+     ==   []       casecmp     encoding  intern   next                slice  to_proc   upcase
+     ===  __pry__  downcase    id2name   length   pretty_print_cycle  succ   to_s    
+   locals: _  __  _dir_  _ex_  _file_  _in_  _out_  _pry_  time
+   => 2013-05-25 14:22:34 +0300
+   NoMethodError: undefined method `out!' for :universe:Symbol
+   from (pry):3:in `__pry__'
+   => nil
+   [4] pry(main)> time
+   NameError: undefined local variable or method `time' for main:Object
+   from (pry):8:in `__pry__'
+   #+END_SRC
+   
+** "binding"和"pry"在一起
+   
+   现在你已经基本了解"binding"和"pry"，那么问题来了。Pry怎么知道在哪开始一次read-eval-print-loop？"binding.pry"为什么会起作用？简单来说， 当你在一个对象上调用pry的时候，Pry获取这个对象的binding并且开始执行一次REPL。获取binding的方法十分简单，叫做"Pry.binding_for".
+
+   #+BEGIN_SRC ruby
+   b = Pry.binding_for(:universe) #=> #<Binding:0xb2e7ad8>
+   b.eval('self') #=> :universe
+   #+END_SRC
+
+   可以传递任何的Ruby对象，如果穿了一个Binding对象或者最高级的binding，会直接返回，但如果是其他的参数，比如":universe"，就会调用__binding__方法并且返回相关的binding。那么:universe为什么能调用这个方法呢，因为它也定义在Object中。
+
+   还有一个方法也可以用来调取binding，"__pry__"，这个方法会在对象调用"pry"的时候创建。
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> :universe.__pry__
+   NoMethodError: undefined method `__pry__' for :universe:Symbol
+   from (pry):1:in `__pry__'
+   [2] pry(main)> :universe.pry
+   [1] pry(:universe)> :universe.__pry__
+   => #<Binding:0xadf1a74>
+   [2] pry(:universe)> 
+   => nil
+   [3] pry(main)> :universe.__pry__
+   => #<Binding:0x91a27c4>
+   [4] pry(main)> :universe.__pry__.eval('self')
+   => :universe
+   #+END_SRC
+
+   不难理解，它只是获取了一个对象的binding(想象"Room@window"，"__pry__"是一样的)。虽然这个方法用得不那么多，但可以做一些有意思的事情。比如，一旦"__pry__"被定义了，你就可以获取对象内部的东西而不用再次进入pry会话。
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> 1337.pry
+   [1] pry(1337)> @leet_number = :so_leet
+   => :so_leet
+   [2] pry(1337)> exit
+   => nil
+   [2] pry(main)> 1337.__pry__.eval('@leet_number')
+   => :so_leet
+   #+END_SRC
+   
+   还有，Pry会给所有对象声明一个"__binding__"方法，这个方法从一开始就已经有了，所以你也不用调用pry了。
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> :universe.__binding__.eval 'upcase'
+   => :UNIVERSE
+   #+END_SRC
+
+   为什么看起来一模一样的方法要弄两个。因为——它们不一样。"__pry__"比"__binding__"更底层，"__binding__"调用了"__pry__"，因此"__binding__"更强大一些，所有的类和模块中并没有"__pry__"方法，但都有"__binding__"。还记得Pry可以在一个类的上下文中开启一个会话吗，就是"__binding__"干的。
+
+   #+BEGIN_SRC ruby
+   A = Class.new
+   A.__pry__ #=> NoMethodError
+   A.__binding__ #=> #<Binding:0xb0e8570>
+   
+   A.pry
+   exit # Exits from the nested session.
+   A.__pry__ #=> NoMethodError, still undefined.
+   #+END_SRC
+
+   所以"__pry__"针对对象，其他的就要靠"__binding__"了，eval的时候，上下文是"self"。
+   
+   #+BEGIN_SRC ruby
+   [1] pry(main)> M = Module.new
+   => M
+   [2] pry(main)> M.__binding__.eval('def magnifico; :splendid end')
+   => nil
+   [3] pry(main)> include M
+   => Object
+   [4] pry(main)> magnifico
+   => :splendid
+   #+END_SRC
+
+   就是这样了，想象一个上下文，想象一个REPL，然后合在一起。
+
+   #+BEGIN_SRC ruby
+   [1] pry(main)> loop do
+                |   print '>> '
+                |   puts "=> #{ TOPLEVEL_BINDING.eval(gets) }"
+                | end
+   >> def hello; :hi end
+   =>
+   >> hello
+   => hi
+   #+END_SRC
+
+   现在，给你的代码用上bindings来好好的装一把。
