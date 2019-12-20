@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orged3427d">1. Decompose Conditional</a></li>
+<li><a href="#orge5e1db4">2. Consolidate Conditional Expression</a></li>
+<li><a href="#orgb0f663c">3. Introduce Null Object</a></li>
+<li><a href="#org634466e">4. Introduce Assertion</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orged3427d" class="outline-2">
+<h2 id="orged3427d"><span class="section-number-2">1</span> Decompose Conditional</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+分解条件表达式
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">if</span> date.before<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">START_DATE</span><span style="color: #8c8c8c;">)</span> || date.after<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">END_DATE</span><span style="color: #8c8c8c;">)</span> <span style="color: #b48ead;">then</span>
+  do_something
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+将条件中的表达式提取出来，可以大大降低复杂程度
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">not_proper_time</span>
+  date.before<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">START_DATE</span><span style="color: #8c8c8c;">)</span> || date.after<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">END_DATE</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<pre class="example">
+   有时候尽管条件代码很短，但代码意图和代码自身之间往往存在着不小的差距
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orge5e1db4" class="outline-2">
+<h2 id="orge5e1db4"><span class="section-number-2">2</span> Consolidate Conditional Expression</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+<p>
+合并条件表达式
+当几种条件执行的行为都一样，则可以合并成一种条件
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgb0f663c" class="outline-2">
+<h2 id="orgb0f663c"><span class="section-number-2">3</span> Introduce Null Object</h2>
+<div class="outline-text-2" id="text-3">
+<blockquote>
+<p>
+引入Null对象，可以删除条件语句
+</p>
+</blockquote>
+<p>
+只有大多数代码都要求空对象做出相同响应的时，使用Null对象才有意义
+比如
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">if</span> deal.customer.blank? <span style="color: #b48ead;">then</span>
+  customer_name = <span style="color: #a3be8c;">'occupant'</span>
+<span style="color: #b48ead;">else</span>
+  customer_name = customer.name
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+就可以单独建一个Null类
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Customer</span>::<span style="color: #c0c5ce;">Null</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name</span>
+    <span style="color: #a3be8c;">'occupant'</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Customer</span>::<span style="color: #c0c5ce;">Normal</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name</span>
+    <span style="color: #b48ead;">super</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Deal</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer</span>
+    <span style="color: #b48ead;">super</span>.blank ? <span style="color: #c0c5ce;">Customer</span>::<span style="color: #c0c5ce;">Null</span>.new : <span style="color: #c0c5ce;">Customer</span>::<span style="color: #c0c5ce;">Normal</span>.new
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+这样就可以去掉条件语句，变成
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">customer_name = customer.name
+</pre>
+</div>
+<pre class="example">
+   这么做有两个前提，
+   一个是有很多地方用到了对customer是否为空的判断，
+   另一个是null类型的customer和正常的customer大部分行为保持一致
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org634466e" class="outline-2">
+<h2 id="org634466e"><span class="section-number-2">4</span> Introduce Assertion</h2>
+<div class="outline-text-2" id="text-4">
+<blockquote>
+<p>
+引入断言
+</p>
+</blockquote>
+<p>
+这个ruby貌似没有必要
+什么是断言，就是断言某个条件一定成立，否则抛出异常，没有必要用它，因为：
+</p>
+<ol class="org-ol">
+<li>可以使用测试代码，健壮程序，使这种可能不会发生</li>
+<li>raise ERROR if xxx 就是这个意思啊</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

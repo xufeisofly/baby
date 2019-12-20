@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org716c259">1. 安装Websocket-rails</a></li>
+<li><a href="#org389fa81">2. server端</a></li>
+<li><a href="#orga6eb528">3. javascript端</a></li>
+<li><a href="#orgfc165e9">4. 一个redis的坑</a></li>
+<li><a href="#orgacb8f6e">5. 参考文章</a></li>
+</ul>
+</div>
+</div>
+<p>
+之前做项目的时候使用http短轮询实现了消息发送功能。因为系统用户量也比较小，除了感觉比较low之外，功能也都实现了。分别是消息栏展示，消息栏消息处理, 桌面通知等。然而最明显的问题就是调试变得十分困难，每次在console里面调试request都会被messages的request刷掉，在staging环境查看后台log时候也会被messages的查询请求刷屏，所以终于还是决定尝试一下websocket。
+</p>
+
+<p>
+websocket原理之前的文章已经写过，犯贱的说，“不过就是一个协议而已”，虽然能想出这个协议才是真正牛逼的事情。Rails 5之后增加了Action Cable，但我还是决定从websocket-rails入手，复写消息更新的功能。
+</p>
+
+<div id="outline-container-org716c259" class="outline-2">
+<h2 id="org716c259"><span class="section-number-2">1</span> 安装Websocket-rails</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+安装教程参考：<a href="https://github.com/websocket-rails/websocket-rails/wiki/Installation-and-Setup">https://github.com/websocket-rails/websocket-rails/wiki/Installation-and-Setup</a>
+</p>
+
+<p>
+websocket-rails使用的是webserver的事件监听，然而我的app使用的是puma，生产环境使用了passenger，都不是event-based，需要开启websocket-rails的standalone模式，开启这个模式之后，websocket-rails会使用redis-server。理论上也并不会和redis产生冲突（然而事实并非如此，稍后会详细描述），websocket-rails默认寻找localhost的6379端口，我们生产环境redis不是这么玩的，还好，在initializer里可以更换端口选项。
+</p>
+
+
+<p>
+随后启动server
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">rake websocket_rails<span style="color: #d08770;">:start_server</span>
+</pre>
+</div>
+
+<p>
+可以通过查看log实时检测接口状态
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">tail -f log/websocket_rails_server.log
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org389fa81" class="outline-2">
+<h2 id="org389fa81"><span class="section-number-2">2</span> server端</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+我需要实现的功能是，当更新或创建一条message时，消息栏立刻更新。根据websocket-rails的介绍，需要创建一个channel实例，并不需要一个单独的websocket接口，通过这个channel广播事件，然后再在前端监听。那么不妨创建一个concern，创建一个Websocket::Message模块。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Websocket</span>
+  <span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Message</span>
+    <span style="color: #d08770;">extend</span> <span style="color: #c0c5ce;">ActiveSupport</span>::<span style="color: #c0c5ce;">Concern</span>
+
+    included <span style="color: #b48ead;">do</span>
+      after_save <span style="color: #d08770;">:deliver_websocket</span>
+    <span style="color: #b48ead;">end</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">deliver_websocket</span>
+      data = <span style="color: #8c8c8c;">{</span>
+        <span style="color: #d08770;">messages:</span> <span style="color: #b48ead;">self</span>.class.with_recipient<span style="color: #93a8c6;">(</span>recipient<span style="color: #93a8c6;">)</span>.with_status<span style="color: #93a8c6;">(</span><span style="color: #d08770;">:unfinished</span><span style="color: #93a8c6;">)</span>.order<span style="color: #93a8c6;">(</span><span style="color: #d08770;">created_at:</span> <span style="color: #d08770;">:desc</span><span style="color: #93a8c6;">)</span>.limit<span style="color: #93a8c6;">(</span><span style="color: #d08770;">20</span><span style="color: #93a8c6;">)</span>
+      <span style="color: #8c8c8c;">}</span>
+
+      <span style="color: #c0c5ce;">WebsocketRails</span><span style="color: #8c8c8c;">[</span>channel_name<span style="color: #8c8c8c;">]</span>.trigger<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'change'</span>, data<span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">end</span>
+
+    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">channel_name</span>
+      <span style="color: #a3be8c;">'message'</span>
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+当然这里可以写一个更通用的Websocketable之类的module，然后里面用元编程写的动态一点，但注意，不同的model可能websocket的内容和方式都不一样，比如message可以再加一个after<sub>create的时候发送桌面通知</sub>。可能就又是一个新的channel和event。所以最好再创建一个websocket<sub>channel的class之类的</sub>，具体参考我前面一篇讲webhook的学习笔记。
+</p>
+
+<p>
+在message model里面include这个module就可以了
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Message</span> &lt; <span style="color: #c0c5ce;">ApplicationRecord</span>
+  <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">Websocket</span>::<span style="color: #c0c5ce;">Message</span>
+
+  belongs_to <span style="color: #d08770;">:recipient</span>
+
+  scope <span style="color: #d08770;">:with_recipient</span>, -&gt;<span style="color: #8c8c8c;">(</span>recipient<span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span> where<span style="color: #93a8c6;">(</span><span style="color: #d08770;">recipient:</span> recipient<span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
+  scope <span style="color: #d08770;">:with_status</span>, -&gt;<span style="color: #8c8c8c;">(</span>status<span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span> where<span style="color: #93a8c6;">(</span><span style="color: #d08770;">status:</span> status<span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+每次save message之后，都会在message channel中广播change event，只要前端监听了这个channel的这个event，就可以做任何想做的事情。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga6eb528" class="outline-2">
+<h2 id="orga6eb528"><span class="section-number-2">3</span> javascript端</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+websocket-rails应该只计划用于Rails全栈框架搭建的应用，为什么呢，因为它的javascript端都是用coffeescript写的。我们的项目使用了Vue框架，还好把coffee转成pure js的网站遍布全网，google一下捡一个就行了。这里我参考了这篇文章，所以这里就使用人家的转换的结果了(<a href="https://github.com/karimbutt/websocket-rails-for-js-frameworks">https://github.com/karimbutt/websocket-rails-for-js-frameworks</a>)。
+</p>
+
+<p>
+接下来在index.html中引入这几个文件(这里Vue应该有自己的引入方式)，注意引入顺序。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">&lt;script src=<span style="color: #a3be8c;">"/static/scripts/websocket_rails.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #a3be8c;">"/static/scripts/event.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #a3be8c;">"/static/scripts/abstract_connection.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #a3be8c;">"/static/scripts/http_connection.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #a3be8c;">"/static/scripts/websocket_connection.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #a3be8c;">"/static/scripts/channel.js"</span>&gt;&lt;/script&gt;
+</pre>
+</div>
+
+<p>
+之后完成server的握手绑定，channel的创建和event的监听。并在回调函数中更新message
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">let</span> <span style="color: #bf616a;">websocketChannel</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">(</span><span style="color: #bf616a;">server</span>, <span style="color: #bf616a;">channel_name</span><span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #b48ead;">let</span> <span style="color: #bf616a;">dispatcher</span> = <span style="color: #b48ead;">new</span> <span style="color: #c0c5ce;">WebSocketRails</span><span style="color: #93a8c6;">(</span>server<span style="color: #93a8c6;">)</span>
+
+  <span style="color: #b48ead;">return</span> dispatcher.subscribe<span style="color: #93a8c6;">(</span>channel_name<span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+
+<span style="color: #b48ead;">let</span> <span style="color: #bf616a;">websocketBindEvent</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">(</span><span style="color: #bf616a;">channel</span><span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span>
+  channel.bind<span style="color: #93a8c6;">(</span><span style="color: #a3be8c;">'change'</span>, data =&gt; <span style="color: #b0b1a3;">{</span>
+    dispatchMessages<span style="color: #97b098;">(</span>data<span style="color: #97b098;">)</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">&#20998;&#21457;&#28040;&#24687;</span>
+  <span style="color: #b0b1a3;">}</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+
+<span style="color: #b48ead;">let</span> <span style="color: #bf616a;">channel</span> = websocketChannel<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'localhost:4040/websocket'</span>, <span style="color: #a3be8c;">'message'</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">server&#31471;&#21475;&#26159;&#22312;rails&#23450;&#20041;&#30340;</span>
+websocketBindEvent<span style="color: #8c8c8c;">(</span>channel<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfc165e9" class="outline-2">
+<h2 id="orgfc165e9"><span class="section-number-2">4</span> 一个redis的坑</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+顺利调试通过的我抑制不住自己兴奋的心情，但又觉得太过顺利，其实自己有一个地方一直是一知半解，就是websocket-rails为什么要使用event-abased的webserver，为什么要使用redis，会不会影响redis的正常使用。于是我打开rails console，输入
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #c0c5ce;">Redis</span>.current.set<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'a'</span>, <span style="color: #d08770;">1</span><span style="color: #8c8c8c;">)</span>
+
+<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; RuntimeError: eventmachine not initialized: evma_connect_to_server</span>
+</pre>
+</div>
+
+<p>
+果然呵呵哒了，解决方法见<a href="https://github.com/websocket-rails/websocket-rails/issues/29">https://github.com/websocket-rails/websocket-rails/issues/29</a>
+</p>
+
+<p>
+大概意思是
+</p>
+
+<blockquote>
+<p>
+changing driver from Synchrony to Hiredis fix the problem
+$redis = Redis.new(:host =&gt; host, :port =&gt; port, :driver =&gt; :hiredis)
+</p>
+</blockquote>
+
+<p>
+果然解决，不过不明就里，什么是hiredis，synchrony，这应该是接下来我应该解决的问题。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgacb8f6e" class="outline-2">
+<h2 id="orgacb8f6e"><span class="section-number-2">5</span> 参考文章</h2>
+<div class="outline-text-2" id="text-5">
+<ul class="org-ul">
+<li><a href="https://medium.com/@karimbutt/integrating-websocket-rails-with-angularjs-or-other-js-frameworks-256729e95a86">https://medium.com/@karimbutt/integrating-websocket-rails-with-angularjs-or-other-js-frameworks-256729e95a86</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

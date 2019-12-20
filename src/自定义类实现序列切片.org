@@ -125,8 +125,8 @@
    v[1:2]
    # => Vector([2,3])
    #+END_SRC
-
-
+   
+** Navigation
 # For prev/next links
 #+BEGIN_SRC emacs-lisp :exports results :results raw
 (gen-prev-next)

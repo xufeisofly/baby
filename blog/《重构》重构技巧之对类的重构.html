@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgb46b643">1. Move Method</a></li>
+<li><a href="#org8c65dcd">2. Extract Class</a></li>
+<li><a href="#org51b4a6a">3. Hide Delegate</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgb46b643" class="outline-2">
+<h2 id="orgb46b643"><span class="section-number-2">1</span> Move Method</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+搬移函数
+这里的move method方法并不是让你什么重构都这样用，这是最基本的方法，但大多数重构方法都比这个更好, <br />
+它解决的本质问题就是：方法要放到正确的类里
+</p>
+</blockquote>
+<p>
+举个unicrm系统里的例子，是一个用于生产销售漏斗log的类的，由于deal对象有两种travel<sub>type</sub>，//
+所以我们根据这个进行举例。
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">SalesPipelineAnalyticListener</span>
+  <span style="color: #c0c5ce;">TYPE</span> = ...
+  <span style="color: #c0c5ce;">STAGES</span> = ...
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discuss_proposal</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+    prepare_proposal<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">if</span> deal.travel_type == <span style="color: #c0c5ce;">TYPE</span><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:tailor</span><span style="color: #8c8c8c;">]</span>
+      add_transitions_log<span style="color: #8c8c8c;">(</span>deal, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:prepare_proposal</span><span style="color: #93a8c6;">]</span>, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:tailor_discuss</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">else</span>
+      add_transitions_log<span style="color: #8c8c8c;">(</span>deal, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:prepare_proposal</span><span style="color: #93a8c6;">]</span>, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:tour_discuss</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">end</span>
+    add_process_log<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">prepare_proposal</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>; <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">add_transitions_log</span><span style="color: #8c8c8c;">(</span>deal, from, to<span style="color: #8c8c8c;">)</span>; <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">add_process_log</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>; <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+其实这个例子用多态代替if更好，但我们现在就单纯的把discuss<sub>proposal执行Move</sub> Method
+因为里面用到了deal的travel<sub>type</sub>，所以应该在deal类中
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Deal</span>
+  <span style="color: #c0c5ce;">TYPE</span> = ...
+  <span style="color: #c0c5ce;">STAGES</span> = ...
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discuss_proposal</span><span style="color: #8c8c8c;">(</span>analytic_instance<span style="color: #8c8c8c;">)</span>
+    analytic_instance.prepare_proposal<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">if</span> travel_type == <span style="color: #c0c5ce;">TYPE</span><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:tailor</span><span style="color: #8c8c8c;">]</span>
+      analytic_instance.add_transitions_log<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, <span style="color: #c0c5ce;">STAGE</span>...<span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">else</span>
+      analytic_instance.add_transitions_log<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, <span style="color: #c0c5ce;">STAGE</span>...<span style="color: #8c8c8c;">)</span>
+    <span style="color: #b48ead;">end</span>
+    analytic_instance.add_process_log<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">SalesPipelineAnalyticListener</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discuss_proposal</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+    deal.discuss_proposal<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+将SalesPipelineAnalyticListener的discuss<sub>proposal改为委托函数</sub>，如果想彻底删掉它，<br />
+就需要找出所有调用这个函数的地方，一一改正
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8c65dcd" class="outline-2">
+<h2 id="org8c65dcd"><span class="section-number-2">2</span> Extract Class</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+<p>
+拆分类
+</p>
+</blockquote>
+<p>
+没有什么好说的，但书中有个遗留问题值得思考，拆分出一个新类以后，这个类的方法要不要公开？<br />
+还是隐藏？书中有三种选择我就直接抄了
+</p>
+<blockquote>
+<ol class="org-ol">
+<li>允许任何对象修改这个类的任何部分，这就使得新类的对象成为引用对象 <br />
+应该考虑使用Change Value to Reference</li>
+<li>不公开这个类，将新类设为不可修改的</li>
+<li>先复制一个新类的对象，然后将复制得到的新对象传递给旧类的对象。但这 <br />
+可能造成一定程度的迷惑，因为人们会认为它们可以修改新类的对象值。 <br />
+此外，如果同一个新类的对象被传递给多个旧类对象，也可能在用户间造成别名问题</li>
+</ol>
+</blockquote>
+<p>
+上面的新类和旧类举个例子：分别对应Telephone类和Person类
+</p>
+</div>
+</div>
+
+<div id="outline-container-org51b4a6a" class="outline-2">
+<h2 id="org51b4a6a"><span class="section-number-2">3</span> Hide Delegate</h2>
+<div class="outline-text-2" id="text-3">
+<blockquote>
+<p>
+隐藏委托关系，每个对象都尽量少了解别的类
+(这里感觉和rails有点相悖，rails的association关联两个对象后，彼此可以使用对方的全部内容)
+主要目的就是减少耦合
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby">deal.customer.name
+</pre>
+</div>
+<p>
+不如换成
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby">deal.customer_name
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer_name</span>
+  customer.name
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+这样，假设以后customer.name改名了，改叫customer.username，只需要改一个customer<sub>name方法就行了</sub>
+</p>
+<blockquote>
+<p>
+但Hide Delegate的前提是需要委托的关系不是很多，如果很多，那就直接调用另一个对象就好了，否则没有意义，还难以维护
+</p>
+</blockquote>
+
+<blockquote>
+<p>
+书中这一章还有外加函数，本地扩展之类的，原因都是因为java无法修改这个类，ruby中不存在，不写了
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

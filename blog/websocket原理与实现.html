@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org1174d53">1. 握手</a></li>
+<li><a href="#orgf92ddc1">2. 数据传输</a>
+<ul>
+<li><a href="#orgee2fb76">2.1. 格式</a></li>
+<li><a href="#org564146f">2.2. 心跳</a></li>
+<li><a href="#org1142f16">2.3. 关闭连接</a></li>
+</ul>
+</li>
+<li><a href="#orga1b1cd0">3. socket.io</a></li>
+<li><a href="#org9ba482a">4. websocket-rails源码学习</a></li>
+</ul>
+</div>
+</div>
+<p>
+之前做unicrm系统的时候做了一个消息的通知功能，当时真不知道websocket，所以我们神奇的选用了http短轮训的方式。作为一生的污点，说什么也要把他kill掉。
+</p>
+
+<p>
+我分为三个部分学习websocket
+</p>
+<div id="outline-container-org1174d53" class="outline-2">
+<h2 id="org1174d53"><span class="section-number-2">1</span> 握手</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+websocket是全双工的协议，但有没有想过，它走的还是网线。网线有只有一组Tx Rx啊。所以如果要实现全双工，就必须先实现握手。
+（否则每次协议都要带一个）
+握手就是客户端发一个握手请求，接收端回应成功，就意味着客户端和接收端建立了联系。
+客户端发送的协议格式
+</p>
+
+<pre class="example">
+GET / HTTP/1.1
+Upgrade: websocket
+Connection: Upgrade
+Host: example.com
+Origin: null
+Sec-WebSocket-Key: sN9cRrP/n9NdMgdcy2VJFQ==
+Sec-WebSocket-Version: 13   
+</pre>
+
+<p>
+服务端返回
+</p>
+
+<pre class="example">
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+</pre>
+
+<p>
+Sec-WebSocket-Accept很有意思，他是根据Sec-WebSocket-Key生成的，具体生成规则此处不描述背下来没有意义
+</p>
+
+<blockquote>
+<p>
+So if the Key was "dGhlIHNhbXBsZSBub25jZQ==", the Accept will be "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=". Once the server sends these headers, the handshake is complete and you can start swapping data!
+</p>
+</blockquote>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgf92ddc1" class="outline-2">
+<h2 id="orgf92ddc1"><span class="section-number-2">2</span> 数据传输</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgee2fb76" class="outline-3">
+<h3 id="orgee2fb76"><span class="section-number-3">2.1</span> 格式</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+抄下mozilla的格式，无非就是一种协议格式而已，没必要知道那么细
+</p>
+
+<pre class="example">
+    Frame format:  
+​​
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
+</pre>
+
+<p>
+总之通过这个协议，你可以知道:
+</p>
+<ol class="org-ol">
+<li>payload length: 获取内容的长度</li>
+<li>mask：可以解密内容</li>
+<li>FIN和opcode: 可以处理消息碎片</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org564146f" class="outline-3">
+<h3 id="org564146f"><span class="section-number-3">2.2</span> 心跳</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+握手之后，客户端或服务端可以选择发送一个ping，接收到ping之后，立刻返回一个pong，ping和pong的内容是一样的，只是opcode不同，这样就知道websocket仍处于连接状态
+</p>
+<blockquote>
+<p>
+If you have gotten more than one ping before you get the chance to send a pong, you only send one pong.
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org1142f16" class="outline-3">
+<h3 id="org1142f16"><span class="section-number-3">2.3</span> 关闭连接</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+客户端或服务端会发送一个close的特定格式的数据，接收到之后也返回一个close的数据，这样就关闭了连接，之后的内容都会被discarded掉
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga1b1cd0" class="outline-2">
+<h2 id="orga1b1cd0"><span class="section-number-2">3</span> socket.io</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+socket.io是websocket的一个js封装框架
+</p>
+</div>
+</div>
+<div id="outline-container-org9ba482a" class="outline-2">
+<h2 id="org9ba482a"><span class="section-number-2">4</span> websocket-rails源码学习</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+参考连接：<a href="https://github.com/abbshr/abbshr.github.io/issues/22">https://github.com/abbshr/abbshr.github.io/issues/22</a>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

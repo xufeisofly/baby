@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org015ccad">1. 事务的特性（ACID）</a></li>
+<li><a href="#org0847aa9">2. 四种隔离级别</a>
+<ul>
+<li><a href="#orgd101844">2.1. RU (Read Uncommitted，读取未提交)</a></li>
+<li><a href="#orgbd3fc50">2.2. RC (Read Committed，读取已提交)</a></li>
+<li><a href="#org377809c">2.3. RR (Repeatable Read，可重复读)</a></li>
+<li><a href="#org157b5f6">2.4. S (Serializable，可串行)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<blockquote>
+<p>
+mysql的四种事务隔离级别和实践
+</p>
+</blockquote>
+
+<div id="outline-container-org015ccad" class="outline-2">
+<h2 id="org015ccad"><span class="section-number-2">1</span> 事务的特性（ACID）</h2>
+<div class="outline-text-2" id="text-1">
+<ul class="org-ul">
+<li>原子性：事务作为执行单位，内部的sql是一起执行的，要么都做，要么都不做</li>
+<li>一致性：事务的执行结果从一个正确的状态到另一个正确的状态（这个正确的状态是什么由应用层定义，比如银行转账但总数不变）</li>
+<li>隔离型：事务和事务之间不能互相干扰（要看具体的隔离级别）</li>
+<li>持续性：事务commit之后对数据的影响是永久的</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0847aa9" class="outline-2">
+<h2 id="org0847aa9"><span class="section-number-2">2</span> 四种隔离级别</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgd101844" class="outline-3">
+<h3 id="orgd101844"><span class="section-number-3">2.1</span> RU (Read Uncommitted，读取未提交)</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+一个事务在提交之前作出的数据改变，另一个事务当时就可以读取到。
+</p>
+
+<p>
+比如我们创建一个表
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #b48ead;">create</span> <span style="color: #b48ead;">table</span> <span style="color: #8fa1b3;">test</span> <span style="color: #8c8c8c;">(</span>
+  `id` <span style="color: #c0c5ce;">int</span><span style="color: #93a8c6;">(</span><span style="color: #d08770;">11</span><span style="color: #93a8c6;">)</span> <span style="color: #b48ead;">not</span> <span style="color: #b48ead;">null</span> auto_increment,
+  `num` <span style="color: #c0c5ce;">int</span><span style="color: #93a8c6;">(</span><span style="color: #d08770;">11</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+然后插入三条数据
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">id</th>
+<th scope="col" class="org-right">num</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-right">2</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+A:启动事务
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #b48ead;">start</span> <span style="color: #b48ead;">transaction</span>;
+</pre>
+</div>
+
+<p>
+B:启动事务，更新数据，但不提交
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #b48ead;">start</span> <span style="color: #b48ead;">transaction</span>;
+<span style="color: #b48ead;">update</span> test <span style="color: #b48ead;">set</span> num=<span style="color: #d08770;">10</span> <span style="color: #b48ead;">where</span> id=<span style="color: #d08770;">1</span>;
+</pre>
+</div>
+
+<p>
+A:select，发现数据已经修改了
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #b48ead;">select</span> num <span style="color: #b48ead;">from</span> test <span style="color: #b48ead;">where</span> id = <span style="color: #d08770;">1</span>
+
+# =&gt; <span style="color: #d08770;">10</span>
+</pre>
+</div>
+
+<p>
+这叫做脏读（dirty read）
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-orgbd3fc50" class="outline-3">
+<h3 id="orgbd3fc50"><span class="section-number-3">2.2</span> RC (Read Committed，读取已提交)</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+还是上面的步骤，但A select时候会发现数据没有修改，因为B还没有提交
+但此时如果B提交了，尽管A还在事务里面，A的数据也会被更新
+</p>
+
+<p>
+B:commit transaction
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #b48ead;">commit</span>;
+</pre>
+</div>
+
+<p>
+A:select 发现数据已经修改
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #b48ead;">select</span> num <span style="color: #b48ead;">from</span> test <span style="color: #b48ead;">where</span> id = <span style="color: #d08770;">1</span>
+
+# =&gt; <span style="color: #d08770;">10</span>
+</pre>
+</div>
+
+<p>
+这叫做不可重复读（在同一个事务里读取两次发现结果不一样），虽然RC比RU级别高，但对于一般并发来说，还是会有在事务中数据发生变化的问题。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org377809c" class="outline-3">
+<h3 id="org377809c"><span class="section-number-3">2.3</span> RR (Repeatable Read，可重复读)</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+顾名思义，肯定是在事务中数据不会收到其他事务的影响（无论其他事务是否提交），才能重复读取
+</p>
+
+<p>
+B:更新数据后commit
+</p>
+
+<p>
+A:select 但数据并没有更新
+</p>
+</div>
+</div>
+
+<div id="outline-container-org157b5f6" class="outline-3">
+<h3 id="org157b5f6"><span class="section-number-3">2.4</span> S (Serializable，可串行)</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+不采用并发，如果有一个事务正在执行，其他事务需要等待这个事务结束才能执行
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

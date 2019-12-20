@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orge82d71f">1. 什么是匿名函数？</a></li>
+<li><a href="#org668b460">2. 比较</a></li>
+<li><a href="#orgdbc3dc4">3. 立即执行函数（iffe）</a></li>
+</ul>
+</div>
+</div>
+<blockquote>
+<p>
+标记一下，开始学前端了
+</p>
+</blockquote>
+
+<div id="outline-container-orge82d71f" class="outline-2">
+<h2 id="orge82d71f"><span class="section-number-2">1</span> 什么是匿名函数？</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+就是&#x2026;没有名字的函数呗，举个例子
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">bob</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
+<span style="color: #8c8c8c;">}</span>
+
+<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">bob</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+<p>
+前一个函数的名字是bob，后一个就是匿名函数
+</p>
+</div>
+</div>
+
+<div id="outline-container-org668b460" class="outline-2">
+<h2 id="org668b460"><span class="section-number-2">2</span> 比较</h2>
+<div class="outline-text-2" id="text-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">有名的</th>
+<th scope="col" class="org-left">匿名的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">调试方便</td>
+<td class="org-left">立即执行的函数可用于创建一个自己的scope，此时并不需要名字</td>
+</tr>
+
+<tr>
+<td class="org-left">递归，有名字的函数可以自己调用自己</td>
+<td class="org-left">简洁，如果是一个很短的函数或是回调，匿名函数会很简洁</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-orgdbc3dc4" class="outline-2">
+<h2 id="orgdbc3dc4"><span class="section-number-2">3</span> 立即执行函数（iffe）</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">function</span><span style="color: #93a8c6;">()</span> <span style="color: #93a8c6;">{</span>
+  alert<span style="color: #b0b1a3;">(</span><span style="color: #a3be8c;">'i am a iffe'</span><span style="color: #b0b1a3;">)</span>    
+<span style="color: #93a8c6;">}()</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+<p>
+function最外面要加括号，感觉就像是
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript"><span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
+  alert<span style="color: #93a8c6;">(</span><span style="color: #a3be8c;">'i am not a iffe'</span><span style="color: #93a8c6;">)</span>
+<span style="color: #8c8c8c;">}</span>
+a<span style="color: #8c8c8c;">()</span>
+</pre>
+</div>
+
+<p>
+iffe很有用的地方就是，它创造了一个自己的scope，内部的变量不受到外界的影响，也不会污染其他的全局内容
+所以JQuery源码上来就是
+</p>
+<div class="org-src-container">
+<pre class="src src-javascript">JQuery = <span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">function</span><span style="color: #93a8c6;">(){</span>
+  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...  </span>
+<span style="color: #93a8c6;">}()</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

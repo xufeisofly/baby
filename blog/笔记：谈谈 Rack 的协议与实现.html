@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga308871">1. 写在前面</a></li>
+<li><a href="#org8d9dbf1">2. Rack 协议</a></li>
+<li><a href="#orgd26acc5">3. 中间件</a></li>
+<li><a href="#orgb4c117c">4. Rack的实现源码</a></li>
+<li><a href="#org675a5b7">5. 包装应用</a></li>
+<li><a href="#orgb11170f">6. 选择Webserver</a></li>
+<li><a href="#orgf726023">7. Rails和Rack</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga308871" class="outline-2">
+<h2 id="orga308871"><span class="section-number-2">1</span> 写在前面</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+本文大量参考了draveness的博客，是该文章的阅读笔记，推荐阅读原文，链接：<a href="https://draveness.me/rack">https://draveness.me/rack</a>
+</p>
+
+<p>
+Rack是应用和Webserver之前的桥梁。Rails就是通过Rack实现webserver和应用程序之间的http通讯。上面的文章对rack进行了系统全面的阐述。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8d9dbf1" class="outline-2">
+<h2 id="org8d9dbf1"><span class="section-number-2">2</span> Rack 协议</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Rack应用就是一个能够响应call方法的ruby对象，它接受一个参数env，返回包含http三个基本值的数组，即[status, headers, body]。
+</p>
+
+<blockquote>
+<p>
+A Rack application is a Ruby object (not a class) that responds to call. It takes exactly one argument, the environment and returns an Array of exactly three values: The status, the headers, and the body.
+</p>
+</blockquote>
+
+<p>
+这里的body实际上是个数组，因为可能会有多个响应内容。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd26acc5" class="outline-2">
+<h2 id="orgd26acc5"><span class="section-number-2">3</span> 中间件</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Rack协议规定了webserver和Rack应用之间的通信方式，中间件使之能够在上层改变http响应和请求，而不会影响Rack底层的实现。文中定义了一个中间件StatusLogger
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">StatusLogger</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>app, options=<span style="color: #93a8c6;">{}</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@app</span> = app
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">call</span><span style="color: #8c8c8c;">(</span>env<span style="color: #8c8c8c;">)</span>
+    status, headers, body = <span style="color: #bf616a;">@app</span>.call<span style="color: #8c8c8c;">(</span>env<span style="color: #8c8c8c;">)</span>
+    <span style="color: #d08770;">puts</span> status
+    <span style="color: #8c8c8c;">[</span>status, headers, body<span style="color: #8c8c8c;">]</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+我们可以在config.ru中测试这个中间件的作用
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">use <span style="color: #c0c5ce;">StatusLogger</span>
+run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #8c8c8c;">{</span> |env| <span style="color: #93a8c6;">[</span><span style="color: #a3be8c;">'200'</span>, <span style="color: #b0b1a3;">{</span> <span style="color: #a3be8c;">'Content-Type'</span> =&gt; <span style="color: #a3be8c;">'text/html'</span> <span style="color: #b0b1a3;">}</span>, <span style="color: #b0b1a3;">[</span><span style="color: #a3be8c;">'get rack\'d'</span><span style="color: #b0b1a3;">]</span><span style="color: #93a8c6;">]</span> <span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+
+<p>
+然后执行rackup config.ru命令，每次模拟发送请求时，都会puts status。可见，可以在中间件中自定义http请求或返回的代码。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb4c117c" class="outline-2">
+<h2 id="orgb4c117c"><span class="section-number-2">4</span> Rack的实现源码</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+当执行rackup config.ru时，实际上是在执行
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">require</span> <span style="color: #a3be8c;">'rack'</span>
+<span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Server</span>.start
+</pre>
+</div>
+
+<p>
+源码中生成了Rack::Server的对象，并调用了其start方法。在实例化对象的时候，有几个默认的参数需要了解一下。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">default_options</span>
+  environment  = <span style="color: #c0c5ce;">ENV</span><span style="color: #8c8c8c;">[</span><span style="color: #a3be8c;">'RACK_ENV'</span><span style="color: #8c8c8c;">]</span> || <span style="color: #a3be8c;">'development'</span>
+  default_host = environment == <span style="color: #a3be8c;">'development'</span> ? <span style="color: #a3be8c;">'localhost'</span> : <span style="color: #a3be8c;">'0.0.0.0'</span>
+  <span style="color: #8c8c8c;">{</span>
+    <span style="color: #d08770;">:environment</span> =&gt; environment,
+    <span style="color: #d08770;">:pid</span>         =&gt; <span style="color: #d08770;">nil</span>,
+    <span style="color: #d08770;">:Port</span>        =&gt; <span style="color: #d08770;">9292</span>,
+    <span style="color: #d08770;">:Host</span>        =&gt; default_host,
+    <span style="color: #d08770;">:AccessLog</span>   =&gt; <span style="color: #93a8c6;">[]</span>,
+    <span style="color: #d08770;">:config</span>      =&gt; <span style="color: #a3be8c;">"config.ru"</span>
+  <span style="color: #8c8c8c;">}</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+可见，默认监听9292端口，默认文件名为config.ru。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org675a5b7" class="outline-2">
+<h2 id="org675a5b7"><span class="section-number-2">5</span> 包装应用</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+在run应用前，需要先将应用“包装”好，所谓的包装，就是将中间件和rack层按照一定的顺序打包，在Rack::Server中对应的方法是
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">wrapped_app</span>
+  <span style="color: #bf616a;">@wrapped_app</span> ||= build_app app
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+其中app方法过程复杂，我们只需要知道是一个Rack应用，包含了所有的中间件以及Proc对象，就像这样
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Builder</span>.new <span style="color: #8c8c8c;">{</span>
+  use <span style="color: #c0c5ce;">MiddleWare1</span>
+  use <span style="color: #c0c5ce;">MiddleWare2</span>
+  run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #93a8c6;">{</span> |env| <span style="color: #b0b1a3;">[</span><span style="color: #a3be8c;">'200'</span>, <span style="color: #97b098;">{</span> <span style="color: #a3be8c;">'Content-Type'</span> =&gt; <span style="color: #a3be8c;">'text/html'</span> <span style="color: #97b098;">}</span>, <span style="color: #97b098;">[</span><span style="color: #a3be8c;">'get rack\'d'</span><span style="color: #97b098;">]</span><span style="color: #b0b1a3;">]</span> <span style="color: #93a8c6;">}</span>
+<span style="color: #8c8c8c;">}</span>.to_app
+</pre>
+</div>
+
+<p>
+build<sub>app的作用是将所有的中间件包裹在Rack的周围</sub>，因为每一个中间件和Rack一样，都是响应一个call方法
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">build_app</span><span style="color: #8c8c8c;">(</span>app<span style="color: #8c8c8c;">)</span>
+  middleware<span style="color: #8c8c8c;">[</span>options<span style="color: #93a8c6;">[</span><span style="color: #d08770;">:environment</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">]</span>.reverse_each <span style="color: #b48ead;">do</span> |middleware|
+    middleware = middleware.call<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span> <span style="color: #b48ead;">if</span> middleware.respond_to?<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:call</span><span style="color: #8c8c8c;">)</span>
+    klass, *args = middleware
+    app = klass.new<span style="color: #8c8c8c;">(</span>app, *args<span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">end</span>
+  app
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<blockquote>
+<p>
+每一个中间件在call方法中都会调用另一个中间件或者rack应用，在接收到应用的返回之后会分别对响应进行处理最后由最先定义的中间件返回
+</p>
+</blockquote>
+
+<p>
+最后，我们按照如下顺序进行调用
+</p>
+
+<pre class="example">
+(request) ---&gt; MiddleWare1 =&gt; MiddleWare2 =&gt; RackApp =&gt; MiddleWare2 =&gt; MiddleWare1 ---&gt; (response)
+</pre>
+
+<p>
+总之，实现了下面的效果
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #c0c5ce;"># </span><span style="color: #65737e;">config.ru</span>
+use <span style="color: #c0c5ce;">MiddleWare1</span>
+use <span style="color: #c0c5ce;">MiddleWare2</span>
+run <span style="color: #c0c5ce;">RackApp</span>
+
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">equals to</span>
+<span style="color: #c0c5ce;">MiddleWare1</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">MiddleWare2</span>.new<span style="color: #93a8c6;">(</span><span style="color: #c0c5ce;">RackApp</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb11170f" class="outline-2">
+<h2 id="orgb11170f"><span class="section-number-2">6</span> 选择Webserver</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+webserver选择方法
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">server</span>
+  <span style="color: #bf616a;">@_server</span> ||= <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Handler</span>.get<span style="color: #8c8c8c;">(</span>options<span style="color: #93a8c6;">[</span><span style="color: #d08770;">:server</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">unless</span> <span style="color: #bf616a;">@_server</span>
+    <span style="color: #bf616a;">@_server</span> = <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Handler</span>.default
+  <span style="color: #b48ead;">end</span>
+  <span style="color: #bf616a;">@_server</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+可见，如果执行rackup命令时传入了server参数，比如rackup -s WEBrick，就会使用该webserver启动，否则就是用默认的webserver。
+选择好对应的webserver且将应用打包好之后，就会执行webserver的run方法了。
+</p>
+
+<blockquote>
+<p>
+所有遵循rack协议的webserver都会实现一个run方法，并且接受app和options和一个block作为参数
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgf726023" class="outline-2">
+<h2 id="orgf726023"><span class="section-number-2">7</span> Rails和Rack</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+执行rake middleware
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby">$ rake middleware
+
+use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Cors</span>
+use <span style="color: #c0c5ce;">Raven</span>::<span style="color: #c0c5ce;">Rack</span>
+use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Sendfile</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Static</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Executor</span>
+use <span style="color: #c0c5ce;">ActiveSupport</span>::<span style="color: #c0c5ce;">Cache</span>::<span style="color: #c0c5ce;">Strategy</span>::<span style="color: #c0c5ce;">LocalCache</span>::<span style="color: #c0c5ce;">Middleware</span>
+use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Runtime</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">RequestId</span>
+use <span style="color: #c0c5ce;">RequestStore</span>::<span style="color: #c0c5ce;">Middleware</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">RemoteIp</span>
+use <span style="color: #c0c5ce;">Rails</span>::<span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Logger</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">ShowExceptions</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">DebugExceptions</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Reloader</span>
+use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Callbacks</span>
+use <span style="color: #c0c5ce;">ActiveRecord</span>::<span style="color: #c0c5ce;">Migration</span>::<span style="color: #c0c5ce;">CheckPending</span>
+use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Head</span>
+use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">ConditionalGet</span>
+use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">ETag</span>
+use <span style="color: #c0c5ce;">Warden</span>::<span style="color: #c0c5ce;">Manager</span>
+use <span style="color: #c0c5ce;">RailsEventStore</span>::<span style="color: #c0c5ce;">Middleware</span>
+run <span style="color: #c0c5ce;">Unicrm</span>::<span style="color: #c0c5ce;">Application</span>.routes
+</pre>
+</div>
+
+<p>
+最后一个是一个RouteSet实例，Rails所有的请求都会经过路由表，根据一定规则分配给控制器
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

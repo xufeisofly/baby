@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org06cf435">1. 进程皆可衍生</a></li>
+<li><a href="#org4f8f05d">2. 孤儿进程</a></li>
+<li><a href="#orga79e266">3. 避免孤儿进程</a>
+<ul>
+<li><a href="#org357b940">3.1. 竞争条件</a></li>
+</ul>
+</li>
+<li><a href="#org54d2b0b">4. 僵尸进程</a></li>
+</ul>
+</div>
+</div>
+<blockquote>
+<p>
+第二部分将介绍进程的衍生(fork)，进程等待，以及僵尸进程的产生和规避
+</p>
+</blockquote>
+
+<div id="outline-container-org06cf435" class="outline-2">
+<h2 id="org06cf435"><span class="section-number-2">1</span> 进程皆可衍生</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+进程衍生采用的方法是fork，它会产生一个和原始进程一模一样的新进程。fork出来的进程是原进程的子进程。fork产生的子进程的一些特性如下：
+</p>
+<ul class="org-ul">
+<li>拥有全新的pid，ppid为被fork的进程</li>
+<li>fork出的子进程和父进程共享所有的文件描述符，两个进程可以共享打开的资源（如文件，socket）</li>
+<li>子进程继承父进程内存中的所有内容，自己拥有一套内存副本，随意更改不会影响父进程</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">if</span> <span style="color: #d08770;">fork</span>
+  <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"for parent"</span>
+<span style="color: #b48ead;">else</span>
+  <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"for child"</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+输出为
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">for</span> child
+<span style="color: #b48ead;">for</span> parent
+</pre>
+</div>
+
+<p>
+if 和 else的代码都得到了执行，因为fork的调用实际会返回两次，父进程返回一次，子进程返回一次，而父进程因为确实被fork了，所以进入if，子进程的fork却返回nil，因此进入else，下面的例子可以看出这点
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">puts</span> <span style="color: #d08770;">fork</span>
+
+<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt;</span>
+<span style="color: #d08770;">21423</span>
+<span style="color: #d08770;">nil</span>
+</pre>
+</div>
+
+<p>
+fork的好处：可以衍生出多个进程，有可能分配到多个CPU中，从而实现多核并发。
+fork的坏处：内存完全备份，因此内存的占用也是成倍增加
+</p>
+
+<p>
+ruby中可以给fork方法传递block
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">fork</span> <span style="color: #b48ead;">do</span>
+  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#23376;&#36827;&#31243;&#25191;&#34892;</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#29238;&#36827;&#31243;&#25191;&#34892;</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4f8f05d" class="outline-2">
+<h2 id="org4f8f05d"><span class="section-number-2">2</span> 孤儿进程</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+之所以叫孤儿进程，是因为
+</p>
+
+<blockquote>
+<p>
+The Parent is dead&#x2026;
+</p>
+</blockquote>
+
+<p>
+而父进程结束并不会对子进程造成任何影响，它还是开心的或者，比如你可以irb中试试，会发现irb关了，但是terminal会继续输出"I'm an orphan!"，很诡异。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">fork</span> <span style="color: #b48ead;">do</span>
+  <span style="color: #d08770;">5</span>.times <span style="color: #b48ead;">do</span>
+    <span style="color: #d08770;">sleep</span> <span style="color: #d08770;">1</span>
+    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"I'm an orphan!"</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #d08770;">abort</span> <span style="color: #a3be8c;">"Sorry puppy, dad is gone..."</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga79e266" class="outline-2">
+<h2 id="orga79e266"><span class="section-number-2">3</span> 避免孤儿进程</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+避免的方式可以想见，就是父进程结束之前查询并等待所有子进程结束之后自己再结束。方法是Process.wait
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">fork</span> <span style="color: #b48ead;">do</span> 
+  <span style="color: #d08770;">5</span>.times <span style="color: #b48ead;">do</span>
+    <span style="color: #d08770;">sleep</span> <span style="color: #d08770;">1</span>
+    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"I am an orphan!"</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #c0c5ce;">Process</span>.wait
+<span style="color: #d08770;">abort</span> <span style="color: #a3be8c;">"Parent process died..."</span>
+</pre>
+</div>
+
+<p>
+还有个方法是Process.wait2，会返回pid，status两个值，这样我们就能知道子进程退出时的状态了。这也是进程之间通信的一种方式。
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">5</span>.times <span style="color: #b48ead;">do</span> 
+  <span style="color: #d08770;">fork</span> <span style="color: #b48ead;">do</span>
+    <span style="color: #b48ead;">if</span> <span style="color: #d08770;">rand</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">5</span><span style="color: #8c8c8c;">)</span>.even?
+      <span style="color: #d08770;">exit</span> <span style="color: #d08770;">111</span>
+    <span style="color: #b48ead;">else</span>
+      <span style="color: #d08770;">exit</span> <span style="color: #d08770;">112</span>
+    <span style="color: #b48ead;">end</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #d08770;">5</span>.times <span style="color: #b48ead;">do</span> 
+  pid, status = <span style="color: #c0c5ce;">Process</span>.wait2
+
+  <span style="color: #b48ead;">if</span> status.exitstatus == <span style="color: #d08770;">111</span>
+    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"</span><span style="color: #bf616a;">#{pid}</span><span style="color: #a3be8c;"> encountered an even number"</span>
+  <span style="color: #b48ead;">else</span>
+    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"</span><span style="color: #bf616a;">#{pid}</span><span style="color: #a3be8c;"> encountered an odd number"</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+
+<p>
+同时还有Process.waitpid和Process.waitpid2，和wait的区别在于不是等待任意的子进程，而是可以指定pid
+</p>
+
+<blockquote>
+<p>
+注意，如果不存在子进程，那么Process.wait会抛出Errno::ECHILD异常。
+</p>
+</blockquote>
+</div>
+
+<div id="outline-container-org357b940" class="outline-3">
+<h3 id="org357b940"><span class="section-number-3">3.1</span> 竞争条件</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+思考，如果Process.wait执行之前子进程就中止了怎么办
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #d08770;">2</span>.times <span style="color: #b48ead;">do</span> 
+  <span style="color: #d08770;">fork</span> <span style="color: #b48ead;">do</span>
+    <span style="color: #d08770;">abort</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #c0c5ce;">Process</span>.wait
+<span style="color: #d08770;">sleep</span> <span style="color: #d08770;">5</span>
+
+<span style="color: #c0c5ce;">Process</span>.wait
+</pre>
+</div>
+
+<p>
+结果是一切正常，第二个Process.wait也没有报错，原因是子进程退出时的状态会加入队列，父进程可以从队列中提取子进程的信息。但这里有个问题，如果子进程退出很久之后父进程才Process.wait，那么子进程的状态会一直被内核保留，是在浪费内核资源，这就是僵尸进程。
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org54d2b0b" class="outline-2">
+<h2 id="org54d2b0b"><span class="section-number-2">4</span> 僵尸进程</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+僵尸进程生成的原因就是：子进程结束了，却不去读取子进程状态。（死不瞑目，没良心的）
+</p>
+
+<p>
+可以使用Process.detach(pid)，它的作用是生成一个专门用来等待子进程退出的新进程。
+</p>
+
+<blockquote>
+<p>
+任何已经结束的进程，如果它的状态一直未被读取，那么它就是一个僵尸进程。
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>&lrm;</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf6bd7eb">1. Self Encapsulate Field</a></li>
+<li><a href="#orgc4baa78">2. Change Value to Reference</a></li>
+<li><a href="#orgb095804">3. Replace Array with Object</a></li>
+<li><a href="#org9a3d037">4. Change Unidirectional Association to Bidirectional</a></li>
+<li><a href="#org4386855">5. Replace Type Code With Class</a></li>
+<li><a href="#org143a4fa">6. Replace Subclasses with Fields</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf6bd7eb" class="outline-2">
+<h2 id="orgf6bd7eb"><span class="section-number-2">1</span> Self Encapsulate Field</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+自封装字段
+就是把某个类中的字段通过方法去取得，这样的好处是在子类中就可以任意复写超类中的这个字段，而不会去改变超累中的值
+</p>
+</blockquote>
+<blockquote>
+<p>
+感觉用的不多啊，除非子类和超类这两个字段定义确实不一样
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgc4baa78" class="outline-2">
+<h2 id="orgc4baa78"><span class="section-number-2">2</span> Change Value to Reference</h2>
+<div class="outline-text-2" id="text-2">
+<blockquote>
+<p>
+将值对象改为引用对象
+特么什么意思
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Customer</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@name</span> = name
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name</span>
+    <span style="color: #bf616a;">@name</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Order</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>customer_name<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@customer</span> = <span style="color: #c0c5ce;">Customer</span>.new customer_name
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer</span>
+    <span style="color: #bf616a;">@customer</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+目前为止，一个order对应一个customer, 哪怕customer的name是一样的，对于不同的order来说，也是一个order对应一个customer实例。
+但我现在想让name一样的customer就是一个对象，怎么办，我就不能传值对象到order，而应该传引用对象到order
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Customer</span>
+  <span style="color: #bf616a;">@@customer_hash</span> = <span style="color: #c0c5ce;">Hash</span>.new
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@name</span> = name
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #b48ead;">self</span>.<span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@@customer_hash</span><span style="color: #8c8c8c;">[</span>name<span style="color: #8c8c8c;">]</span> ||= <span style="color: #b48ead;">self</span>.new<span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name</span>
+    <span style="color: #bf616a;">@name</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+
+<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Order</span>
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>customer_name<span style="color: #8c8c8c;">)</span>
+    <span style="color: #bf616a;">@customer</span> = <span style="color: #c0c5ce;">Customer</span>.create<span style="color: #8c8c8c;">(</span>customer_name<span style="color: #8c8c8c;">)</span>
+  <span style="color: #b48ead;">end</span>
+
+  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer</span>
+    <span style="color: #bf616a;">@customer</span>
+  <span style="color: #b48ead;">end</span>
+<span style="color: #b48ead;">end</span>
+</pre>
+</div>
+<p>
+将新建的customer对象存在一个类变量里，每次创建order对象的时候，都先看看有没有现成的customer对象
+</p>
+<blockquote>
+<p>
+一般谁会这么用啊，rails都是存在数据库里的，可以使用find<sub>or</sub><sub>create</sub><sub>by哈哈</sub>
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgb095804" class="outline-2">
+<h2 id="orgb095804"><span class="section-number-2">3</span> Replace Array with Object</h2>
+<div class="outline-text-2" id="text-3">
+<blockquote>
+<p>
+用对象取代数组（或者哈希）
+数组应该只用于容纳相似的对象，对于不同的对象，应该放到Hash里面或者自定义的一个类里面
+可以定义一个类存放，但在ruby里面，可以用Struct.new定义一个类
+</p>
+</blockquote>
+<div class="org-src-container">
+<pre class="src src-ruby">row<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">0</span><span style="color: #8c8c8c;">]</span> = <span style="color: #a3be8c;">'Liverpool'</span>
+row<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> = <span style="color: #d08770;">15</span>
+</pre>
+</div>
+<p>
+改为
+</p>
+<div class="org-src-container">
+<pre class="src src-ruby"><span style="color: #c0c5ce;">Performance</span> = <span style="color: #c0c5ce;">Struct</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:name</span>, <span style="color: #d08770;">:win</span><span style="color: #8c8c8c;">)</span>
+row = <span style="color: #c0c5ce;">Performance</span>.new
+row.name = <span style="color: #a3be8c;">'Liverpool'</span>
+row.win = <span style="color: #d08770;">15</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9a3d037" class="outline-2">
+<h2 id="org9a3d037"><span class="section-number-2">4</span> Change Unidirectional Association to Bidirectional</h2>
+<div class="outline-text-2" id="text-4">
+<blockquote>
+<p>
+将单向关联改为双向关联
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org4386855" class="outline-2">
+<h2 id="org4386855"><span class="section-number-2">5</span> Replace Type Code With Class</h2>
+<div class="outline-text-2" id="text-5">
+<blockquote>
+<p>
+以类取代类型码
+之前已经写过了
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-org143a4fa" class="outline-2">
+<h2 id="org143a4fa"><span class="section-number-2">6</span> Replace Subclasses with Fields</h2>
+<div class="outline-text-2" id="text-6">
+<blockquote>
+<p>
+当子类中返回的内容超级少时，可以删掉，在父类中用方法代替
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>
