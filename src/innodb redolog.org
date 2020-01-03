@@ -1,0 +1,39 @@
+#+TITLE: InnoDB log 文件
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+
+** redo log
+
+   与 binlog, error log 等 mysql server 层提供的日志不同，redo log 是 innodb 存储引擎提供的日志文件，是 innodb 特有的，它记录了对 innodb 的事务日志。通常对于 mysql 的 DML 操作会先通过 innodb change buffer，然后在 doublewrite 到磁盘中，在落盘期间一旦异常宕机，就会造成数据错误，所以 innodb 提供了 WAL 技术，即 Write-Ahead logging，再每次变更数据时，都先写 redo 日志，这样一旦宕机，也可以从 redo log 中恢复数据。
+
+   在这里会产生疑问。
+
+   #+BEGIN_QUOTE
+   如果在记录 redo log 过程中异常故障怎么办？本质上和更新数据文件不是一样的吗？
+   #+END_QUOTE
+
+   要解释这个问题，需要明确以下几点。
+
+*** redo log buffer, os buffer
+	
+	redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如果一次 DML 就 fsync 一条 write-log 会导致大量磁盘 IO，影响性能。更具体来说，redo log 要经过两层 buffer，分别是 innodb 提供的 redo log buffer 和 操作系统提供的 os buffer。经过一层 os buffer 的好处是即使 mysql 挂掉，只要服务器没有宕机则数据就不会丢失。所以一次 commit 的过程如下。
+
+	#+CAPTION: redo.png
+	[[file:/Users/norris/projects/baby/src/../images/redo.png.png]]	
+
+	那么 buffer 什么时候 flush 呢？
+
+*** ~innodb_flush_log_at_trx_commit~ 参数
+
+	innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通过 ~innodb_flush_log_at_trx_commit~ 来配置
+
+	- 变量为 0: 事务提交不会更新 os buffer，会通过 master thread 每秒的任务来 flush redo buffer 到 os buffer，紧接着 fsync 到 log file，因此若系统崩溃，会丢失 1s 数据
+    - 变量为 1: 事务提交即会 flush 并 fsync 到 log file，不会丢失数据，但影响磁盘 IO 性能
+	- 变量为 2: 事务提交会 flush 到 os buffer，但通过 master thread 每秒 fsync 到磁盘 log file，所以 mysql 崩溃但服务器不宕机，就不会丢失数据，若服务器宕机，则会丢失 1s 数据。同时不影响磁盘性能
+
+#+CAPTION: flush
+[[file:/Users/norris/projects/baby/src/../images/flush.png.png]]
+
+# For prev/next links
+#+BEGIN_SRC emacs-lisp :exports results :results raw
+(gen-prev-next)
+#+END_SRC

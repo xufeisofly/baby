@@ -1,0 +1,21 @@
+#+TITLE: TODOs
+
+*** LIVE sla，涉及新 live rpc 迁移修改
+*** oncall 机器人
+*** 老 live 迁移
+*** 新 live 爬虫问题
+*** publication 后台结算迁移，调度任务整理
+*** DONE 推广页 button 加字段 <2019-12-26 Thu>
+*** TODO 后台优化三期
+**** TODO 会员推荐页
+***** DONE 排序，筛选（前端处理）0d
+***** TODO 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d
+***** DONE 增加排序规则：权重 + 创建时间倒叙 0d
+***** DONE ~sku_id~ => ~business_id~ 1d
+**** TODO sku 专题和推广活动
+***** DONE 精选专题单增加跳转链接和图片 1d
+***** DONE 精选专题多/单 ~sku_id~ => ~business_id~ 0.5d
+***** TODO 模块配置列表去掉一些模块 0d 
+**** DONE 线下活动复制。榜单复制 <2019-12-26 Thu>
+***** DONE 榜单复制 0.5 d
+***** DONE 线下活动复制 0.5 d
