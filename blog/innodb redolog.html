@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>InnoDB log 文件</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">InnoDB log 文件</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org0174ef7">1. redo log</a>
+<ul>
+<li><a href="#orgecfce83">1.1. redo log buffer, os buffer</a></li>
+<li><a href="#org87a7780">1.2. <code>innodb_flush_log_at_trx_commit</code> 参数</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0174ef7" class="outline-2">
+<h2 id="org0174ef7"><span class="section-number-2">1</span> redo log</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+与 binlog, error log 等 mysql server 层提供的日志不同，redo log 是 innodb 存储引擎提供的日志文件，是 innodb 特有的，它记录了对 innodb 的事务日志。通常对于 mysql 的 DML 操作会先通过 innodb change buffer，然后在 doublewrite 到磁盘中，在落盘期间一旦异常宕机，就会造成数据错误，所以 innodb 提供了 WAL 技术，即 Write-Ahead logging，再每次变更数据时，都先写 redo 日志，这样一旦宕机，也可以从 redo log 中恢复数据。
+</p>
+
+<p>
+在这里会产生疑问。
+</p>
+
+<blockquote>
+<p>
+如果在记录 redo log 过程中异常故障怎么办？本质上和更新数据文件不是一样的吗？
+</p>
+</blockquote>
+
+<p>
+要解释这个问题，需要明确以下几点。
+</p>
+</div>
+
+<div id="outline-container-orgecfce83" class="outline-3">
+<h3 id="orgecfce83"><span class="section-number-3">1.1</span> redo log buffer, os buffer</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如果一次 DML 就 fsync 一条 write-log 会导致大量磁盘 IO，影响性能。更具体来说，redo log 要经过两层 buffer，分别是 innodb 提供的 redo log buffer 和 操作系统提供的 os buffer。经过一层 os buffer 的好处是即使 mysql 挂掉，只要服务器没有宕机则数据就不会丢失。所以一次 commit 的过程如下。
+</p>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/redo.png.png" alt="redo.png.png" /> 
+</p>
+<p><span class="figure-number">Figure 1: </span>redo.png</p>
+</div>
+
+<p>
+那么 buffer 什么时候 flush 呢？
+</p>
+</div>
+</div>
+
+<div id="outline-container-org87a7780" class="outline-3">
+<h3 id="org87a7780"><span class="section-number-3">1.2</span> <code>innodb_flush_log_at_trx_commit</code> 参数</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通过 <code>innodb_flush_log_at_trx_commit</code> 来配置
+</p>
+
+<ul class="org-ul">
+<li>变量为 0: 事务提交不会更新 os buffer，会通过 master thread 每秒的任务来 flush redo buffer 到 os buffer，紧接着 fsync 到 log file，因此若系统崩溃，会丢失 1s 数据</li>
+<li>变量为 1: 事务提交即会 flush 并 fsync 到 log file，不会丢失数据，但影响磁盘 IO 性能</li>
+<li>变量为 2: 事务提交会 flush 到 os buffer，但通过 master thread 每秒 fsync 到磁盘 log file，所以 mysql 崩溃但服务器不宕机，就不会丢失数据，若服务器宕机，则会丢失 1s 数据。同时不影响磁盘性能</li>
+</ul>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/flush.png.png" alt="flush.png.png" />
+</p>
+<p><span class="figure-number">Figure 2: </span>flush</p>
+</div>
+
+<div class="div-wrap">
+<div class="div-left">
+<p>
+<a href="inject reduce.html">&larr; nil</a>
+</p>
+
+</div>
+<div class="div-center">
+<p>
+<a href="home.html">⟨Blog Home⟩</a>
+</p>
+
+</div>
+<div class="div-right">
+<p>
+<a href="mysql的事务级别.html">nil &rarr;</a>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

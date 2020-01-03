@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TODOs</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">TODOs</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org937dda1">1. LIVE sla，涉及新 live rpc 迁移修改</a></li>
+<li><a href="#org81e0c1f">2. oncall 机器人</a></li>
+<li><a href="#orge96f3aa">3. 老 live 迁移</a></li>
+<li><a href="#org96e0366">4. 新 live 爬虫问题</a></li>
+<li><a href="#org1473248">5. publication 后台结算迁移，调度任务整理</a></li>
+<li><a href="#org659e75b">6. <span class="done DONE">DONE</span> 推广页 button 加字段 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></a></li>
+<li><a href="#org1228f9e">7. <span class="todo TODO">TODO</span> 后台优化三期</a>
+<ul>
+<li><a href="#org137f758">7.1. <span class="todo TODO">TODO</span> 会员推荐页</a>
+<ul>
+<li><a href="#orgfdfce30">7.1.1. <span class="done DONE">DONE</span> 排序，筛选（前端处理）0d</a></li>
+<li><a href="#orgb677f59">7.1.2. <span class="todo TODO">TODO</span> 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d</a></li>
+<li><a href="#orgc5cc146">7.1.3. <span class="done DONE">DONE</span> 增加排序规则：权重 + 创建时间倒叙 0d</a></li>
+<li><a href="#orgcc970bd">7.1.4. <span class="done DONE">DONE</span> <code>sku_id</code> =&gt; <code>business_id</code> 1d</a></li>
+</ul>
+</li>
+<li><a href="#org9268540">7.2. <span class="todo TODO">TODO</span> sku 专题和推广活动</a>
+<ul>
+<li><a href="#org88e2ac0">7.2.1. <span class="done DONE">DONE</span> 精选专题单增加跳转链接和图片 1d</a></li>
+<li><a href="#org65924ef">7.2.2. <span class="done DONE">DONE</span> 精选专题多/单 <code>sku_id</code> =&gt; <code>business_id</code> 0.5d</a></li>
+<li><a href="#org82568a7">7.2.3. <span class="todo TODO">TODO</span> 模块配置列表去掉一些模块 0d</a></li>
+</ul>
+</li>
+<li><a href="#org90752ed">7.3. <span class="done DONE">DONE</span> 线下活动复制。榜单复制 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></a>
+<ul>
+<li><a href="#orgc3570c5">7.3.1. <span class="done DONE">DONE</span> 榜单复制 0.5 d</a></li>
+<li><a href="#org8d5770c">7.3.2. <span class="done DONE">DONE</span> 线下活动复制 0.5 d</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org937dda1" class="outline-2">
+<h2 id="org937dda1"><span class="section-number-2">1</span> LIVE sla，涉及新 live rpc 迁移修改</h2>
+</div>
+<div id="outline-container-org81e0c1f" class="outline-2">
+<h2 id="org81e0c1f"><span class="section-number-2">2</span> oncall 机器人</h2>
+</div>
+<div id="outline-container-orge96f3aa" class="outline-2">
+<h2 id="orge96f3aa"><span class="section-number-2">3</span> 老 live 迁移</h2>
+</div>
+<div id="outline-container-org96e0366" class="outline-2">
+<h2 id="org96e0366"><span class="section-number-2">4</span> 新 live 爬虫问题</h2>
+</div>
+<div id="outline-container-org1473248" class="outline-2">
+<h2 id="org1473248"><span class="section-number-2">5</span> publication 后台结算迁移，调度任务整理</h2>
+</div>
+<div id="outline-container-org659e75b" class="outline-2">
+<h2 id="org659e75b"><span class="section-number-2">6</span> <span class="done DONE">DONE</span> 推广页 button 加字段 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></h2>
+</div>
+<div id="outline-container-org1228f9e" class="outline-2">
+<h2 id="org1228f9e"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> 后台优化三期</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-org137f758" class="outline-3">
+<h3 id="org137f758"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> 会员推荐页</h3>
+<div class="outline-text-3" id="text-7-1">
+</div>
+<div id="outline-container-orgfdfce30" class="outline-4">
+<h4 id="orgfdfce30"><span class="section-number-4">7.1.1</span> <span class="done DONE">DONE</span> 排序，筛选（前端处理）0d</h4>
+</div>
+<div id="outline-container-orgb677f59" class="outline-4">
+<h4 id="orgb677f59"><span class="section-number-4">7.1.2</span> <span class="todo TODO">TODO</span> 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d</h4>
+</div>
+<div id="outline-container-orgc5cc146" class="outline-4">
+<h4 id="orgc5cc146"><span class="section-number-4">7.1.3</span> <span class="done DONE">DONE</span> 增加排序规则：权重 + 创建时间倒叙 0d</h4>
+</div>
+<div id="outline-container-orgcc970bd" class="outline-4">
+<h4 id="orgcc970bd"><span class="section-number-4">7.1.4</span> <span class="done DONE">DONE</span> <code>sku_id</code> =&gt; <code>business_id</code> 1d</h4>
+</div>
+</div>
+<div id="outline-container-org9268540" class="outline-3">
+<h3 id="org9268540"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> sku 专题和推广活动</h3>
+<div class="outline-text-3" id="text-7-2">
+</div>
+<div id="outline-container-org88e2ac0" class="outline-4">
+<h4 id="org88e2ac0"><span class="section-number-4">7.2.1</span> <span class="done DONE">DONE</span> 精选专题单增加跳转链接和图片 1d</h4>
+</div>
+<div id="outline-container-org65924ef" class="outline-4">
+<h4 id="org65924ef"><span class="section-number-4">7.2.2</span> <span class="done DONE">DONE</span> 精选专题多/单 <code>sku_id</code> =&gt; <code>business_id</code> 0.5d</h4>
+</div>
+<div id="outline-container-org82568a7" class="outline-4">
+<h4 id="org82568a7"><span class="section-number-4">7.2.3</span> <span class="todo TODO">TODO</span> 模块配置列表去掉一些模块 0d</h4>
+</div>
+</div>
+<div id="outline-container-org90752ed" class="outline-3">
+<h3 id="org90752ed"><span class="section-number-3">7.3</span> <span class="done DONE">DONE</span> 线下活动复制。榜单复制 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></h3>
+<div class="outline-text-3" id="text-7-3">
+</div>
+<div id="outline-container-orgc3570c5" class="outline-4">
+<h4 id="orgc3570c5"><span class="section-number-4">7.3.1</span> <span class="done DONE">DONE</span> 榜单复制 0.5 d</h4>
+</div>
+<div id="outline-container-org8d5770c" class="outline-4">
+<h4 id="org8d5770c"><span class="section-number-4">7.3.2</span> <span class="done DONE">DONE</span> 线下活动复制 0.5 d</h4>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+</div>
+</div>
+</body>
+</html>

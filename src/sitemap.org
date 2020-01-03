@@ -1,5 +1,7 @@
 #+TITLE: Sitemap for project baby
 
+- [[file:innodb redolog.org][InnoDB log 文件]]
+- [[file:todo.org][TODOs]]
 - [[file:自定义类实现序列切片.org][自定义类实现序列切片]]
 - [[file:高性能MYSQL.org][高性能 MYSQL]]
 - [[file:websocket原理与实现.org][websocket原理与实现]]
