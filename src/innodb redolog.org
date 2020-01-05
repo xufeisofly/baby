@@ -44,13 +44,9 @@
 
    如下图
 
-   #+CAPTION: innodb 逻辑存储结构
-   [[https://i.loli.net/2020/01/05/BalWPAGkDx3HT4E.png]]
-
-#+CAPTION: 44
-#+ATTR_HTML: :alt https://i.loli.net/2020/01/05/z3l92sbaYOxkynP.png image
-[[file:/Users/norris/projects/baby/src/../images/44.png]]
-   
+   #+CAPTION: innodb 存储结构
+   #+ATTR_HTML: :alt https://i.loli.net/2020/01/05/pYqtsn8UvEBOTHK.png
+   [[file:/Users/norris/projects/baby/src/../images/innodb_storage.png]]
 
 
 #+BEGIN_SRC emacs-lisp :exports results :results raw
