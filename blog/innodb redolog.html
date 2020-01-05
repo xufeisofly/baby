@@ -69,6 +69,7 @@ for the JavaScript code in this tag.
 <li><a href="#org87a7780">1.2. <code>innodb_flush_log_at_trx_commit</code> 参数</a></li>
 </ul>
 </li>
+<li><a href="#org3414286">2. InnoDB 逻辑存储结构</a></li>
 </ul>
 </div>
 </div>
@@ -90,13 +91,6 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 
-
-<div class="figure">
-<p><img src="https://i.loli.net/2020/01/05/hf5UyZGeMSPr8oV.png" alt="hf5UyZGeMSPr8oV.png" />
-</p>
-<p><span class="figure-number">Figure 1: </span>10</p>
-</div>
-
 <p>
 要解释这个问题，需要明确以下几点。
 </p>
@@ -113,7 +107,7 @@ redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/redo.png.png" alt="redo.png.png" /> 
 </p>
-<p><span class="figure-number">Figure 2: </span>redo.png</p>
+<p><span class="figure-number">Figure 1: </span>redo.png</p>
 </div>
 
 <p>
@@ -139,8 +133,45 @@ innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通�
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/flush.png.png" alt="flush.png.png" />
 </p>
-<p><span class="figure-number">Figure 3: </span>flush</p>
+<p><span class="figure-number">Figure 2: </span>flush</p>
 </div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3414286" class="outline-2">
+<h2 id="org3414286"><span class="section-number-2">2</span> InnoDB 逻辑存储结构</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+innoDB 存储结构分为
+</p>
+
+<ul class="org-ul">
+<li>表空间(tablespace)</li>
+<li>段(segment)</li>
+<li>区(extent)</li>
+<li>页(page)</li>
+</ul>
+
+<p>
+如下图
+</p>
+
+
+<div class="figure">
+<p><img src="https://i.loli.net/2020/01/05/BalWPAGkDx3HT4E.png" alt="BalWPAGkDx3HT4E.png" />
+</p>
+<p><span class="figure-number">Figure 3: </span>innodb 逻辑存储结构</p>
+</div>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/44.png" alt="https://i.loli.net/2020/01/05/z3l92sbaYOxkynP.png image" />
+</p>
+<p><span class="figure-number">Figure 4: </span>44</p>
+</div>
+
+
 
 <div class="div-wrap">
 <div class="div-left">
@@ -162,7 +193,6 @@ innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通�
 
 </div>
 
-</div>
 </div>
 </div>
 </div>

@@ -10,12 +10,9 @@
    #+BEGIN_QUOTE
    如果在记录 redo log 过程中异常故障怎么办？本质上和更新数据文件不是一样的吗？
    #+END_QUOTE
-
-[[https://i.loli.net/2020/01/05/hf5UyZGeMSPr8oV.png]]
-
+   
    要解释这个问题，需要明确以下几点。
 
-** 
 *** redo log buffer, os buffer
 	
 	redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如果一次 DML 就 fsync 一条 write-log 会导致大量磁盘 IO，影响性能。更具体来说，redo log 要经过两层 buffer，分别是 innodb 提供的 redo log buffer 和 操作系统提供的 os buffer。经过一层 os buffer 的好处是即使 mysql 挂掉，只要服务器没有宕机则数据就不会丢失。所以一次 commit 的过程如下。
@@ -36,7 +33,26 @@
 #+CAPTION: flush
 [[file:/Users/norris/projects/baby/src/../images/flush.png.png]]
 
-# For prev/next links
+** InnoDB 逻辑存储结构
+
+   innoDB 存储结构分为
+
+   - 表空间(tablespace)
+   - 段(segment)
+   - 区(extent)
+   - 页(page)
+
+   如下图
+
+   #+CAPTION: innodb 逻辑存储结构
+   [[https://i.loli.net/2020/01/05/BalWPAGkDx3HT4E.png]]
+
+#+CAPTION: 44
+#+ATTR_HTML: :alt https://i.loli.net/2020/01/05/z3l92sbaYOxkynP.png image
+[[file:/Users/norris/projects/baby/src/../images/44.png]]
+   
+
+
 #+BEGIN_SRC emacs-lisp :exports results :results raw
 (gen-prev-next)
 #+END_SRC
