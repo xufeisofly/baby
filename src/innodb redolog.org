@@ -47,7 +47,9 @@
    #+CAPTION: innodb 存储结构
    #+ATTR_HTML: :alt https://i.loli.net/2020/01/05/pYqtsn8UvEBOTHK.png
    [[file:/Users/norris/projects/baby/src/../images/innodb_storage.png]]
-
+#+CAPTION: 66
+#+ATTR_HTML: :onerror this.src=https://i.loli.net/2020/01/05/f6brXuANFxHC7Wl.png
+[[file:/Users/norris/projects/baby/src/../images/66.png]]
 
 #+BEGIN_SRC emacs-lisp :exports results :results raw
 (gen-prev-next)
