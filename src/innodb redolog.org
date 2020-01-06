@@ -1,4 +1,4 @@
-#+TITLE: InnoDB log 文件
+#+TITLE: InnoDB 笔记
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
 
 ** redo log
@@ -44,13 +44,56 @@
 
    如下图
 
-   #+CAPTION: innodb 存储结构
-   #+ATTR_HTML: :alt https://i.loli.net/2020/01/05/pYqtsn8UvEBOTHK.png
-   [[file:/Users/norris/projects/baby/src/../images/innodb_storage.png]]
-#+CAPTION: 66
-#+ATTR_HTML: :onerror this.src=https://i.loli.net/2020/01/05/f6brXuANFxHC7Wl.png
-[[file:/Users/norris/projects/baby/src/../images/66.png]]
+   #+CAPTION: innodb 逻辑存储结构
+   #+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/05/hwfBTnus9W6GjX1.png'
+[[file:/Users/norris/projects/baby/src/../images/innodb_storage_s.png]]
 
-#+BEGIN_SRC emacs-lisp :exports results :results raw
-(gen-prev-next)
-#+END_SRC
+*** 表空间
+
+	表空间是存储结构的最上层，存在一个共享表空间 ibddata1，除此之外若启用 ~innodb_file_per_table~ 参数，则每一个表都有自己的 ibd 表空间文件。打开 mysql 根目录就可以看到
+
+	#+CAPTION: 表空间文件
+	#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/05/hlzo54WEfDNG87d.png'
+	[[file:/Users/norris/projects/baby/src/../images/my_ibd.png]]
+	
+	自己的表空间中存放以下信息
+
+	- 数据、索引、插入缓冲 bitmap 页
+
+	共享表空间存放以下信息
+	
+	- 回滚信息、插入缓冲页、系统事务信息、二次写缓冲（即系统类和缓冲类信息）
+
+	如
+	
+	#+CAPTION: ibd 内容
+	#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/05/BEDqVUPe1a42h7m.png'
+[[file:/Users/norris/projects/baby/src/../images/my_idb_content.png]]
+
+
+*** 段
+	
+*** 区
+
+	页的大小可以配置，区中可以有很多页，但是，*区的大小永远是 1M*，一般的一个页是 16KB，也就是说一个区有64个连续的页
+
+	但是刚创建表的时候，每个段会先用32个碎片页来存放数据，所以不会去申请区，即在数据量超过32个碎片页之前，段中是没有区的，但一旦有了区，这个区大小肯定是 1M
+
+	
+*** 页
+
+	页是 ~innodb~ 管理磁盘的最小单位，一般有如下类型
+
+	- 数据页(B-tree node)
+    - undo 页(undo log page)
+	- 系统页(system page)
+	- 事务数据页(transaction system page)
+	- 插入缓冲位图页(insert buffer bitmap)
+	- 插入缓冲空闲列表页(insert buffer free list)
+    - 未压缩的二进制大对象页(uncompressed blob page)
+	- 压缩的二进制大对象页(compressed blob page)
+
+
+#+CAPTION: 999
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/06/OdBuP8oQgFTe9WA.png'
+[[file:/Users/norris/projects/baby/src/../images/999.png]]
