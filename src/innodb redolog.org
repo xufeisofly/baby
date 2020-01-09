@@ -1,7 +1,29 @@
 #+TITLE: InnoDB 笔记
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
 
+** double write
+   
+   为什么需要 double write 来保证数据正确性
+
+   #+CAPTION: partial write
+   #+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/09/FqDBoeTlwLXhpJH.png'
+[[file:/Users/norris/projects/baby/src/../images/double_write.png]]
+
+　　一个数据页的大小是16K，假设在把内存中的脏页写到数据库的时候，写了2K突然掉电，也就是说前2K数据是新的，后14K是旧的，那么磁盘数据库这个数据页就是不完整的，是一个坏掉的数据页。redo只能加上旧、校检完整的数据页恢复一个脏块，不能修复坏掉的数据页，所以这个数据就丢失了，可能会造成数据不一致，所以需要double write。
+
+#+CAPTION: double write process
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/09/XU3kiwZfhPSBDu2.png'
+[[file:/Users/norris/projects/baby/src/../images/double_write_process.png]]
+
+    也就是说，不能用 redo log 恢复的，使用共享表空间里的 double write 段来恢复，如果 double write 段写的也有问题，那说明单表 ibd 的页肯定也是干净的，就可以用 redo log 恢复了。
+
+    #+begin_example
+    *所以需要 double write 的根本原因就是：innodb 一页 16K, 但磁盘一个单位是 4K，而 16K 的页必须写满，否则 redo log 不可用*
+    #+end_example
+
 ** redo log
+
+   默认 redo log 是两个文件单独存放，循环写入（但并非顺序写入，因为有 redo log header 占位）
 
    与 binlog, error log 等 mysql server 层提供的日志不同，redo log 是 innodb 存储引擎提供的日志文件，是 innodb 特有的，它记录了对 innodb 的事务日志。通常对于 mysql 的 DML 操作会先通过 innodb change buffer，然后在 doublewrite 到磁盘中，在落盘期间一旦异常宕机，就会造成数据错误，所以 innodb 提供了 WAL 技术，即 Write-Ahead logging，再每次变更数据时，都先写 redo 日志，这样一旦宕机，也可以从 redo log 中恢复数据。
 
@@ -32,6 +54,18 @@
 
 #+CAPTION: flush
 [[file:/Users/norris/projects/baby/src/../images/flush.png.png]]
+
+** undo log
+   
+   undo log 实际上并不是一种「日志」，而是一系列 rollback command list. 它是逻辑日志，并不能让数据库恢复到之前的样子，而是做了一系列相反的 DML 操作，回到当时的逻辑状态。
+
+   undo log 执行过程中也会产生 redo log
+
+   undo log 存放在共享表空间（也可以配置参数放在单独的 undo log 文件）
+
+   undo log 的作用：
+   - 回滚事务
+   - 实现 MVCC 访问之前版本的数据
 
 ** InnoDB 逻辑存储结构
 
@@ -93,7 +127,105 @@
     - 未压缩的二进制大对象页(uncompressed blob page)
 	- 压缩的二进制大对象页(compressed blob page)
 
+** 索引与算法
 
-#+CAPTION: 999
-#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/06/OdBuP8oQgFTe9WA.png'
-[[file:/Users/norris/projects/baby/src/../images/999.png]]
+   B+ 树并不能找到具体行，而是找到数据行所在的页，然后把页读到内存，在内存中通过二分法查找到最终的数据。
+
+*** B+ 树插入节点
+
+	具体方法看书，只需要知道
+	
+	- 为了保证 B+ 还是平衡的，插入节点经常需要拆分页，造成磁盘 IO
+
+	#+BEGIN_QUOTE
+	B+ 树索引的本质就是 B+ 树在数据库中的实现
+	#+END_QUOTE
+
+*** 在线架构变更
+
+	我们肯定尝试过在线增加索引或者增加列，这种在线架构变更耗时过长往往会阻塞当前 DDL，主要处理方式有下面两种：
+	
+**** Online Schema Change(OSC)
+
+	 OSC 是 Facebook 用 PHP 写的用户在线架构变更的脚本，大致逻辑如下
+
+	 - createCopyTable 创建和原始表一样的新表
+	 - alterCopyTable 对新表增加索引或列等
+	 - createDeltasTable 创建 deltas 表，主要用来保存后面所有对原表的 DML 操作记录，类似于 binlog 作用
+	 - createTriggers 配合 deltas 表，对原表创建触发器，使 DML 记录到 deltas 表
+	 - startSnpshotXact 开始 OSC 操作的事务
+	 - selectTableIntoOutfile 将原表数据写入新表。为了减小对原表锁定时间，这里用分片输出到多个外部文件，然后将外部文件导入新表
+	 - dropNCIndexs 导入新表前，删除新表所有辅助索引 (为了加快速度？)
+	 - loadCopyTable 数据导入新表
+	 - replayChanges 将 OSC 过程中 deltas 记录的 DML 操作应用到新表
+	 - recreateNCIndexs 重新创建辅助索引
+	 - replayChanges 因为创建辅助索引花时间，再次导入 deltas 记录 （直接都这次导入不完了？）
+	 - swapTables 新旧表交换名字，变更生效
+
+	 OSC 还是通过创建新表和交换名字的方式，不过它创建了 deltas 表用来记录期间的 DML 操作，其实如果直接在 mysql 上改也是可以的，那样就要利用 redo log 之类的东西。
+
+
+**** Online DDL
+
+	 mysql 5.6 开始支持 DDL(在线数据定义)，可以在不阻塞的情况下变更数据，但只支持下面的
+
+	 - 增删改辅助索引
+	 - 列重命名
+
+** 锁
+
+   innoDB 的锁(lock) 主要指的是事务锁，而线程等 mutex 在这里叫做闩(latch)
+
+   锁的两种类型
+
+   - S 共享锁
+   - X 排他锁
+
+   两个锁之间存在兼容关系，即互相之间是否阻塞，如下
+
+   |   | S       | X       |
+   | S | noblock | block   |
+   | X | block   | noblock |
+
+   可见，X 锁与所有锁不兼容，就是说，如果事务中已经有了别的锁，再想加入 X 锁时就会被阻塞
+
+   S, X 加锁的方式如下：
+
+   - 加 S 锁: 
+     1. select ... lock in share mode
+     2. select ... where foreign key 外键 select 会自动加 S 锁，保证数据一致性
+        
+   - 加 X 锁:
+     1. select ... for update
+     2. DML 操作
+
+   那么普通 select 在事务中会不会加 S 呢，答案是不会，普通 select 会使用一致性非锁定读模式，即时事务中有了 X 锁，也不会阻塞读，因为它会读取上一个版本（MVCC）
+
+*** 加锁范围
+    :PROPERTIES:
+    :ORDERED:  t
+    :END:
+    
+    有 record, gap, next-key lock 三种
+
+    - record 只针对单行加锁，不会影响其他行插入
+    - gap 针对上一记录到本记录的间隙加锁，如 insert a = 1, a = 4, a = 7, 那么会对 a (1, 4)(4,7) 区间加锁
+    - next-key = record + gap，上述变成 a (1, 4] (4, 7]
+
+    #+BEGIN_QUOTE
+	repeated read 隔离模式采用 next-key，只有针对唯一索引会降级成 record， 提高并发
+	#+END_QUOTE
+
+** 事务
+
+   #+begin_quote
+   数据库和文件系统的区别之一，就是是否能实现事务
+   #+end_quote
+
+*** 分类
+
+    - 扁平事务
+    - 带有保存点的扁平事务，可回滚到一个 savepoint
+    - 链事务，T1 提交会出发 T2 开始
+    - 嵌套事务，innodb 不支持，可以用保存点模拟
+    - 分布式事务，监听多个数据库的事务

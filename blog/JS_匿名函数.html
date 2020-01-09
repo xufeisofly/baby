@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,9 +62,9 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orge82d71f">1. 什么是匿名函数？</a></li>
-<li><a href="#org668b460">2. 比较</a></li>
-<li><a href="#orgdbc3dc4">3. 立即执行函数（iffe）</a></li>
+<li><a href="#orge715893">1. 什么是匿名函数？</a></li>
+<li><a href="#orgf0bda06">2. 比较</a></li>
+<li><a href="#org14f7e24">3. 立即执行函数（iffe）</a></li>
 </ul>
 </div>
 </div>
@@ -74,20 +74,20 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 
-<div id="outline-container-orge82d71f" class="outline-2">
-<h2 id="orge82d71f"><span class="section-number-2">1</span> 什么是匿名函数？</h2>
+<div id="outline-container-orge715893" class="outline-2">
+<h2 id="orge715893"><span class="section-number-2">1</span> 什么是匿名函数？</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 就是&#x2026;没有名字的函数呗，举个例子
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #b48ead;">function</span> <span style="color: #8fa1b3;">bob</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
-  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
-<span style="color: #8c8c8c;">}</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">bob</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
+<span style="color: #DCDCCC;">}</span>
 
-<span style="color: #b48ead;">var</span> <span style="color: #bf616a;">bob</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
-  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
-<span style="color: #8c8c8c;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">bob</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
+<span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 <p>
@@ -96,8 +96,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org668b460" class="outline-2">
-<h2 id="org668b460"><span class="section-number-2">2</span> 比较</h2>
+<div id="outline-container-orgf0bda06" class="outline-2">
+<h2 id="orgf0bda06"><span class="section-number-2">2</span> 比较</h2>
 <div class="outline-text-2" id="text-2">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -128,23 +128,23 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgdbc3dc4" class="outline-2">
-<h2 id="orgdbc3dc4"><span class="section-number-2">3</span> 立即执行函数（iffe）</h2>
+<div id="outline-container-org14f7e24" class="outline-2">
+<h2 id="org14f7e24"><span class="section-number-2">3</span> 立即执行函数（iffe）</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">function</span><span style="color: #93a8c6;">()</span> <span style="color: #93a8c6;">{</span>
-  alert<span style="color: #b0b1a3;">(</span><span style="color: #a3be8c;">'i am a iffe'</span><span style="color: #b0b1a3;">)</span>    
-<span style="color: #93a8c6;">}()</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-javascript"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #BFEBBF;">()</span> <span style="color: #BFEBBF;">{</span>
+  alert<span style="color: #D0BF8F;">(</span><span style="color: #CC9393;">'i am a iffe'</span><span style="color: #D0BF8F;">)</span>    
+<span style="color: #BFEBBF;">}()</span><span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 <p>
 function最外面要加括号，感觉就像是
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #b48ead;">var</span> <span style="color: #bf616a;">a</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">()</span> <span style="color: #8c8c8c;">{</span>
-  alert<span style="color: #93a8c6;">(</span><span style="color: #a3be8c;">'i am not a iffe'</span><span style="color: #93a8c6;">)</span>
-<span style="color: #8c8c8c;">}</span>
-a<span style="color: #8c8c8c;">()</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
+  alert<span style="color: #BFEBBF;">(</span><span style="color: #CC9393;">'i am not a iffe'</span><span style="color: #BFEBBF;">)</span>
+<span style="color: #DCDCCC;">}</span>
+a<span style="color: #DCDCCC;">()</span>
 </pre>
 </div>
 
@@ -153,9 +153,9 @@ iffe很有用的地方就是，它创造了一个自己的scope，内部的变�
 所以JQuery源码上来就是
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript">JQuery = <span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">function</span><span style="color: #93a8c6;">(){</span>
-  <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...  </span>
-<span style="color: #93a8c6;">}()</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-javascript">JQuery = <span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #BFEBBF;">(){</span>
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...  </span>
+<span style="color: #BFEBBF;">}()</span><span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
@@ -166,7 +166,7 @@ iffe很有用的地方就是，它创造了一个自己的scope，内部的变�
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

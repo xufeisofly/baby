@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,33 +62,33 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf8b8590">1. 什么时候重构</a></li>
-<li><a href="#org8467d98">2. 什么地方重构</a>
+<li><a href="#orgd6f1ab7">1. 什么时候重构</a></li>
+<li><a href="#org28c1251">2. 什么地方重构</a>
 <ul>
-<li><a href="#orgceec9a4">2.1. 重复代码</a></li>
-<li><a href="#org963005b">2.2. 过长的函数</a>
+<li><a href="#org61b1581">2.1. 重复代码</a></li>
+<li><a href="#org934ac29">2.2. 过长的函数</a>
 <ul>
-<li><a href="#org52106c9">2.2.1. Replace Temp with query</a></li>
-<li><a href="#org1197b1b">2.2.2. Introduce Parameter Object</a></li>
-<li><a href="#orgd3d4755">2.2.3. Preserve Whole Object</a></li>
+<li><a href="#org2b0d773">2.2.1. Replace Temp with query</a></li>
+<li><a href="#org8f4cd52">2.2.2. Introduce Parameter Object</a></li>
+<li><a href="#org9e46ac9">2.2.3. Preserve Whole Object</a></li>
 </ul>
 </li>
-<li><a href="#orgee36450">2.3. 过长的参数</a></li>
-<li><a href="#org727ef6c">2.4. 不同方向的变化</a></li>
-<li><a href="#orgd7d78bc">2.5. 散弹式修改</a></li>
-<li><a href="#orgae31ca3">2.6. 依恋情结</a></li>
-<li><a href="#org2b3caa7">2.7. 使用对象封装参数和行为</a></li>
-<li><a href="#orgc911aee">2.8. switch语句</a>
+<li><a href="#orgbbf95ae">2.3. 过长的参数</a></li>
+<li><a href="#orgbe20877">2.4. 不同方向的变化</a></li>
+<li><a href="#org4f02bc3">2.5. 散弹式修改</a></li>
+<li><a href="#orga268d9b">2.6. 依恋情结</a></li>
+<li><a href="#org5d7a19c">2.7. 使用对象封装参数和行为</a></li>
+<li><a href="#org3b1d78b">2.8. switch语句</a>
 <ul>
-<li><a href="#org853ace1">2.8.1. 1. Replace Type Code with Subclasses</a></li>
-<li><a href="#org79c0035">2.8.2. 2. Replace Type Code with State/Strategy</a></li>
+<li><a href="#orgc5ed9c3">2.8.1. 1. Replace Type Code with Subclasses</a></li>
+<li><a href="#org5d69f84">2.8.2. 2. Replace Type Code with State/Strategy</a></li>
 </ul>
 </li>
-<li><a href="#org30b812d">2.9. 没用的类</a></li>
-<li><a href="#orgb50d7c1">2.10. “未来性”的代码</a></li>
-<li><a href="#orgeb543e7">2.11. 类之间过于复杂的引用关系</a></li>
-<li><a href="#orge5711c9">2.12. 不该继承的子类和超类</a></li>
-<li><a href="#org4ae6f51">2.13. 过多的注释</a></li>
+<li><a href="#org21c3e5f">2.9. 没用的类</a></li>
+<li><a href="#org4c74f21">2.10. “未来性”的代码</a></li>
+<li><a href="#org1d1ddfe">2.11. 类之间过于复杂的引用关系</a></li>
+<li><a href="#org0e98322">2.12. 不该继承的子类和超类</a></li>
+<li><a href="#org6313815">2.13. 过多的注释</a></li>
 </ul>
 </li>
 </ul>
@@ -117,8 +117,8 @@ for the JavaScript code in this tag.
 </tbody>
 </table>
 </blockquote>
-<div id="outline-container-orgf8b8590" class="outline-2">
-<h2 id="orgf8b8590"><span class="section-number-2">1</span> 什么时候重构</h2>
+<div id="outline-container-orgd6f1ab7" class="outline-2">
+<h2 id="orgd6f1ab7"><span class="section-number-2">1</span> 什么时候重构</h2>
 <div class="outline-text-2" id="text-1">
 <blockquote>
 <p>
@@ -129,12 +129,12 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org8467d98" class="outline-2">
-<h2 id="org8467d98"><span class="section-number-2">2</span> 什么地方重构</h2>
+<div id="outline-container-org28c1251" class="outline-2">
+<h2 id="org28c1251"><span class="section-number-2">2</span> 什么地方重构</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgceec9a4" class="outline-3">
-<h3 id="orgceec9a4"><span class="section-number-3">2.1</span> 重复代码</h3>
+<div id="outline-container-org61b1581" class="outline-3">
+<h3 id="org61b1581"><span class="section-number-3">2.1</span> 重复代码</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 方法基本就是提取出来重复的部分，放到一个何时的地方，大家一起调用
@@ -142,8 +142,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org963005b" class="outline-3">
-<h3 id="org963005b"><span class="section-number-3">2.2</span> 过长的函数</h3>
+<div id="outline-container-org934ac29" class="outline-3">
+<h3 id="org934ac29"><span class="section-number-3">2.2</span> 过长的函数</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 小函数会造成函数变多，这时候需要起个好名字
@@ -158,8 +158,8 @@ for the JavaScript code in this tag.
 </p>
 </div>
 
-<div id="outline-container-org52106c9" class="outline-4">
-<h4 id="org52106c9"><span class="section-number-4">2.2.1</span> Replace Temp with query</h4>
+<div id="outline-container-org2b0d773" class="outline-4">
+<h4 id="org2b0d773"><span class="section-number-4">2.2.1</span> Replace Temp with query</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 去掉临时变量，虽然有时候会重复执行函数，影响性能，但值得
@@ -167,14 +167,14 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org1197b1b" class="outline-4">
-<h4 id="org1197b1b"><span class="section-number-4">2.2.2</span> Introduce Parameter Object</h4>
+<div id="outline-container-org8f4cd52" class="outline-4">
+<h4 id="org8f4cd52"><span class="section-number-4">2.2.2</span> Introduce Parameter Object</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 将特定组合的参数封装成一个对象，如
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">method<span style="color: #8c8c8c;">(</span>start_date, end_date<span style="color: #8c8c8c;">)</span> =&gt; method<span style="color: #8c8c8c;">(</span>date_range<span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby">method<span style="color: #DCDCCC;">(</span>start_date, end_date<span style="color: #DCDCCC;">)</span> =&gt; method<span style="color: #DCDCCC;">(</span>date_range<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 <p>
@@ -183,22 +183,22 @@ date<sub>range是一个对象</sub>
 </div>
 </div>
 
-<div id="outline-container-orgd3d4755" class="outline-4">
-<h4 id="orgd3d4755"><span class="section-number-4">2.2.3</span> Preserve Whole Object</h4>
+<div id="outline-container-org9e46ac9" class="outline-4">
+<h4 id="org9e46ac9"><span class="section-number-4">2.2.3</span> Preserve Whole Object</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <p>
 保持对象完整，如果参数只是某个对象的几个属性，可以改为传递整个对象
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">method<span style="color: #8c8c8c;">(</span>deal.destination, deal.days<span style="color: #8c8c8c;">)</span> =&gt; method<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby">method<span style="color: #DCDCCC;">(</span>deal.destination, deal.days<span style="color: #DCDCCC;">)</span> =&gt; method<span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgee36450" class="outline-3">
-<h3 id="orgee36450"><span class="section-number-3">2.3</span> 过长的参数</h3>
+<div id="outline-container-orgbbf95ae" class="outline-3">
+<h3 id="orgbbf95ae"><span class="section-number-3">2.3</span> 过长的参数</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 如果参数列可以属于一个对象，可以将同一个对象的参数收集起来，将对象本身传进去
@@ -206,8 +206,8 @@ date<sub>range是一个对象</sub>
 </div>
 </div>
 
-<div id="outline-container-org727ef6c" class="outline-3">
-<h3 id="org727ef6c"><span class="section-number-3">2.4</span> 不同方向的变化</h3>
+<div id="outline-container-orgbe20877" class="outline-3">
+<h3 id="orgbe20877"><span class="section-number-3">2.4</span> 不同方向的变化</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 针对某一个外界的变化的所有相应修改，都应该只发生在单一的类中，而这个新类的所有内容都应该反应此变化
@@ -220,8 +220,8 @@ date<sub>range是一个对象</sub>
 </div>
 </div>
 
-<div id="outline-container-orgd7d78bc" class="outline-3">
-<h3 id="orgd7d78bc"><span class="section-number-3">2.5</span> 散弹式修改</h3>
+<div id="outline-container-org4f02bc3" class="outline-3">
+<h3 id="org4f02bc3"><span class="section-number-3">2.5</span> 散弹式修改</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 出现某种变化时，不得不在不同的类中进行修改。应该一些列的相关行为放到一个类中。
@@ -235,8 +235,8 @@ date<sub>range是一个对象</sub>
 </div>
 </div>
 
-<div id="outline-container-orgae31ca3" class="outline-3">
-<h3 id="orgae31ca3"><span class="section-number-3">2.6</span> 依恋情结</h3>
+<div id="outline-container-orga268d9b" class="outline-3">
+<h3 id="orga268d9b"><span class="section-number-3">2.6</span> 依恋情结</h3>
 <div class="outline-text-3" id="text-2-6">
 <ul class="org-ul">
 <li>某个函数从另一个对象那里调用了很多数据，那这个函数应该在另一个类里面。</li>
@@ -245,8 +245,8 @@ date<sub>range是一个对象</sub>
 </div>
 </div>
 
-<div id="outline-container-org2b3caa7" class="outline-3">
-<h3 id="org2b3caa7"><span class="section-number-3">2.7</span> 使用对象封装参数和行为</h3>
+<div id="outline-container-org5d7a19c" class="outline-3">
+<h3 id="org5d7a19c"><span class="section-number-3">2.7</span> 使用对象封装参数和行为</h3>
 <div class="outline-text-3" id="text-2-7">
 <p>
 创造更多的小对象，对象可以打包参数，也可以打包参数和行为，我们可以把start<sub>date和end</sub><sub>data就搞成</sub> <br />
@@ -255,8 +255,8 @@ date<sub>range是一个对象</sub>
 </div>
 </div>
 
-<div id="outline-container-orgc911aee" class="outline-3">
-<h3 id="orgc911aee"><span class="section-number-3">2.8</span> switch语句</h3>
+<div id="outline-container-org3b1d78b" class="outline-3">
+<h3 id="org3b1d78b"><span class="section-number-3">2.8</span> switch语句</h3>
 <div class="outline-text-3" id="text-2-8">
 <blockquote>
 <p>
@@ -268,8 +268,8 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
 有两种处理方法：
 </p>
 </div>
-<div id="outline-container-org853ace1" class="outline-4">
-<h4 id="org853ace1"><span class="section-number-4">2.8.1</span> 1. Replace Type Code with Subclasses</h4>
+<div id="outline-container-orgc5ed9c3" class="outline-4">
+<h4 id="orgc5ed9c3"><span class="section-number-4">2.8.1</span> 1. Replace Type Code with Subclasses</h4>
 <div class="outline-text-4" id="text-2-8-1">
 <blockquote>
 <p>
@@ -283,20 +283,20 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
 </blockquote>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>blood_type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@blood_type</span> = blood_type
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>blood_type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@blood_type</span> = blood_type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">talk</span>
-    <span style="color: #b48ead;">case</span> <span style="color: #bf616a;">@blood_type</span>
-    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:a</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">talk</span>
+    <span style="color: #F0DFAF; font-weight: bold;">case</span> <span style="color: #DFAF8F;">@blood_type</span>
+    <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">:a</span>
       balabala_a
-    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:b</span>
+    <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">:b</span>
       balabala_b
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -304,43 +304,43 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
 改成如下
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Blood</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@type</span> = type
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Blood</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@type</span> = type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">instance</span>
-    <span style="color: #b48ead;">case</span> <span style="color: #bf616a;">@type</span>
-    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:a</span>
-      <span style="color: #c0c5ce;">BloodA</span>.new
-    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:b</span>
-      <span style="color: #c0c5ce;">BloodB</span>.new
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">instance</span>
+    <span style="color: #F0DFAF; font-weight: bold;">case</span> <span style="color: #DFAF8F;">@type</span>
+    <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">:a</span>
+      <span style="color: #7CB8BB;">BloodA</span>.new
+    <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">:b</span>
+      <span style="color: #7CB8BB;">BloodB</span>.new
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodA</span> &lt; <span style="color: #c0c5ce;">Blood</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BloodA</span> &lt; <span style="color: #7CB8BB;">Blood</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">balabala</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodB</span> &lt; <span style="color: #c0c5ce;">Blood</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BloodB</span> &lt; <span style="color: #7CB8BB;">Blood</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">balabala</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>blood_instance<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@blood_instance</span> = blood_instance
-  <span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>blood_instance<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@blood_instance</span> = blood_instance
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">talk</span>
-    <span style="color: #bf616a;">@blood_instance</span>.balabala
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">talk</span>
+    <span style="color: #DFAF8F;">@blood_instance</span>.balabala
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-blood_instance = <span style="color: #c0c5ce;">Blood</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:a</span><span style="color: #8c8c8c;">)</span>.instance
-person = <span style="color: #c0c5ce;">Person</span>.new<span style="color: #8c8c8c;">(</span>blood_instance<span style="color: #8c8c8c;">)</span>
+blood_instance = <span style="color: #7CB8BB;">Blood</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:a</span><span style="color: #DCDCCC;">)</span>.instance
+person = <span style="color: #7CB8BB;">Person</span>.new<span style="color: #DCDCCC;">(</span>blood_instance<span style="color: #DCDCCC;">)</span>
 person.talk
 </pre>
 </div>
@@ -351,8 +351,8 @@ person.talk
 </blockquote>
 </div>
 </div>
-<div id="outline-container-org79c0035" class="outline-4">
-<h4 id="org79c0035"><span class="section-number-4">2.8.2</span> 2. Replace Type Code with State/Strategy</h4>
+<div id="outline-container-org5d69f84" class="outline-4">
+<h4 id="org5d69f84"><span class="section-number-4">2.8.2</span> 2. Replace Type Code with State/Strategy</h4>
 <div class="outline-text-4" id="text-2-8-2">
 <blockquote>
 <p>
@@ -370,61 +370,61 @@ person.talk
 还是刚才的例子，但我们假设这个person对象的血型是可以变的&#x2026;明显不能用刚才的Person.new(blood<sub>instance</sub>)
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodType</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@type</span> = type
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BloodType</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@type</span> = type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">new_type</span>
-    <span style="color: #b48ead;">case</span> <span style="color: #bf616a;">@type</span>
-    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:a</span>
-      <span style="color: #c0c5ce;">BloodA</span>.new
-    <span style="color: #b48ead;">when</span> <span style="color: #d08770;">:b</span>
-      <span style="color: #c0c5ce;">BloodB</span>.new
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">new_type</span>
+    <span style="color: #F0DFAF; font-weight: bold;">case</span> <span style="color: #DFAF8F;">@type</span>
+    <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">:a</span>
+      <span style="color: #7CB8BB;">BloodA</span>.new
+    <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">:b</span>
+      <span style="color: #7CB8BB;">BloodB</span>.new
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodA</span> &lt; <span style="color: #c0c5ce;">BloodType</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type</span>
-    <span style="color: #c0c5ce;">BloodType</span>::<span style="color: #c0c5ce;">A</span>
-  <span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BloodA</span> &lt; <span style="color: #7CB8BB;">BloodType</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">type</span>
+    <span style="color: #7CB8BB;">BloodType</span>::<span style="color: #7CB8BB;">A</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">balabala</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BloodB</span> &lt; <span style="color: #c0c5ce;">BloodType</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type</span>
-    <span style="color: #c0c5ce;">BloodType</span>::<span style="color: #c0c5ce;">B</span>
-  <span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BloodB</span> &lt; <span style="color: #7CB8BB;">BloodType</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">type</span>
+    <span style="color: #7CB8BB;">BloodType</span>::<span style="color: #7CB8BB;">B</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">balabala</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">balabala</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@type</span> = type
-  <span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@type</span> = type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type</span>
-    <span style="color: #bf616a;">@type</span>
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">type</span>
+    <span style="color: #DFAF8F;">@type</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">type=</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@type</span> = <span style="color: #c0c5ce;">BloodType</span>.new<span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>.new_type
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">type=</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@type</span> = <span style="color: #7CB8BB;">BloodType</span>.new<span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>.new_type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">talk</span>
-    <span style="color: #bf616a;">@type</span>.balabala
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">talk</span>
+    <span style="color: #DFAF8F;">@type</span>.balabala
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-person = <span style="color: #c0c5ce;">Person</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:a</span><span style="color: #8c8c8c;">)</span>
+person = <span style="color: #7CB8BB;">Person</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:a</span><span style="color: #DCDCCC;">)</span>
 person.talk
-<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&#25913;&#21464;&#34880;&#22411;</span>
-person.type = <span style="color: #d08770;">:b</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&#25913;&#21464;&#34880;&#22411;</span>
+person.type = <span style="color: #BFEBBF;">:b</span>
 person.talk
 </pre>
 </div>
@@ -432,8 +432,8 @@ person.talk
 </div>
 </div>
 
-<div id="outline-container-org30b812d" class="outline-3">
-<h3 id="org30b812d"><span class="section-number-3">2.9</span> 没用的类</h3>
+<div id="outline-container-org21c3e5f" class="outline-3">
+<h3 id="org21c3e5f"><span class="section-number-3">2.9</span> 没用的类</h3>
 <div class="outline-text-3" id="text-2-9">
 <blockquote>
 <p>
@@ -448,8 +448,8 @@ person.talk
 </div>
 </div>
 
-<div id="outline-container-orgb50d7c1" class="outline-3">
-<h3 id="orgb50d7c1"><span class="section-number-3">2.10</span> “未来性”的代码</h3>
+<div id="outline-container-org4c74f21" class="outline-3">
+<h3 id="org4c74f21"><span class="section-number-3">2.10</span> “未来性”的代码</h3>
 <div class="outline-text-3" id="text-2-10">
 <blockquote>
 <p>
@@ -460,8 +460,8 @@ person.talk
 </div>
 </div>
 
-<div id="outline-container-orgeb543e7" class="outline-3">
-<h3 id="orgeb543e7"><span class="section-number-3">2.11</span> 类之间过于复杂的引用关系</h3>
+<div id="outline-container-org1d1ddfe" class="outline-3">
+<h3 id="org1d1ddfe"><span class="section-number-3">2.11</span> 类之间过于复杂的引用关系</h3>
 <div class="outline-text-3" id="text-2-11">
 <blockquote>
 <p>
@@ -488,9 +488,9 @@ person.talk
 <div class="org-src-container">
 <pre class="src src-ruby">deal.customer_name
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer_name</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">customer_name</span>
   customer.name
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -500,8 +500,8 @@ person.talk
 </div>
 </div>
 
-<div id="outline-container-orge5711c9" class="outline-3">
-<h3 id="orge5711c9"><span class="section-number-3">2.12</span> 不该继承的子类和超类</h3>
+<div id="outline-container-org0e98322" class="outline-3">
+<h3 id="org0e98322"><span class="section-number-3">2.12</span> 不该继承的子类和超类</h3>
 <div class="outline-text-3" id="text-2-12">
 <blockquote>
 <p>
@@ -519,17 +519,17 @@ person.talk
 下面为第二种方法举例
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">A</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">m_accepted</span>
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">A</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">m_accepted</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">m_refused</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">m_refused</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">B</span> &lt; <span style="color: #c0c5ce;">A</span>
-  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">only need m_accepted</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">B</span> &lt; <span style="color: #7CB8BB;">A</span>
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">only need m_accepted</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -537,15 +537,15 @@ person.talk
 应该将B改为这样
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">B</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>a_instance<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@_a_instance</span> = a_instance
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">B</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>a_instance<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@_a_instance</span> = a_instance
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">m_accepted</span>
-    <span style="color: #bf616a;">@_a_instance</span>.m_accepted
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">m_accepted</span>
+    <span style="color: #DFAF8F;">@_a_instance</span>.m_accepted
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -559,8 +559,8 @@ person.talk
 </div>
 </div>
 
-<div id="outline-container-org4ae6f51" class="outline-3">
-<h3 id="org4ae6f51"><span class="section-number-3">2.13</span> 过多的注释</h3>
+<div id="outline-container-org6313815" class="outline-3">
+<h3 id="org6313815"><span class="section-number-3">2.13</span> 过多的注释</h3>
 <div class="outline-text-3" id="text-2-13">
 <ol class="org-ol">
 <li>先使用Extract Method</li>
@@ -576,7 +576,7 @@ person.talk
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

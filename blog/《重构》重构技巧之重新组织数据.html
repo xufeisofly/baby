@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,17 +62,17 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9c4070b">1. Self Encapsulate Field</a></li>
-<li><a href="#org8d2af07">2. Change Value to Reference</a></li>
-<li><a href="#org55a4bca">3. Replace Array with Object</a></li>
-<li><a href="#orgbd2f1c2">4. Change Unidirectional Association to Bidirectional</a></li>
-<li><a href="#org9e5a709">5. Replace Type Code With Class</a></li>
-<li><a href="#orga9bc018">6. Replace Subclasses with Fields</a></li>
+<li><a href="#org5d1fc9d">1. Self Encapsulate Field</a></li>
+<li><a href="#org33ba069">2. Change Value to Reference</a></li>
+<li><a href="#org3d101dc">3. Replace Array with Object</a></li>
+<li><a href="#orge49a967">4. Change Unidirectional Association to Bidirectional</a></li>
+<li><a href="#org3a1122a">5. Replace Type Code With Class</a></li>
+<li><a href="#orgb13d757">6. Replace Subclasses with Fields</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org9c4070b" class="outline-2">
-<h2 id="org9c4070b"><span class="section-number-2">1</span> Self Encapsulate Field</h2>
+<div id="outline-container-org5d1fc9d" class="outline-2">
+<h2 id="org5d1fc9d"><span class="section-number-2">1</span> Self Encapsulate Field</h2>
 <div class="outline-text-2" id="text-1">
 <blockquote>
 <p>
@@ -88,8 +88,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org8d2af07" class="outline-2">
-<h2 id="org8d2af07"><span class="section-number-2">2</span> Change Value to Reference</h2>
+<div id="outline-container-org33ba069" class="outline-2">
+<h2 id="org33ba069"><span class="section-number-2">2</span> Change Value to Reference</h2>
 <div class="outline-text-2" id="text-2">
 <blockquote>
 <p>
@@ -98,25 +98,25 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Customer</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@name</span> = name
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Customer</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@name</span> = name
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name</span>
-    <span style="color: #bf616a;">@name</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">name</span>
+    <span style="color: #DFAF8F;">@name</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Order</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>customer_name<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@customer</span> = <span style="color: #c0c5ce;">Customer</span>.new customer_name
-  <span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Order</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>customer_name<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@customer</span> = <span style="color: #7CB8BB;">Customer</span>.new customer_name
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer</span>
-    <span style="color: #bf616a;">@customer</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">customer</span>
+    <span style="color: #DFAF8F;">@customer</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -124,31 +124,31 @@ for the JavaScript code in this tag.
 但我现在想让name一样的customer就是一个对象，怎么办，我就不能传值对象到order，而应该传引用对象到order
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Customer</span>
-  <span style="color: #bf616a;">@@customer_hash</span> = <span style="color: #c0c5ce;">Hash</span>.new
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Customer</span>
+  <span style="color: #DFAF8F;">@@customer_hash</span> = <span style="color: #7CB8BB;">Hash</span>.new
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@name</span> = name
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@name</span> = name
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #b48ead;">self</span>.<span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@@customer_hash</span><span style="color: #8c8c8c;">[</span>name<span style="color: #8c8c8c;">]</span> ||= <span style="color: #b48ead;">self</span>.new<span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@@customer_hash</span><span style="color: #DCDCCC;">[</span>name<span style="color: #DCDCCC;">]</span> ||= <span style="color: #F0DFAF; font-weight: bold;">self</span>.new<span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name</span>
-    <span style="color: #bf616a;">@name</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">name</span>
+    <span style="color: #DFAF8F;">@name</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Order</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>customer_name<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@customer</span> = <span style="color: #c0c5ce;">Customer</span>.create<span style="color: #8c8c8c;">(</span>customer_name<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Order</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>customer_name<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@customer</span> = <span style="color: #7CB8BB;">Customer</span>.create<span style="color: #DCDCCC;">(</span>customer_name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer</span>
-    <span style="color: #bf616a;">@customer</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">customer</span>
+    <span style="color: #DFAF8F;">@customer</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -162,8 +162,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org55a4bca" class="outline-2">
-<h2 id="org55a4bca"><span class="section-number-2">3</span> Replace Array with Object</h2>
+<div id="outline-container-org3d101dc" class="outline-2">
+<h2 id="org3d101dc"><span class="section-number-2">3</span> Replace Array with Object</h2>
 <div class="outline-text-2" id="text-3">
 <blockquote>
 <p>
@@ -173,25 +173,25 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">row<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">0</span><span style="color: #8c8c8c;">]</span> = <span style="color: #a3be8c;">'Liverpool'</span>
-row<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> = <span style="color: #d08770;">15</span>
+<pre class="src src-ruby">row<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">0</span><span style="color: #DCDCCC;">]</span> = <span style="color: #CC9393;">'Liverpool'</span>
+row<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> = <span style="color: #BFEBBF;">15</span>
 </pre>
 </div>
 <p>
 改为
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">Performance</span> = <span style="color: #c0c5ce;">Struct</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:name</span>, <span style="color: #d08770;">:win</span><span style="color: #8c8c8c;">)</span>
-row = <span style="color: #c0c5ce;">Performance</span>.new
-row.name = <span style="color: #a3be8c;">'Liverpool'</span>
-row.win = <span style="color: #d08770;">15</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Performance</span> = <span style="color: #7CB8BB;">Struct</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:name</span>, <span style="color: #BFEBBF;">:win</span><span style="color: #DCDCCC;">)</span>
+row = <span style="color: #7CB8BB;">Performance</span>.new
+row.name = <span style="color: #CC9393;">'Liverpool'</span>
+row.win = <span style="color: #BFEBBF;">15</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbd2f1c2" class="outline-2">
-<h2 id="orgbd2f1c2"><span class="section-number-2">4</span> Change Unidirectional Association to Bidirectional</h2>
+<div id="outline-container-orge49a967" class="outline-2">
+<h2 id="orge49a967"><span class="section-number-2">4</span> Change Unidirectional Association to Bidirectional</h2>
 <div class="outline-text-2" id="text-4">
 <blockquote>
 <p>
@@ -201,8 +201,8 @@ row.win = <span style="color: #d08770;">15</span>
 </div>
 </div>
 
-<div id="outline-container-org9e5a709" class="outline-2">
-<h2 id="org9e5a709"><span class="section-number-2">5</span> Replace Type Code With Class</h2>
+<div id="outline-container-org3a1122a" class="outline-2">
+<h2 id="org3a1122a"><span class="section-number-2">5</span> Replace Type Code With Class</h2>
 <div class="outline-text-2" id="text-5">
 <blockquote>
 <p>
@@ -213,8 +213,8 @@ row.win = <span style="color: #d08770;">15</span>
 </div>
 </div>
 
-<div id="outline-container-orga9bc018" class="outline-2">
-<h2 id="orga9bc018"><span class="section-number-2">6</span> Replace Subclasses with Fields</h2>
+<div id="outline-container-orgb13d757" class="outline-2">
+<h2 id="orgb13d757"><span class="section-number-2">6</span> Replace Subclasses with Fields</h2>
 <div class="outline-text-2" id="text-6">
 <blockquote>
 <p>
@@ -229,7 +229,7 @@ row.win = <span style="color: #d08770;">15</span>
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

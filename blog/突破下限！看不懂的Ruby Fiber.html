@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,18 +62,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org5b99238">1. Fiber基本使用</a></li>
-<li><a href="#org8758c0d">2. Fiber作用</a>
+<li><a href="#org65b4298">1. Fiber基本使用</a></li>
+<li><a href="#org13a333f">2. Fiber作用</a>
 <ul>
-<li><a href="#org29431b0">2.1. 对于线程（thread）</a></li>
-<li><a href="#org52ada90">2.2. 对于事件驱动（EventMachine）</a></li>
+<li><a href="#org7f2676a">2.1. 对于线程（thread）</a></li>
+<li><a href="#org5905e9a">2.2. 对于事件驱动（EventMachine）</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org5b99238" class="outline-2">
-<h2 id="org5b99238"><span class="section-number-2">1</span> Fiber基本使用</h2>
+<div id="outline-container-org65b4298" class="outline-2">
+<h2 id="org65b4298"><span class="section-number-2">1</span> Fiber基本使用</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 fiber使用一个block创造一个实例，block中的代码可以自行控制执行过程，类似javascript的Generator，下面是个例子。
@@ -81,8 +81,8 @@ fiber使用一个block创造一个实例，block中的代码可以自行控制�
 </div>
 </div>
 
-<div id="outline-container-org8758c0d" class="outline-2">
-<h2 id="org8758c0d"><span class="section-number-2">2</span> Fiber作用</h2>
+<div id="outline-container-org13a333f" class="outline-2">
+<h2 id="org13a333f"><span class="section-number-2">2</span> Fiber作用</h2>
 <div class="outline-text-2" id="text-2">
 <blockquote>
 <p>
@@ -91,8 +91,8 @@ Fibers are primitives for implementing light weight cooperative concurrency in R
 </blockquote>
 </div>
 
-<div id="outline-container-org29431b0" class="outline-3">
-<h3 id="org29431b0"><span class="section-number-3">2.1</span> 对于线程（thread）</h3>
+<div id="outline-container-org7f2676a" class="outline-3">
+<h3 id="org7f2676a"><span class="section-number-3">2.1</span> 对于线程（thread）</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Fiber是thread的辅助，可以说是一种调度模式，fiber目的是可以更灵活的分配concurrency(并发)资源，虽然无法实现真正的parallelism(并行)。
@@ -119,23 +119,23 @@ Ruby never allows more than one of its native threads to run at the same time. N
 </div>
 </div>
 
-<div id="outline-container-org52ada90" class="outline-3">
-<h3 id="org52ada90"><span class="section-number-3">2.2</span> 对于事件驱动（EventMachine）</h3>
+<div id="outline-container-org5905e9a" class="outline-3">
+<h3 id="org5905e9a"><span class="section-number-3">2.2</span> 对于事件驱动（EventMachine）</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 和多线程对应的另一套方案是EventMachine(以下简称EM)。EM允许我们用异步的方式执行程序，从而处理一些io事物（如http request）,问题就是会有许多前套的callback，即callback hell（这里跟javascript简直太像）。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">http = <span style="color: #c0c5ce;">EventMachine</span>::<span style="color: #c0c5ce;">HttpRequest</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'http://niltouch.cn/'</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby">http = <span style="color: #7CB8BB;">EventMachine</span>::<span style="color: #7CB8BB;">HttpRequest</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'http://niltouch.cn/'</span><span style="color: #DCDCCC;">)</span>
 
-http.callback <span style="color: #b48ead;">do</span> |response|
-  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
-<span style="color: #b48ead;">end</span>
+http.callback <span style="color: #F0DFAF; font-weight: bold;">do</span> |response|
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-http.errback <span style="color: #b48ead;">do</span> |error|
-  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
-<span style="color: #b48ead;">end</span>
+http.errback <span style="color: #F0DFAF; font-weight: bold;">do</span> |error|
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 http.start
 </pre>
@@ -151,24 +151,24 @@ http.start
 </blockquote>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">require</span> <span style="color: #a3be8c;">'fiber'</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">require</span> <span style="color: #CC9393;">'fiber'</span>
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">async_fetch</span><span style="color: #8c8c8c;">(</span>url<span style="color: #8c8c8c;">)</span>
-  f = <span style="color: #c0c5ce;">Fiber</span>.current
-  http = <span style="color: #c0c5ce;">EventMachine</span>::<span style="color: #c0c5ce;">HttpRequest</span>.new<span style="color: #8c8c8c;">(</span>url<span style="color: #8c8c8c;">)</span>.get <span style="color: #d08770;">timeout:</span> <span style="color: #d08770;">10</span>
-  http.callback <span style="color: #8c8c8c;">{</span> f.resume<span style="color: #93a8c6;">(</span>http<span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
-  http.errback <span style="color: #8c8c8c;">{</span> f.resume<span style="color: #93a8c6;">(</span>http<span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">async_fetch</span><span style="color: #DCDCCC;">(</span>url<span style="color: #DCDCCC;">)</span>
+  f = <span style="color: #7CB8BB;">Fiber</span>.current
+  http = <span style="color: #7CB8BB;">EventMachine</span>::<span style="color: #7CB8BB;">HttpRequest</span>.new<span style="color: #DCDCCC;">(</span>url<span style="color: #DCDCCC;">)</span>.get <span style="color: #BFEBBF;">timeout:</span> <span style="color: #BFEBBF;">10</span>
+  http.callback <span style="color: #DCDCCC;">{</span> f.resume<span style="color: #BFEBBF;">(</span>http<span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
+  http.errback <span style="color: #DCDCCC;">{</span> f.resume<span style="color: #BFEBBF;">(</span>http<span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
 
-  <span style="color: #b48ead;">return</span> <span style="color: #c0c5ce;">Fiber</span>.yield
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #7CB8BB;">Fiber</span>.yield
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #c0c5ce;">EventMachine</span>.run <span style="color: #b48ead;">do</span>
-  <span style="color: #c0c5ce;">Fiber</span>.new <span style="color: #b48ead;">do</span>
-    data = async_fetch<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'http://niltouch.cn'</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #7CB8BB;">EventMachine</span>.run <span style="color: #F0DFAF; font-weight: bold;">do</span>
+  <span style="color: #7CB8BB;">Fiber</span>.new <span style="color: #F0DFAF; font-weight: bold;">do</span>
+    data = async_fetch<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'http://niltouch.cn'</span><span style="color: #DCDCCC;">)</span>
 
-    <span style="color: #c0c5ce;">EventMachine</span>.stop
-  <span style="color: #b48ead;">end</span>.resume
-<span style="color: #b48ead;">end</span>
+    <span style="color: #7CB8BB;">EventMachine</span>.stop
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>.resume
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 </div>
@@ -180,7 +180,7 @@ http.start
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

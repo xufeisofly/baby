@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,22 +62,22 @@ for the JavaScript code in this tag.
 inject和reduce互为别名，它们解决了一个我经常会使用，并且代码写的很脏的问题
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">result = <span style="color: #8c8c8c;">[]</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span>, <span style="color: #d08770;">2</span>, <span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span>.each <span style="color: #b48ead;">do</span> |item|
+<pre class="src src-ruby">result = <span style="color: #DCDCCC;">[]</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span>.each <span style="color: #F0DFAF; font-weight: bold;">do</span> |item|
   result &lt;&lt; item
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 result
-<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; [1, 2, 3]</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; [1, 2, 3]</span>
 </pre>
 </div>
 <p>
 就可以变成
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span>, <span style="color: #d08770;">2</span>, <span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span>.inject<span style="color: #8c8c8c;">(</span><span style="color: #93a8c6;">[]</span><span style="color: #8c8c8c;">)</span> <span style="color: #b48ead;">do</span> |result, item|
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span>.inject<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">[]</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">do</span> |result, item|
   result &lt;&lt; item
-<span style="color: #b48ead;">end</span>
-<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; [1, 2, 3]</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; [1, 2, 3]</span>
 </pre>
 </div>
 <p>
@@ -85,8 +85,8 @@ result
 当没有指定参数的时候，result默认为数组的第一个值
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span>, <span style="color: #d08770;">2</span>, <span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span>.inject <span style="color: #8c8c8c;">{</span> |result, item| result + item <span style="color: #8c8c8c;">}</span>
-<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; 6</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span>.inject <span style="color: #DCDCCC;">{</span> |result, item| result + item <span style="color: #DCDCCC;">}</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; 6</span>
 </pre>
 </div>
 <blockquote>
@@ -100,7 +100,7 @@ result
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

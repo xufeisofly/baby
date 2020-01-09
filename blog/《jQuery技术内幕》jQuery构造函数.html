@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -59,27 +59,27 @@ for the JavaScript code in this tag.
 <body>
 <div id="content">
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">function</span><span style="color: #93a8c6;">(</span><span style="color: #bf616a;">window</span>, <span style="color: #d08770;">undefined</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">{</span>
-  <span style="color: #b48ead;">var</span> <span style="color: #bf616a;">jQuery</span> = <span style="color: #b0b1a3;">(</span><span style="color: #b48ead;">function</span><span style="color: #97b098;">()</span> <span style="color: #97b098;">{</span>
-    <span style="color: #b48ead;">var</span> <span style="color: #bf616a;">jQuery</span> = <span style="color: #b48ead;">function</span><span style="color: #aebed8;">(</span><span style="color: #bf616a;">selector</span>, <span style="color: #bf616a;">context</span><span style="color: #aebed8;">)</span> <span style="color: #aebed8;">{</span>
-      <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">new</span> <span style="color: #c0c5ce;">jQuery.fn.init</span><span style="color: #b0b0b3;">(</span>selector, context, rootjQuery<span style="color: #b0b0b3;">)</span>
-    <span style="color: #aebed8;">}</span>
+<pre class="src src-javascript"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #BFEBBF;">(</span><span style="color: #DFAF8F;">window</span>, <span style="color: #BFEBBF;">undefined</span><span style="color: #BFEBBF;">)</span> <span style="color: #BFEBBF;">{</span>
+  <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">jQuery</span> = <span style="color: #D0BF8F;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #93E0E3;">()</span> <span style="color: #93E0E3;">{</span>
+    <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">jQuery</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #9FC59F;">(</span><span style="color: #DFAF8F;">selector</span>, <span style="color: #DFAF8F;">context</span><span style="color: #9FC59F;">)</span> <span style="color: #9FC59F;">{</span>
+      <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">jQuery.fn.init</span><span style="color: #94BFF3;">(</span>selector, context, rootjQuery<span style="color: #94BFF3;">)</span>
+    <span style="color: #9FC59F;">}</span>
 
-    jQuery.fn = jQuery.<span style="color: #d08770;">prototype</span> = <span style="color: #aebed8;">{</span>
+    jQuery.fn = jQuery.<span style="color: #BFEBBF;">prototype</span> = <span style="color: #9FC59F;">{</span>
       constructor: jQuery,
-      <span style="color: #8fa1b3;">init</span>: <span style="color: #b48ead;">function</span><span style="color: #b0b0b3;">(</span><span style="color: #bf616a;">selector</span>, <span style="color: #bf616a;">context</span>, <span style="color: #bf616a;">rootjQuery</span><span style="color: #b0b0b3;">)</span> <span style="color: #b0b0b3;">{</span> ... <span style="color: #b0b0b3;">}</span>,
-      <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
-    <span style="color: #aebed8;">}</span>
+      <span style="color: #93E0E3;">init</span>: <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #94BFF3;">(</span><span style="color: #DFAF8F;">selector</span>, <span style="color: #DFAF8F;">context</span>, <span style="color: #DFAF8F;">rootjQuery</span><span style="color: #94BFF3;">)</span> <span style="color: #94BFF3;">{</span> ... <span style="color: #94BFF3;">}</span>,
+      <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
+    <span style="color: #9FC59F;">}</span>
 
-    jQuery.fn.init.<span style="color: #d08770;">prototype</span> = jQuery.fn
-    jQuery.extend = jQuery.fn.extend = <span style="color: #b48ead;">function</span><span style="color: #aebed8;">()</span> <span style="color: #aebed8;">{</span> ... <span style="color: #aebed8;">}</span>
-    jQuery.extend<span style="color: #aebed8;">(</span><span style="color: #b0b0b3;">{</span>
-      <span style="color: #c0c5ce;">//</span><span style="color: #65737e;">...</span>
-    <span style="color: #b0b0b3;">}</span><span style="color: #aebed8;">)</span>
-    <span style="color: #b48ead;">return</span> jQuery
-  <span style="color: #97b098;">}</span><span style="color: #b0b1a3;">)()</span>;
+    jQuery.fn.init.<span style="color: #BFEBBF;">prototype</span> = jQuery.fn
+    jQuery.extend = jQuery.fn.extend = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #9FC59F;">()</span> <span style="color: #9FC59F;">{</span> ... <span style="color: #9FC59F;">}</span>
+    jQuery.extend<span style="color: #9FC59F;">(</span><span style="color: #94BFF3;">{</span>
+      <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
+    <span style="color: #94BFF3;">}</span><span style="color: #9FC59F;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">return</span> jQuery
+  <span style="color: #93E0E3;">}</span><span style="color: #D0BF8F;">)()</span>;
   window.jQuery = window.$ = jQuery
-<span style="color: #93a8c6;">}</span><span style="color: #8c8c8c;">)(</span>window<span style="color: #8c8c8c;">)</span>;
+<span style="color: #BFEBBF;">}</span><span style="color: #DCDCCC;">)(</span>window<span style="color: #DCDCCC;">)</span>;
 </pre>
 </div>
 </div>
@@ -88,7 +88,7 @@ for the JavaScript code in this tag.
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

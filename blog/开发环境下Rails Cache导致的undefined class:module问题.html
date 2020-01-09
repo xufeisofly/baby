@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,12 +62,12 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org9fa7611">1. 开发环境下Rails Cache导致的undefined class/module问题</a></li>
+<li><a href="#org7bfcbad">1. 开发环境下Rails Cache导致的undefined class/module问题</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org9fa7611" class="outline-2">
-<h2 id="org9fa7611"><span class="section-number-2">1</span> 开发环境下Rails Cache导致的undefined class/module问题</h2>
+<div id="outline-container-org7bfcbad" class="outline-2">
+<h2 id="org7bfcbad"><span class="section-number-2">1</span> 开发环境下Rails Cache导致的undefined class/module问题</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 参考： <a href="https://aaronvb.com/articles/rails-caching-and-undefined-class-module.html">https://aaronvb.com/articles/rails-caching-and-undefined-class-module.html</a>
@@ -79,15 +79,15 @@ Rails cache已经用到cache的一些gem会在开发环境下触发这个问题�
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">config.cache_class = <span style="color: #d08770;">true</span>  
-<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">+END_SRC`</span>
+<pre class="src src-ruby">config.cache_class = <span style="color: #BFEBBF;">true</span>  
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">+END_SRC`</span>
 
 &#35299;&#20915;&#26041;&#27861;&#23601;&#26159;&#22312;initializer&#37324;&#38024;&#23545;development&#21152;&#36733;&#19968;&#19979;&#25152;&#38656;&#35201;&#30340;class
-<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">+BEGIN_SRC ruby</span>
-<span style="color: #b48ead;">if</span> <span style="color: #c0c5ce;">Rails</span>.env.development?
-  require_dependency <span style="color: #a3be8c;">'user.rb'</span>
-  require_dependency <span style="color: #a3be8c;">'../events/price_check_form_submitted.rb'</span>
-<span style="color: #b48ead;">end</span>  
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">+BEGIN_SRC ruby</span>
+<span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #7CB8BB;">Rails</span>.env.development?
+  require_dependency <span style="color: #CC9393;">'user.rb'</span>
+  require_dependency <span style="color: #CC9393;">'../events/price_check_form_submitted.rb'</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>  
 </pre>
 </div>
 </div>
@@ -98,7 +98,7 @@ Rails cache已经用到cache的一些gem会在开发环境下触发这个问题�
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

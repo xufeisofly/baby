@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,11 +62,11 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org716c259">1. 安装Websocket-rails</a></li>
-<li><a href="#org389fa81">2. server端</a></li>
-<li><a href="#orga6eb528">3. javascript端</a></li>
-<li><a href="#orgfc165e9">4. 一个redis的坑</a></li>
-<li><a href="#orgacb8f6e">5. 参考文章</a></li>
+<li><a href="#org43724d6">1. 安装Websocket-rails</a></li>
+<li><a href="#orge8d73d9">2. server端</a></li>
+<li><a href="#orge5d41c4">3. javascript端</a></li>
+<li><a href="#org127af0b">4. 一个redis的坑</a></li>
+<li><a href="#org0031ed0">5. 参考文章</a></li>
 </ul>
 </div>
 </div>
@@ -78,8 +78,8 @@ for the JavaScript code in this tag.
 websocket原理之前的文章已经写过，犯贱的说，“不过就是一个协议而已”，虽然能想出这个协议才是真正牛逼的事情。Rails 5之后增加了Action Cable，但我还是决定从websocket-rails入手，复写消息更新的功能。
 </p>
 
-<div id="outline-container-org716c259" class="outline-2">
-<h2 id="org716c259"><span class="section-number-2">1</span> 安装Websocket-rails</h2>
+<div id="outline-container-org43724d6" class="outline-2">
+<h2 id="org43724d6"><span class="section-number-2">1</span> 安装Websocket-rails</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 安装教程参考：<a href="https://github.com/websocket-rails/websocket-rails/wiki/Installation-and-Setup">https://github.com/websocket-rails/websocket-rails/wiki/Installation-and-Setup</a>
@@ -95,7 +95,7 @@ websocket-rails使用的是webserver的事件监听，然而我的app使用的�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">rake websocket_rails<span style="color: #d08770;">:start_server</span>
+<pre class="src src-ruby">rake websocket_rails<span style="color: #BFEBBF;">:start_server</span>
 </pre>
 </div>
 
@@ -110,35 +110,35 @@ websocket-rails使用的是webserver的事件监听，然而我的app使用的�
 </div>
 </div>
 
-<div id="outline-container-org389fa81" class="outline-2">
-<h2 id="org389fa81"><span class="section-number-2">2</span> server端</h2>
+<div id="outline-container-orge8d73d9" class="outline-2">
+<h2 id="orge8d73d9"><span class="section-number-2">2</span> server端</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 我需要实现的功能是，当更新或创建一条message时，消息栏立刻更新。根据websocket-rails的介绍，需要创建一个channel实例，并不需要一个单独的websocket接口，通过这个channel广播事件，然后再在前端监听。那么不妨创建一个concern，创建一个Websocket::Message模块。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Websocket</span>
-  <span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Message</span>
-    <span style="color: #d08770;">extend</span> <span style="color: #c0c5ce;">ActiveSupport</span>::<span style="color: #c0c5ce;">Concern</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Websocket</span>
+  <span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Message</span>
+    <span style="color: #DCDCCC; font-weight: bold;">extend</span> <span style="color: #7CB8BB;">ActiveSupport</span>::<span style="color: #7CB8BB;">Concern</span>
 
-    included <span style="color: #b48ead;">do</span>
-      after_save <span style="color: #d08770;">:deliver_websocket</span>
-    <span style="color: #b48ead;">end</span>
+    included <span style="color: #F0DFAF; font-weight: bold;">do</span>
+      after_save <span style="color: #BFEBBF;">:deliver_websocket</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">deliver_websocket</span>
-      data = <span style="color: #8c8c8c;">{</span>
-        <span style="color: #d08770;">messages:</span> <span style="color: #b48ead;">self</span>.class.with_recipient<span style="color: #93a8c6;">(</span>recipient<span style="color: #93a8c6;">)</span>.with_status<span style="color: #93a8c6;">(</span><span style="color: #d08770;">:unfinished</span><span style="color: #93a8c6;">)</span>.order<span style="color: #93a8c6;">(</span><span style="color: #d08770;">created_at:</span> <span style="color: #d08770;">:desc</span><span style="color: #93a8c6;">)</span>.limit<span style="color: #93a8c6;">(</span><span style="color: #d08770;">20</span><span style="color: #93a8c6;">)</span>
-      <span style="color: #8c8c8c;">}</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">deliver_websocket</span>
+      data = <span style="color: #DCDCCC;">{</span>
+        <span style="color: #BFEBBF;">messages:</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.class.with_recipient<span style="color: #BFEBBF;">(</span>recipient<span style="color: #BFEBBF;">)</span>.with_status<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">:unfinished</span><span style="color: #BFEBBF;">)</span>.order<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">created_at:</span> <span style="color: #BFEBBF;">:desc</span><span style="color: #BFEBBF;">)</span>.limit<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">20</span><span style="color: #BFEBBF;">)</span>
+      <span style="color: #DCDCCC;">}</span>
 
-      <span style="color: #c0c5ce;">WebsocketRails</span><span style="color: #8c8c8c;">[</span>channel_name<span style="color: #8c8c8c;">]</span>.trigger<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'change'</span>, data<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">end</span>
+      <span style="color: #7CB8BB;">WebsocketRails</span><span style="color: #DCDCCC;">[</span>channel_name<span style="color: #DCDCCC;">]</span>.trigger<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'change'</span>, data<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">channel_name</span>
-      <span style="color: #a3be8c;">'message'</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">channel_name</span>
+      <span style="color: #CC9393;">'message'</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -151,14 +151,14 @@ websocket-rails使用的是webserver的事件监听，然而我的app使用的�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Message</span> &lt; <span style="color: #c0c5ce;">ApplicationRecord</span>
-  <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">Websocket</span>::<span style="color: #c0c5ce;">Message</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Message</span> &lt; <span style="color: #7CB8BB;">ApplicationRecord</span>
+  <span style="color: #DCDCCC; font-weight: bold;">include</span> <span style="color: #7CB8BB;">Websocket</span>::<span style="color: #7CB8BB;">Message</span>
 
-  belongs_to <span style="color: #d08770;">:recipient</span>
+  belongs_to <span style="color: #BFEBBF;">:recipient</span>
 
-  scope <span style="color: #d08770;">:with_recipient</span>, -&gt;<span style="color: #8c8c8c;">(</span>recipient<span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span> where<span style="color: #93a8c6;">(</span><span style="color: #d08770;">recipient:</span> recipient<span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
-  scope <span style="color: #d08770;">:with_status</span>, -&gt;<span style="color: #8c8c8c;">(</span>status<span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span> where<span style="color: #93a8c6;">(</span><span style="color: #d08770;">status:</span> status<span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
-<span style="color: #b48ead;">end</span>
+  scope <span style="color: #BFEBBF;">:with_recipient</span>, -&gt;<span style="color: #DCDCCC;">(</span>recipient<span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span> where<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">recipient:</span> recipient<span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
+  scope <span style="color: #BFEBBF;">:with_status</span>, -&gt;<span style="color: #DCDCCC;">(</span>status<span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span> where<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">status:</span> status<span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -168,8 +168,8 @@ websocket-rails使用的是webserver的事件监听，然而我的app使用的�
 </div>
 </div>
 
-<div id="outline-container-orga6eb528" class="outline-2">
-<h2 id="orga6eb528"><span class="section-number-2">3</span> javascript端</h2>
+<div id="outline-container-orge5d41c4" class="outline-2">
+<h2 id="orge5d41c4"><span class="section-number-2">3</span> javascript端</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 websocket-rails应该只计划用于Rails全栈框架搭建的应用，为什么呢，因为它的javascript端都是用coffeescript写的。我们的项目使用了Vue框架，还好把coffee转成pure js的网站遍布全网，google一下捡一个就行了。这里我参考了这篇文章，所以这里就使用人家的转换的结果了(<a href="https://github.com/karimbutt/websocket-rails-for-js-frameworks">https://github.com/karimbutt/websocket-rails-for-js-frameworks</a>)。
@@ -180,12 +180,12 @@ websocket-rails应该只计划用于Rails全栈框架搭建的应用，为什么
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">&lt;script src=<span style="color: #a3be8c;">"/static/scripts/websocket_rails.js"</span>&gt;&lt;/script&gt;
-&lt;script src=<span style="color: #a3be8c;">"/static/scripts/event.js"</span>&gt;&lt;/script&gt;
-&lt;script src=<span style="color: #a3be8c;">"/static/scripts/abstract_connection.js"</span>&gt;&lt;/script&gt;
-&lt;script src=<span style="color: #a3be8c;">"/static/scripts/http_connection.js"</span>&gt;&lt;/script&gt;
-&lt;script src=<span style="color: #a3be8c;">"/static/scripts/websocket_connection.js"</span>&gt;&lt;/script&gt;
-&lt;script src=<span style="color: #a3be8c;">"/static/scripts/channel.js"</span>&gt;&lt;/script&gt;
+<pre class="src src-javascript">&lt;script src=<span style="color: #CC9393;">"/static/scripts/websocket_rails.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #CC9393;">"/static/scripts/event.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #CC9393;">"/static/scripts/abstract_connection.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #CC9393;">"/static/scripts/http_connection.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #CC9393;">"/static/scripts/websocket_connection.js"</span>&gt;&lt;/script&gt;
+&lt;script src=<span style="color: #CC9393;">"/static/scripts/channel.js"</span>&gt;&lt;/script&gt;
 </pre>
 </div>
 
@@ -194,36 +194,36 @@ websocket-rails应该只计划用于Rails全栈框架搭建的应用，为什么
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #b48ead;">let</span> <span style="color: #bf616a;">websocketChannel</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">(</span><span style="color: #bf616a;">server</span>, <span style="color: #bf616a;">channel_name</span><span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span>
-  <span style="color: #b48ead;">let</span> <span style="color: #bf616a;">dispatcher</span> = <span style="color: #b48ead;">new</span> <span style="color: #c0c5ce;">WebSocketRails</span><span style="color: #93a8c6;">(</span>server<span style="color: #93a8c6;">)</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">websocketChannel</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">(</span><span style="color: #DFAF8F;">server</span>, <span style="color: #DFAF8F;">channel_name</span><span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span>
+  <span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">dispatcher</span> = <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">WebSocketRails</span><span style="color: #BFEBBF;">(</span>server<span style="color: #BFEBBF;">)</span>
 
-  <span style="color: #b48ead;">return</span> dispatcher.subscribe<span style="color: #93a8c6;">(</span>channel_name<span style="color: #93a8c6;">)</span>
-<span style="color: #8c8c8c;">}</span>
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> dispatcher.subscribe<span style="color: #BFEBBF;">(</span>channel_name<span style="color: #BFEBBF;">)</span>
+<span style="color: #DCDCCC;">}</span>
 
-<span style="color: #b48ead;">let</span> <span style="color: #bf616a;">websocketBindEvent</span> = <span style="color: #b48ead;">function</span><span style="color: #8c8c8c;">(</span><span style="color: #bf616a;">channel</span><span style="color: #8c8c8c;">)</span> <span style="color: #8c8c8c;">{</span>
-  channel.bind<span style="color: #93a8c6;">(</span><span style="color: #a3be8c;">'change'</span>, data =&gt; <span style="color: #b0b1a3;">{</span>
-    dispatchMessages<span style="color: #97b098;">(</span>data<span style="color: #97b098;">)</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">&#20998;&#21457;&#28040;&#24687;</span>
-  <span style="color: #b0b1a3;">}</span><span style="color: #93a8c6;">)</span>
-<span style="color: #8c8c8c;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">websocketBindEvent</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">(</span><span style="color: #DFAF8F;">channel</span><span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span>
+  channel.bind<span style="color: #BFEBBF;">(</span><span style="color: #CC9393;">'change'</span>, data =&gt; <span style="color: #D0BF8F;">{</span>
+    dispatchMessages<span style="color: #93E0E3;">(</span>data<span style="color: #93E0E3;">)</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#20998;&#21457;&#28040;&#24687;</span>
+  <span style="color: #D0BF8F;">}</span><span style="color: #BFEBBF;">)</span>
+<span style="color: #DCDCCC;">}</span>
 
-<span style="color: #b48ead;">let</span> <span style="color: #bf616a;">channel</span> = websocketChannel<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'localhost:4040/websocket'</span>, <span style="color: #a3be8c;">'message'</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">// </span><span style="color: #65737e;">server&#31471;&#21475;&#26159;&#22312;rails&#23450;&#20041;&#30340;</span>
-websocketBindEvent<span style="color: #8c8c8c;">(</span>channel<span style="color: #8c8c8c;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">channel</span> = websocketChannel<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'localhost:4040/websocket'</span>, <span style="color: #CC9393;">'message'</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">server&#31471;&#21475;&#26159;&#22312;rails&#23450;&#20041;&#30340;</span>
+websocketBindEvent<span style="color: #DCDCCC;">(</span>channel<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgfc165e9" class="outline-2">
-<h2 id="orgfc165e9"><span class="section-number-2">4</span> 一个redis的坑</h2>
+<div id="outline-container-org127af0b" class="outline-2">
+<h2 id="org127af0b"><span class="section-number-2">4</span> 一个redis的坑</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 顺利调试通过的我抑制不住自己兴奋的心情，但又觉得太过顺利，其实自己有一个地方一直是一知半解，就是websocket-rails为什么要使用event-abased的webserver，为什么要使用redis，会不会影响redis的正常使用。于是我打开rails console，输入
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">Redis</span>.current.set<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'a'</span>, <span style="color: #d08770;">1</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Redis</span>.current.set<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'a'</span>, <span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">)</span>
 
-<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; RuntimeError: eventmachine not initialized: evma_connect_to_server</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; RuntimeError: eventmachine not initialized: evma_connect_to_server</span>
 </pre>
 </div>
 
@@ -249,8 +249,8 @@ $redis = Redis.new(:host =&gt; host, :port =&gt; port, :driver =&gt; :hiredis)
 </div>
 
 
-<div id="outline-container-orgacb8f6e" class="outline-2">
-<h2 id="orgacb8f6e"><span class="section-number-2">5</span> 参考文章</h2>
+<div id="outline-container-org0031ed0" class="outline-2">
+<h2 id="org0031ed0"><span class="section-number-2">5</span> 参考文章</h2>
 <div class="outline-text-2" id="text-5">
 <ul class="org-ul">
 <li><a href="https://medium.com/@karimbutt/integrating-websocket-rails-with-angularjs-or-other-js-frameworks-256729e95a86">https://medium.com/@karimbutt/integrating-websocket-rails-with-angularjs-or-other-js-frameworks-256729e95a86</a></li>
@@ -263,7 +263,7 @@ $redis = Redis.new(:host =&gt; host, :port =&gt; port, :driver =&gt; :hiredis)
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

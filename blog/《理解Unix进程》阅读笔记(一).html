@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,26 +62,26 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org8aa4b57">1. 进程皆有标识</a></li>
-<li><a href="#orga4d9dd9">2. 进程皆有父</a></li>
-<li><a href="#orgeed5992">3. 进程皆有文件描述符</a></li>
-<li><a href="#org86da2dd">4. 进程皆有资源限制</a></li>
-<li><a href="#org5135f56">5. 进程皆有环境变量</a></li>
-<li><a href="#orgfca7997">6. 进程皆有参数</a></li>
-<li><a href="#org7456472">7. 进程皆有名</a></li>
-<li><a href="#org299dee8">8. 进程皆有退出码</a>
+<li><a href="#orge14d821">1. 进程皆有标识</a></li>
+<li><a href="#orgbf95546">2. 进程皆有父</a></li>
+<li><a href="#org2877bf6">3. 进程皆有文件描述符</a></li>
+<li><a href="#org5fe8f1f">4. 进程皆有资源限制</a></li>
+<li><a href="#org6e6c533">5. 进程皆有环境变量</a></li>
+<li><a href="#orgc43c1ef">6. 进程皆有参数</a></li>
+<li><a href="#orga90ac97">7. 进程皆有名</a></li>
+<li><a href="#orgd3ebbff">8. 进程皆有退出码</a>
 <ul>
-<li><a href="#orgce1b5e4">8.1. 退出进程的方法</a>
+<li><a href="#orgb0e0fc9">8.1. 退出进程的方法</a>
 <ul>
-<li><a href="#org38a60c5">8.1.1. Kernel#exit</a></li>
-<li><a href="#orgdb5a3c1">8.1.2. Kernel#exit!</a></li>
-<li><a href="#orgbf77d16">8.1.3. Kernel#abort</a></li>
-<li><a href="#orgc1907e0">8.1.4. Kernel#raise</a></li>
+<li><a href="#orgaaac62d">8.1.1. Kernel#exit</a></li>
+<li><a href="#org4a46164">8.1.2. Kernel#exit!</a></li>
+<li><a href="#orgd26348e">8.1.3. Kernel#abort</a></li>
+<li><a href="#orgaff58d4">8.1.4. Kernel#raise</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org84ea1d4">9. 总结</a></li>
+<li><a href="#org9099ec7">9. 总结</a></li>
 </ul>
 </div>
 </div>
@@ -95,22 +95,22 @@ for the JavaScript code in this tag.
 一切代码都是在进程中运行的。
 </p>
 
-<div id="outline-container-org8aa4b57" class="outline-2">
-<h2 id="org8aa4b57"><span class="section-number-2">1</span> 进程皆有标识</h2>
+<div id="outline-container-orge14d821" class="outline-2">
+<h2 id="orge14d821"><span class="section-number-2">1</span> 进程皆有标识</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 进程标示符称为pid，pid，em&#x2026;就是一个ID，ruby查看pid的方法
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">puts</span> <span style="color: #c0c5ce;">Process</span>.pid
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #7CB8BB;">Process</span>.pid
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orga4d9dd9" class="outline-2">
-<h2 id="orga4d9dd9"><span class="section-number-2">2</span> 进程皆有父</h2>
+<div id="outline-container-orgbf95546" class="outline-2">
+<h2 id="orgbf95546"><span class="section-number-2">2</span> 进程皆有父</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 系统的每一个进程都有一个父进程。
@@ -127,14 +127,14 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">puts</span> <span style="color: #c0c5ce;">Process</span>.ppid
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #7CB8BB;">Process</span>.ppid
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgeed5992" class="outline-2">
-<h2 id="orgeed5992"><span class="section-number-2">3</span> 进程皆有文件描述符</h2>
+<div id="outline-container-org2877bf6" class="outline-2">
+<h2 id="org2877bf6"><span class="section-number-2">3</span> 进程皆有文件描述符</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 可以文件描述符就是打开文件的"foreign<sub>key</sub>"，在Unix中，万物皆视为为文件，开启一个进程势必会打开一个文件，其实这里的文件称为资源更好，那么文件描述符实际上是标示了某个被进程操作的资源，如套接字，管道等等。
@@ -142,14 +142,14 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">passwd = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'/etc/passwd'</span> <span style="color: #8c8c8c;">)</span>
-<span style="color: #d08770;">puts</span> passwd.fileno
+<pre class="src src-ruby">passwd = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'/etc/passwd'</span> <span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC; font-weight: bold;">puts</span> passwd.fileno
 
-hosts= <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c;">(</span> <span style="color: #a3be8c;">'/etc/hosts'</span><span style="color: #8c8c8c;">)</span>
-<span style="color: #d08770;">puts</span> hosts.fileno
+hosts= <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC;">(</span> <span style="color: #CC9393;">'/etc/hosts'</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC; font-weight: bold;">puts</span> hosts.fileno
 
-null = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c;">(</span> <span style="color: #a3be8c;">'/dev/null'</span> <span style="color: #8c8c8c;">)</span>
-<span style="color: #d08770;">puts</span> null.fileno
+null = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC;">(</span> <span style="color: #CC9393;">'/dev/null'</span> <span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC; font-weight: bold;">puts</span> null.fileno
 </pre>
 </div>
 
@@ -158,9 +158,9 @@ null = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">3</span>
-<span style="color: #d08770;">4</span>
-<span style="color: #d08770;">3</span>
+<pre class="src src-ruby"><span style="color: #BFEBBF;">3</span>
+<span style="color: #BFEBBF;">4</span>
+<span style="color: #BFEBBF;">3</span>
 </pre>
 </div>
 
@@ -185,42 +185,42 @@ null = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c
 </div>
 </div>
 
-<div id="outline-container-org86da2dd" class="outline-2">
-<h2 id="org86da2dd"><span class="section-number-2">4</span> 进程皆有资源限制</h2>
+<div id="outline-container-org5fe8f1f" class="outline-2">
+<h2 id="org5fe8f1f"><span class="section-number-2">4</span> 进程皆有资源限制</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 进程资源的限制分为软限制和硬限制
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">p</span> <span style="color: #c0c5ce;">Process</span>.getrlimit<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:NOFILE</span><span style="color: #8c8c8c;">)</span>
-<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; [2560, 9223372036854775807]</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">p</span> <span style="color: #7CB8BB;">Process</span>.getrlimit<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:NOFILE</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; [2560, 9223372036854775807]</span>
 </pre>
 </div>
 
 <pre class="example">
-   软限制：自定义的限制，超出后报异常，可以更改，这个数字为能够打开的资源数
-   硬限制：只有超级客户可以更改硬限制, 上面那个超大的数实际上就是没有限制的意思
+软限制：自定义的限制，超出后报异常，可以更改，这个数字为能够打开的资源数
+硬限制：只有超级客户可以更改硬限制, 上面那个超大的数实际上就是没有限制的意思
 </pre>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">Process</span>.setrlimit<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:NOFILE</span>, <span style="color: #d08770;">3</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Process</span>.setrlimit<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:NOFILE</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">)</span>
 
-<span style="color: #c0c5ce;">Process</span>.getrlimit<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:NOFILE</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #7CB8BB;">Process</span>.getrlimit<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:NOFILE</span><span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org5135f56" class="outline-2">
-<h2 id="org5135f56"><span class="section-number-2">5</span> 进程皆有环境变量</h2>
+<div id="outline-container-org6e6c533" class="outline-2">
+<h2 id="org6e6c533"><span class="section-number-2">5</span> 进程皆有环境变量</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 环境变量是包含进程数据的键值对。进程从其父进程那里集成环境变量。
 环境变量在ruby中是通过ENV传递的
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">$ <span style="color: #c0c5ce;">MESSAGE</span>=<span style="color: #a3be8c;">'wing it'</span> ruby -e <span style="color: #a3be8c;">"puts ENV['MESSAGE']"</span>
+<pre class="src src-ruby">$ <span style="color: #7CB8BB;">MESSAGE</span>=<span style="color: #CC9393;">'wing it'</span> ruby -e <span style="color: #CC9393;">"puts ENV['MESSAGE']"</span>
 </pre>
 </div>
 
@@ -230,8 +230,8 @@ null = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c
 </div>
 </div>
 
-<div id="outline-container-orgfca7997" class="outline-2">
-<h2 id="orgfca7997"><span class="section-number-2">6</span> 进程皆有参数</h2>
+<div id="outline-container-orgc43c1ef" class="outline-2">
+<h2 id="orgc43c1ef"><span class="section-number-2">6</span> 进程皆有参数</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 所有的进程都可以传递参数，参数会封装成为一个称为ARGV的数组
@@ -240,14 +240,14 @@ null = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c
 <div class="org-src-container">
 <pre class="src src-ruby">$ ruby argv.rb foo bar
 
-<span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; ARGV = ['foo', 'bar']</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; ARGV = ['foo', 'bar']</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org7456472" class="outline-2">
-<h2 id="org7456472"><span class="section-number-2">7</span> 进程皆有名</h2>
+<div id="outline-container-orga90ac97" class="outline-2">
+<h2 id="orga90ac97"><span class="section-number-2">7</span> 进程皆有名</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 也就是每个进程都有个name字段，ruby中可以通过$PROGRAM<sub>NAME获得</sub>，比如irb进程的名称就叫做irb
@@ -255,7 +255,7 @@ null = <span style="color: #c0c5ce;">File</span>.open<span style="color: #8c8c8c
 
 <div class="org-src-container">
 <pre class="src src-ruby">irb
-&gt; <span style="color: #d08770;">puts</span> <span style="color: #d08770;">$PROGRAM_NAME</span>
+&gt; <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #DCDCCC; font-weight: bold;">$PROGRAM_NAME</span>
 </pre>
 </div>
 
@@ -265,36 +265,36 @@ by the way，进程名称也可以修改，直接赋值即可
 </div>
 </div>
 
-<div id="outline-container-org299dee8" class="outline-2">
-<h2 id="org299dee8"><span class="section-number-2">8</span> 进程皆有退出码</h2>
+<div id="outline-container-orgd3ebbff" class="outline-2">
+<h2 id="orgd3ebbff"><span class="section-number-2">8</span> 进程皆有退出码</h2>
 <div class="outline-text-2" id="text-8">
 <p>
 进程退出的时候会更新上一个退出码，用于表明退出时的情况，退出码=0时表示顺利退出，其他表示出现了错误
 </p>
 </div>
 
-<div id="outline-container-orgce1b5e4" class="outline-3">
-<h3 id="orgce1b5e4"><span class="section-number-3">8.1</span> 退出进程的方法</h3>
+<div id="outline-container-orgb0e0fc9" class="outline-3">
+<h3 id="orgb0e0fc9"><span class="section-number-3">8.1</span> 退出进程的方法</h3>
 <div class="outline-text-3" id="text-8-1">
 <p>
 在ruby中退出进程的方法有下面几种
 </p>
 </div>
 
-<div id="outline-container-org38a60c5" class="outline-4">
-<h4 id="org38a60c5"><span class="section-number-4">8.1.1</span> Kernel#exit</h4>
+<div id="outline-container-orgaaac62d" class="outline-4">
+<h4 id="orgaaac62d"><span class="section-number-4">8.1.1</span> Kernel#exit</h4>
 <div class="outline-text-4" id="text-8-1-1">
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">exit</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#24847;&#21619;&#30528;&#20197;0&#20316;&#20026;&#36864;&#20986;&#30721;&#36864;&#20986;</span>
-<span style="color: #d08770;">exit</span> <span style="color: #d08770;">22</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#24378;&#21046;&#25351;&#23450;&#19968;&#20010;&#36864;&#20986;&#30721;</span>
-<span style="color: #d08770;">at_exit</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"exit hook!"</span> <span style="color: #8c8c8c;">}</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">at_exit&#26159;exit&#30340;&#38057;&#23376;&#26041;&#27861;&#65292;&#36864;&#20986;&#26102;&#20250;&#25191;&#34892;block</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#24847;&#21619;&#30528;&#20197;0&#20316;&#20026;&#36864;&#20986;&#30721;&#36864;&#20986;</span>
+<span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #BFEBBF;">22</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#24378;&#21046;&#25351;&#23450;&#19968;&#20010;&#36864;&#20986;&#30721;</span>
+<span style="color: #DCDCCC; font-weight: bold;">at_exit</span> <span style="color: #DCDCCC;">{</span> <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"exit hook!"</span> <span style="color: #DCDCCC;">}</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">at_exit&#26159;exit&#30340;&#38057;&#23376;&#26041;&#27861;&#65292;&#36864;&#20986;&#26102;&#20250;&#25191;&#34892;block</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgdb5a3c1" class="outline-4">
-<h4 id="orgdb5a3c1"><span class="section-number-4">8.1.2</span> Kernel#exit!</h4>
+<div id="outline-container-org4a46164" class="outline-4">
+<h4 id="org4a46164"><span class="section-number-4">8.1.2</span> Kernel#exit!</h4>
 <div class="outline-text-4" id="text-8-1-2">
 <p>
 和exit的区别是exit!的退出码为1，且不会执行at<sub>exit</sub>
@@ -302,24 +302,24 @@ by the way，进程名称也可以修改，直接赋值即可
 </div>
 </div>
 
-<div id="outline-container-orgbf77d16" class="outline-4">
-<h4 id="orgbf77d16"><span class="section-number-4">8.1.3</span> Kernel#abort</h4>
+<div id="outline-container-orgd26348e" class="outline-4">
+<h4 id="orgd26348e"><span class="section-number-4">8.1.3</span> Kernel#abort</h4>
 <div class="outline-text-4" id="text-8-1-3">
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">abort</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#36864;&#20986;&#30721;&#20026;1     </span>
-<span style="color: #d08770;">at_exit</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"last!"</span> <span style="color: #8c8c8c;">}</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#20250;&#35843;&#29992;at_exit</span>
-<span style="color: #d08770;">abort</span> <span style="color: #a3be8c;">"some error"</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#21487;&#20197;&#25351;&#23450;STDERR</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">abort</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#36864;&#20986;&#30721;&#20026;1     </span>
+<span style="color: #DCDCCC; font-weight: bold;">at_exit</span> <span style="color: #DCDCCC;">{</span> <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"last!"</span> <span style="color: #DCDCCC;">}</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#20250;&#35843;&#29992;at_exit</span>
+<span style="color: #DCDCCC; font-weight: bold;">abort</span> <span style="color: #CC9393;">"some error"</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#21487;&#20197;&#25351;&#23450;STDERR</span>
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgc1907e0" class="outline-4">
-<h4 id="orgc1907e0"><span class="section-number-4">8.1.4</span> Kernel#raise</h4>
+<div id="outline-container-orgaff58d4" class="outline-4">
+<h4 id="orgaff58d4"><span class="section-number-4">8.1.4</span> Kernel#raise</h4>
 <div class="outline-text-4" id="text-8-1-4">
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">raise</span> <span style="color: #a3be8c;">'hell'</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#36864;&#20986;&#30721;&#20026;1&#65292;&#19988;&#20250;&#35843;&#29992;at_exit</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #CC9393;">'hell'</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#36864;&#20986;&#30721;&#20026;1&#65292;&#19988;&#20250;&#35843;&#29992;at_exit</span>
 </pre>
 </div>
 </div>
@@ -327,8 +327,8 @@ by the way，进程名称也可以修改，直接赋值即可
 </div>
 </div>
 
-<div id="outline-container-org84ea1d4" class="outline-2">
-<h2 id="org84ea1d4"><span class="section-number-2">9</span> 总结</h2>
+<div id="outline-container-org9099ec7" class="outline-2">
+<h2 id="org9099ec7"><span class="section-number-2">9</span> 总结</h2>
 <div class="outline-text-2" id="text-9">
 <p>
 如果把进程看成一个的table，那么它包含的字段如下
@@ -383,7 +383,7 @@ by the way，进程名称也可以修改，直接赋值即可
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

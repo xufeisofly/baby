@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,23 +62,23 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org8f1fe48">1. Rename Method</a></li>
-<li><a href="#orgff1ed5d">2. Separate Query from Modifier</a></li>
-<li><a href="#orgc0bc61a">3. Preserve Whole Object</a></li>
-<li><a href="#org9593cd6">4. Replace Parameters with Methods</a></li>
-<li><a href="#org89ee881">5. Introduce Parameter Object</a></li>
-<li><a href="#org88606d3">6. Replace Constructor with Factory Method</a></li>
-<li><a href="#orgab0e1e0">7. Replace Error Code with Exception</a>
+<li><a href="#orgc736df1">1. Rename Method</a></li>
+<li><a href="#orgd6a380c">2. Separate Query from Modifier</a></li>
+<li><a href="#org1ab8317">3. Preserve Whole Object</a></li>
+<li><a href="#org17eea1d">4. Replace Parameters with Methods</a></li>
+<li><a href="#orgca72920">5. Introduce Parameter Object</a></li>
+<li><a href="#org89c2acb">6. Replace Constructor with Factory Method</a></li>
+<li><a href="#org8f78432">7. Replace Error Code with Exception</a>
 <ul>
 <li>
 <ul>
-<li><a href="#org8c4ef7e">7.0.1. 1. 非受控异常</a></li>
-<li><a href="#orgb5553ef">7.0.2. 2. 受控异常</a></li>
+<li><a href="#orgc99c47d">7.0.1. 1. 非受控异常</a></li>
+<li><a href="#org095aa91">7.0.2. 2. 受控异常</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org61eb2cc">8. Replace Exception with Test</a></li>
+<li><a href="#org4cb6581">8. Replace Exception with Test</a></li>
 </ul>
 </div>
 </div>
@@ -89,8 +89,8 @@ for the JavaScript code in this tag.
 </ol>
 </blockquote>
 
-<div id="outline-container-org8f1fe48" class="outline-2">
-<h2 id="org8f1fe48"><span class="section-number-2">1</span> Rename Method</h2>
+<div id="outline-container-orgc736df1" class="outline-2">
+<h2 id="orgc736df1"><span class="section-number-2">1</span> Rename Method</h2>
 <div class="outline-text-2" id="text-1">
 <blockquote>
 <p>
@@ -101,22 +101,22 @@ for the JavaScript code in this tag.
 你的代码首先是为人写的，其次才是为计算机写的
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">old_method</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">old_method</span>
   do_something
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
 可以先使用旧函数调用新函数
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">new_method</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">new_method</span>
   do_something
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">old_method</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">old_method</span>
   new_method
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -125,8 +125,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orgff1ed5d" class="outline-2">
-<h2 id="orgff1ed5d"><span class="section-number-2">2</span> Separate Query from Modifier</h2>
+<div id="outline-container-orgd6a380c" class="outline-2">
+<h2 id="orgd6a380c"><span class="section-number-2">2</span> Separate Query from Modifier</h2>
 <div class="outline-text-2" id="text-2">
 <blockquote>
 <p>
@@ -140,47 +140,47 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">find_thief</span>
-  thief = find_person<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:thief</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">find_thief</span>
+  thief = find_person<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:thief</span><span style="color: #DCDCCC;">)</span>
   send_alert
   thief
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">check_security</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">check_security</span>
   thief = find_thief
-  some_later_code<span style="color: #8c8c8c;">(</span>thief<span style="color: #8c8c8c;">)</span>
-<span style="color: #b48ead;">end</span>
+  some_later_code<span style="color: #DCDCCC;">(</span>thief<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
 find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面却send<sub>alert</sub>，应该将其拆出来
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">new_find_thief</span>
-  thief = find_person<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:thief</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">new_find_thief</span>
+  thief = find_person<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:thief</span><span style="color: #DCDCCC;">)</span>
   thief
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">find_thief</span>
-  thief = find_person<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:thief</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">find_thief</span>
+  thief = find_person<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:thief</span><span style="color: #DCDCCC;">)</span>
   send_alert
   new_find_thief
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">check_security</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">check_security</span>
   find_thief
   thief = new_find_thief
-  some_later_code<span style="color: #8c8c8c;">(</span>thief<span style="color: #8c8c8c;">)</span>
-<span style="color: #b48ead;">end</span>
+  some_later_code<span style="color: #DCDCCC;">(</span>thief<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
 最后，就可以更改find<sub>thief了</sub>
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">find_thief</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">find_thief</span>
   send_alert
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <blockquote>
@@ -191,8 +191,8 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </div>
 </div>
 
-<div id="outline-container-orgc0bc61a" class="outline-2">
-<h2 id="orgc0bc61a"><span class="section-number-2">3</span> Preserve Whole Object</h2>
+<div id="outline-container-org1ab8317" class="outline-2">
+<h2 id="org1ab8317"><span class="section-number-2">3</span> Preserve Whole Object</h2>
 <div class="outline-text-2" id="text-3">
 <blockquote>
 <p>
@@ -200,7 +200,7 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">method<span style="color: #8c8c8c;">(</span>deal.days, deal.priority<span style="color: #8c8c8c;">)</span> =&gt; method<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby">method<span style="color: #DCDCCC;">(</span>deal.days, deal.priority<span style="color: #DCDCCC;">)</span> =&gt; method<span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 <p>
@@ -211,8 +211,8 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </div>
 </div>
 
-<div id="outline-container-org9593cd6" class="outline-2">
-<h2 id="org9593cd6"><span class="section-number-2">4</span> Replace Parameters with Methods</h2>
+<div id="outline-container-org17eea1d" class="outline-2">
+<h2 id="org17eea1d"><span class="section-number-2">4</span> Replace Parameters with Methods</h2>
 <div class="outline-text-2" id="text-4">
 <blockquote>
 <p>
@@ -220,15 +220,15 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">level = get_level<span style="color: #8c8c8c;">()</span>
-my_method<span style="color: #8c8c8c;">(</span>level<span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby">level = get_level<span style="color: #DCDCCC;">()</span>
+my_method<span style="color: #DCDCCC;">(</span>level<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 <p>
 改为
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">my_method<span style="color: #8c8c8c;">()</span>
+<pre class="src src-ruby">my_method<span style="color: #DCDCCC;">()</span>
 </pre>
 </div>
 <p>
@@ -237,8 +237,8 @@ my_method<span style="color: #8c8c8c;">(</span>level<span style="color: #8c8c8c;
 </div>
 </div>
 
-<div id="outline-container-org89ee881" class="outline-2">
-<h2 id="org89ee881"><span class="section-number-2">5</span> Introduce Parameter Object</h2>
+<div id="outline-container-orgca72920" class="outline-2">
+<h2 id="orgca72920"><span class="section-number-2">5</span> Introduce Parameter Object</h2>
 <div class="outline-text-2" id="text-5">
 <blockquote>
 <p>
@@ -249,17 +249,17 @@ my_method<span style="color: #8c8c8c;">(</span>level<span style="color: #8c8c8c;
 不知道多少次看到代码用一对值表示一个范围，start end upper lower，可以创建一个Range对象
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">Range</span> = <span style="color: #c0c5ce;">Struct</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:start</span>, <span style="color: #d08770;">:end</span><span style="color: #8c8c8c;">)</span>
-range = <span style="color: #c0c5ce;">Range</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">start:</span> start, <span style="color: #b48ead;">end</span>: <span style="color: #b48ead;">end</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Range</span> = <span style="color: #7CB8BB;">Struct</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:start</span>, <span style="color: #BFEBBF;">:end</span><span style="color: #DCDCCC;">)</span>
+range = <span style="color: #7CB8BB;">Range</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">start:</span> start, <span style="color: #F0DFAF; font-weight: bold;">end</span>: <span style="color: #F0DFAF; font-weight: bold;">end</span><span style="color: #DCDCCC;">)</span>
 
-method<span style="color: #8c8c8c;">(</span>range<span style="color: #8c8c8c;">)</span>
+method<span style="color: #DCDCCC;">(</span>range<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org88606d3" class="outline-2">
-<h2 id="org88606d3"><span class="section-number-2">6</span> Replace Constructor with Factory Method</h2>
+<div id="outline-container-org89c2acb" class="outline-2">
+<h2 id="org89c2acb"><span class="section-number-2">6</span> Replace Constructor with Factory Method</h2>
 <div class="outline-text-2" id="text-6">
 <blockquote>
 <p>
@@ -271,30 +271,30 @@ method<span style="color: #8c8c8c;">(</span>range<span style="color: #8c8c8c;">)
 不过在ruby中很少见到啊
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@type</span> = type
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@type</span> = type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
 改为
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Person</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@type</span> = type
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@type</span> = type
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>type<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">if</span> type == <span style="color: #a3be8c;">'teacher'</span> <span style="color: #b48ead;">then</span>
-      <span style="color: #c0c5ce;">Teacher</span>.new
-    <span style="color: #b48ead;">elsif</span> type == <span style="color: #a3be8c;">'worker'</span> <span style="color: #b48ead;">then</span>
-      <span style="color: #c0c5ce;">Worker</span>.new
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">if</span> type == <span style="color: #CC9393;">'teacher'</span> <span style="color: #F0DFAF; font-weight: bold;">then</span>
+      <span style="color: #7CB8BB;">Teacher</span>.new
+    <span style="color: #F0DFAF; font-weight: bold;">elsif</span> type == <span style="color: #CC9393;">'worker'</span> <span style="color: #F0DFAF; font-weight: bold;">then</span>
+      <span style="color: #7CB8BB;">Worker</span>.new
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -303,8 +303,8 @@ method<span style="color: #8c8c8c;">(</span>range<span style="color: #8c8c8c;">)
 </div>
 </div>
 
-<div id="outline-container-orgab0e1e0" class="outline-2">
-<h2 id="orgab0e1e0"><span class="section-number-2">7</span> Replace Error Code with Exception</h2>
+<div id="outline-container-org8f78432" class="outline-2">
+<h2 id="org8f78432"><span class="section-number-2">7</span> Replace Error Code with Exception</h2>
 <div class="outline-text-2" id="text-7">
 <blockquote>
 <p>
@@ -312,8 +312,8 @@ ruby里基本都是exception，很少再见到error code了，不过对于异常
 </p>
 </blockquote>
 </div>
-<div id="outline-container-org8c4ef7e" class="outline-4">
-<h4 id="org8c4ef7e"><span class="section-number-4">7.0.1</span> 1. 非受控异常</h4>
+<div id="outline-container-orgc99c47d" class="outline-4">
+<h4 id="orgc99c47d"><span class="section-number-4">7.0.1</span> 1. 非受控异常</h4>
 <div class="outline-text-4" id="text-7-0-1">
 <p>
 非受控异常指的是小概率的，不存在于程序正常逻辑中的异常，这种异常应该在出现之前就想办法尽量避免，比如
@@ -327,28 +327,28 @@ ruby里基本都是exception，很少再见到error code了，不过对于异常
 </p>
 </div>
 </div>
-<div id="outline-container-orgb5553ef" class="outline-4">
-<h4 id="orgb5553ef"><span class="section-number-4">7.0.2</span> 2. 受控异常</h4>
+<div id="outline-container-org095aa91" class="outline-4">
+<h4 id="org095aa91"><span class="section-number-4">7.0.2</span> 2. 受控异常</h4>
 <div class="outline-text-4" id="text-7-0-2">
 <p>
 受控异常一般是已知的有该可能性发生的错误，由于是大概率的，我们必须要rescue
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">raise</span> <span style="color: #c0c5ce;">PhoneNumberException</span>, <span style="color: #a3be8c;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span> <span style="color: #b48ead;">if</span> phone.blank?
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">PhoneNumberException</span>, <span style="color: #CC9393;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span> <span style="color: #F0DFAF; font-weight: bold;">if</span> phone.blank?
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span>
-  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
-<span style="color: #b48ead;">rescue</span> <span style="color: #c0c5ce;">PhoneNumberException</span> =&gt; e
-  <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">rescue</span> <span style="color: #7CB8BB;">PhoneNumberException</span> =&gt; e
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org61eb2cc" class="outline-2">
-<h2 id="org61eb2cc"><span class="section-number-2">8</span> Replace Exception with Test</h2>
+<div id="outline-container-org4cb6581" class="outline-2">
+<h2 id="org4cb6581"><span class="section-number-2">8</span> Replace Exception with Test</h2>
 <div class="outline-text-2" id="text-8">
 <blockquote>
 <p>
@@ -361,26 +361,26 @@ Exceptions can be perceived as non-local GOTO statements. This can adversely aff
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span>
-  <span style="color: #b48ead;">if</span> phone.present?
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>
+  <span style="color: #F0DFAF; font-weight: bold;">if</span> phone.present?
     do_something
-  <span style="color: #b48ead;">else</span>
-    <span style="color: #d08770;">raise</span> <span style="color: #c0c5ce;">PhoneNumberException</span>, <span style="color: #a3be8c;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">else</span>
+    <span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">PhoneNumberException</span>, <span style="color: #CC9393;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
 应该改为
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span>
-  <span style="color: #b48ead;">if</span> phone.present?
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>
+  <span style="color: #F0DFAF; font-weight: bold;">if</span> phone.present?
     do_something
-  <span style="color: #b48ead;">else</span>
-    <span style="color: #b48ead;">return</span> something
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">else</span>
+    <span style="color: #F0DFAF; font-weight: bold;">return</span> something
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -402,13 +402,13 @@ Exceptions can be perceived as non-local GOTO statements. This can adversely aff
 还有一种情况我们经常会看到
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BadController</span> &lt; <span style="color: #c0c5ce;">ApplicationController</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BadController</span> &lt; <span style="color: #7CB8BB;">ApplicationController</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>
     some_object.save!
-  <span style="color: #b48ead;">rescue</span> =&gt; e
-    render <span style="color: #d08770;">json:</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">msg:</span> e.message <span style="color: #8c8c8c;">}</span>, <span style="color: #d08770;">status:</span> <span style="color: #d08770;">:unprocessable_entity</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">rescue</span> =&gt; e
+    render <span style="color: #BFEBBF;">json:</span> <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">msg:</span> e.message <span style="color: #DCDCCC;">}</span>, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -417,13 +417,13 @@ Exceptions can be perceived as non-local GOTO statements. This can adversely aff
 所以更好的一种方式是，指定你想rescue的error
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BetterController</span> &lt; <span style="color: #c0c5ce;">ApplicationController</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BetterController</span> &lt; <span style="color: #7CB8BB;">ApplicationController</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>
     some_object.save!
-  <span style="color: #b48ead;">rescue</span> <span style="color: #c0c5ce;">ActiveRecord</span>::<span style="color: #c0c5ce;">RecordInvalid</span> =&gt; e
-    render <span style="color: #d08770;">json:</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">msg:</span> e.message <span style="color: #8c8c8c;">}</span>, <span style="color: #d08770;">status:</span> <span style="color: #d08770;">:unprocessable_entity</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">rescue</span> <span style="color: #7CB8BB;">ActiveRecord</span>::<span style="color: #7CB8BB;">RecordInvalid</span> =&gt; e
+    render <span style="color: #BFEBBF;">json:</span> <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">msg:</span> e.message <span style="color: #DCDCCC;">}</span>, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -439,15 +439,15 @@ Programmers read code a heck of a lot more than they write it so your code shoul
 说白了，就是这种错误是我很可能会发生的，所以是一种控制流，不要用异常处理
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BestController</span> &lt; <span style="color: #c0c5ce;">ApplicationController</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span>
-    <span style="color: #b48ead;">if</span> some_object.save
-      <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">do_something</span>
-    <span style="color: #b48ead;">else</span>
-      render <span style="color: #d08770;">json:</span> <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">msg:</span> <span style="color: #a3be8c;">'xxx'</span> <span style="color: #8c8c8c;">}</span>, <span style="color: #d08770;">status:</span> <span style="color: #d08770;">:unprocessable_entity</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BestController</span> &lt; <span style="color: #7CB8BB;">ApplicationController</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>
+    <span style="color: #F0DFAF; font-weight: bold;">if</span> some_object.save
+      <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">do_something</span>
+    <span style="color: #F0DFAF; font-weight: bold;">else</span>
+      render <span style="color: #BFEBBF;">json:</span> <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">msg:</span> <span style="color: #CC9393;">'xxx'</span> <span style="color: #DCDCCC;">}</span>, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -473,7 +473,7 @@ Programmers read code a heck of a lot more than they write it so your code shoul
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

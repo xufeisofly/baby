@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,18 +62,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgc583f33">1. 工厂</a>
+<li><a href="#orgb3b5800">1. 工厂</a>
 <ul>
-<li><a href="#orgb7cd113">1.1. 工厂类</a></li>
-<li><a href="#orgebd8182">1.2. 工厂函数</a></li>
+<li><a href="#org393cc97">1.1. 工厂类</a></li>
+<li><a href="#org1cea27c">1.2. 工厂函数</a></li>
 </ul>
 </li>
-<li><a href="#org6d76e2b">2. 使用类，而不是对象</a></li>
-<li><a href="#orga885b00">3. 使用 mapping</a></li>
-<li><a href="#org32835d0">4. 动态生成类名（不要这么做）</a></li>
-<li><a href="#org8c8c724">5. 注册子类</a></li>
-<li><a href="#orga2a9587">6. Metaclass</a></li>
-<li><a href="#orge338960">7. 初始化子类钩子</a></li>
+<li><a href="#org9a639cb">2. 使用类，而不是对象</a></li>
+<li><a href="#org179589e">3. 使用 mapping</a></li>
+<li><a href="#orgbb8e28b">4. 动态生成类名（不要这么做）</a></li>
+<li><a href="#org1fb3958">5. 注册子类</a></li>
+<li><a href="#orgb7c3776">6. Metaclass</a></li>
+<li><a href="#org2ee9516">7. 初始化子类钩子</a></li>
 </ul>
 </div>
 </div>
@@ -102,34 +102,34 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">send_message</span><span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">message</span> = <span style="color: #d08770;">None</span>
-    <span style="color: #b48ead;">if</span> message_type == <span style="color: #a3be8c;">'chat'</span>:
-        <span style="color: #bf616a;">message</span> = ChatMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'email'</span>:
-        <span style="color: #bf616a;">message</span> = EmailMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'phone'</span>:
-        <span style="color: #bf616a;">message</span> = PhoneMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">else</span>:
-        <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type_<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">send_message</span><span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">message</span> = <span style="color: #BFEBBF;">None</span>
+    <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type == <span style="color: #CC9393;">'chat'</span>:
+        <span style="color: #DFAF8F;">message</span> = ChatMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'email'</span>:
+        <span style="color: #DFAF8F;">message</span> = EmailMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'phone'</span>:
+        <span style="color: #DFAF8F;">message</span> = PhoneMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">else</span>:
+        <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type_<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-    message.send<span style="color: #8c8c8c;">()</span>
-
-
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+    message.send<span style="color: #DCDCCC;">()</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">ChatMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">EmailMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">ChatMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">PhoneMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">EmailMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+
+
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">PhoneMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
 </pre>
 </div>
 
@@ -137,68 +137,68 @@ for the JavaScript code in this tag.
 这段代码漂亮的满足了我们的要求，不过用一些手段可以让它变得更好。
 </p>
 
-<div id="outline-container-orgc583f33" class="outline-2">
-<h2 id="orgc583f33"><span class="section-number-2">1</span> 工厂</h2>
+<div id="outline-container-orgb3b5800" class="outline-2">
+<h2 id="orgb3b5800"><span class="section-number-2">1</span> 工厂</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 首先，我希望有个单独的方法来创建 message 实例，纵观程序世界我们有两种常用的方法：工厂类和工厂函数
 </p>
 </div>
 
-<div id="outline-container-orgb7cd113" class="outline-3">
-<h3 id="orgb7cd113"><span class="section-number-3">1.1</span> 工厂类</h3>
+<div id="outline-container-org393cc97" class="outline-3">
+<h3 id="org393cc97"><span class="section-number-3">1.1</span> 工厂类</h3>
 <div class="outline-text-3" id="text-1-1">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">send_message</span><span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">message</span> = MessageFactory<span style="color: #8c8c8c;">()</span>.create<span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>
-    message.send<span style="color: #8c8c8c;">()</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">send_message</span><span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">message</span> = MessageFactory<span style="color: #DCDCCC;">()</span>.create<span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>
+    message.send<span style="color: #DCDCCC;">()</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MessageFactory</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #bf616a;">message</span> = <span style="color: #d08770;">None</span>
-        <span style="color: #b48ead;">if</span> message_type == <span style="color: #a3be8c;">'chat'</span>:
-            <span style="color: #bf616a;">message</span> = ChatMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-        <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'email'</span>:
-            <span style="color: #bf616a;">message</span> = EmailMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-        <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'phone'</span>:
-            <span style="color: #bf616a;">message</span> = PhoneMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-        <span style="color: #b48ead;">else</span>:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">MessageFactory</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #DFAF8F;">message</span> = <span style="color: #BFEBBF;">None</span>
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type == <span style="color: #CC9393;">'chat'</span>:
+            <span style="color: #DFAF8F;">message</span> = ChatMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'email'</span>:
+            <span style="color: #DFAF8F;">message</span> = EmailMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'phone'</span>:
+            <span style="color: #DFAF8F;">message</span> = PhoneMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">else</span>:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> message
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> message
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgebd8182" class="outline-3">
-<h3 id="orgebd8182"><span class="section-number-3">1.2</span> 工厂函数</h3>
+<div id="outline-container-org1cea27c" class="outline-3">
+<h3 id="org1cea27c"><span class="section-number-3">1.2</span> 工厂函数</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">send_message</span><span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">message</span> = BaseMessage.create<span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>
-    message.send<span style="color: #8c8c8c;">()</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">send_message</span><span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">message</span> = BaseMessage.create<span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>
+    message.send<span style="color: #DCDCCC;">()</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #bf616a;">message</span> = <span style="color: #d08770;">None</span>
-        <span style="color: #b48ead;">if</span> message_type == <span style="color: #a3be8c;">'chat'</span>:
-            <span style="color: #bf616a;">message</span> = ChatMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-        <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'email'</span>:
-            <span style="color: #bf616a;">message</span> = EmailMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-        <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'phone'</span>:
-            <span style="color: #bf616a;">message</span> = PhoneMessage<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
-        <span style="color: #b48ead;">else</span>:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #DFAF8F;">message</span> = <span style="color: #BFEBBF;">None</span>
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type == <span style="color: #CC9393;">'chat'</span>:
+            <span style="color: #DFAF8F;">message</span> = ChatMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'email'</span>:
+            <span style="color: #DFAF8F;">message</span> = EmailMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'phone'</span>:
+            <span style="color: #DFAF8F;">message</span> = PhoneMessage<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">else</span>:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> message          
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> message          
 </pre>
 </div>
 
@@ -209,33 +209,33 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org6d76e2b" class="outline-2">
-<h2 id="org6d76e2b"><span class="section-number-2">2</span> 使用类，而不是对象</h2>
+<div id="outline-container-org9a639cb" class="outline-2">
+<h2 id="org9a639cb"><span class="section-number-2">2</span> 使用类，而不是对象</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 现在我们来优化工厂函数的代码。因为在 python 中类是一等公民，所以我们不需要实例化对象出来，用工厂制造出来一个类就好了。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">send_message</span><span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">message</span> = BaseMessage.create<span style="color: #8c8c8c;">(</span>message_type, params<span style="color: #8c8c8c;">)</span>
-    message.send<span style="color: #8c8c8c;">()</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">send_message</span><span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">message</span> = BaseMessage.create<span style="color: #DCDCCC;">(</span>message_type, params<span style="color: #DCDCCC;">)</span>
+    message.send<span style="color: #DCDCCC;">()</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #bf616a;">message_class</span> = <span style="color: #d08770;">None</span>
-        <span style="color: #b48ead;">if</span> message_type == <span style="color: #a3be8c;">'chat'</span>:
-            <span style="color: #bf616a;">message_class</span> = ChatMessage
-        <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'email'</span>:
-            <span style="color: #bf616a;">message_class</span> = EmailMessage
-        <span style="color: #b48ead;">elif</span> message_type == <span style="color: #a3be8c;">'phone'</span>:
-            <span style="color: #bf616a;">message_class</span> = PhoneMessage
-        <span style="color: #b48ead;">else</span>:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #DFAF8F;">message_class</span> = <span style="color: #BFEBBF;">None</span>
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type == <span style="color: #CC9393;">'chat'</span>:
+            <span style="color: #DFAF8F;">message_class</span> = ChatMessage
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'email'</span>:
+            <span style="color: #DFAF8F;">message_class</span> = EmailMessage
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> message_type == <span style="color: #CC9393;">'phone'</span>:
+            <span style="color: #DFAF8F;">message_class</span> = PhoneMessage
+        <span style="color: #F0DFAF; font-weight: bold;">else</span>:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> message_class<span style="color: #8c8c8c;">(</span>params<span style="color: #8c8c8c;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> message_class<span style="color: #DCDCCC;">(</span>params<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 
@@ -247,27 +247,27 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orga885b00" class="outline-2">
-<h2 id="orga885b00"><span class="section-number-2">3</span> 使用 mapping</h2>
+<div id="outline-container-org179589e" class="outline-2">
+<h2 id="org179589e"><span class="section-number-2">3</span> 使用 mapping</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 很明显，我们不得不处理一大堆无聊的条件语句，我们可以尝试把 if 换成 mapping 映射：
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #bf616a;">MESSAGE_TYPE_TO_CLASS_MAP</span> = <span style="color: #8c8c8c;">{</span>
-            <span style="color: #a3be8c;">'chat'</span>: ChatMessage,
-            <span style="color: #a3be8c;">'email'</span>: EmailMessage,
-            <span style="color: #a3be8c;">'phone'</span>: PhoneMessage,
-        <span style="color: #8c8c8c;">}</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #DFAF8F;">MESSAGE_TYPE_TO_CLASS_MAP</span> = <span style="color: #DCDCCC;">{</span>
+            <span style="color: #CC9393;">'chat'</span>: ChatMessage,
+            <span style="color: #CC9393;">'email'</span>: EmailMessage,
+            <span style="color: #CC9393;">'phone'</span>: PhoneMessage,
+        <span style="color: #DCDCCC;">}</span>
 
-        <span style="color: #b48ead;">if</span> message_type <span style="color: #b48ead;">not</span> <span style="color: #b48ead;">in</span> MESSAGE_TYPE_TO_CLASS_MAP:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">in</span> MESSAGE_TYPE_TO_CLASS_MAP:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> MESSAGE_TYPE_TO_CLASS_MAP<span style="color: #8c8c8c;">[</span>message_type<span style="color: #8c8c8c;">](</span>params<span style="color: #8c8c8c;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> MESSAGE_TYPE_TO_CLASS_MAP<span style="color: #DCDCCC;">[</span>message_type<span style="color: #DCDCCC;">](</span>params<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 
@@ -277,23 +277,23 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org32835d0" class="outline-2">
-<h2 id="org32835d0"><span class="section-number-2">4</span> 动态生成类名（不要这么做）</h2>
+<div id="outline-container-orgbb8e28b" class="outline-2">
+<h2 id="orgbb8e28b"><span class="section-number-2">4</span> 动态生成类名（不要这么做）</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 你可能已经注意到了，这些子类的名字和对应 type 的值很像，我们可以通过 type 来生成类名，而不用单独保存一个 mapping。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #bf616a;">class_name</span> = message_type<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">0</span><span style="color: #8c8c8c;">]</span>.upper<span style="color: #8c8c8c;">()</span> + message_type<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span>:<span style="color: #8c8c8c;">]</span> + <span style="color: #a3be8c;">'Message'</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #DFAF8F;">class_name</span> = message_type<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">0</span><span style="color: #DCDCCC;">]</span>.upper<span style="color: #DCDCCC;">()</span> + message_type<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>:<span style="color: #DCDCCC;">]</span> + <span style="color: #CC9393;">'Message'</span>
 
-        <span style="color: #b48ead;">if</span> class_name <span style="color: #b48ead;">not</span> <span style="color: #b48ead;">in</span> <span style="color: #d08770;">globals</span><span style="color: #8c8c8c;">()</span>:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> class_name <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">in</span> <span style="color: #DCDCCC; font-weight: bold;">globals</span><span style="color: #DCDCCC;">()</span>:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> <span style="color: #d08770;">globals</span><span style="color: #8c8c8c;">()[</span>class_name<span style="color: #8c8c8c;">](</span>params<span style="color: #8c8c8c;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #DCDCCC; font-weight: bold;">globals</span><span style="color: #DCDCCC;">()[</span>class_name<span style="color: #DCDCCC;">](</span>params<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 
@@ -303,8 +303,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org8c8c724" class="outline-2">
-<h2 id="org8c8c724"><span class="section-number-2">5</span> 注册子类</h2>
+<div id="outline-container-org1fb3958" class="outline-2">
+<h2 id="org1fb3958"><span class="section-number-2">5</span> 注册子类</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 简单的使用 mapping 并不是最好的方法，如果你增加了一个新的 message 子类，除了定义它你还要记得把它加到 mapping 里面。如果我们能用某种方法标记一下子类，然后子类就能自动加到 mapping 里面就好了。没错，这就是亮瞎人眼的 python 装饰器。
@@ -319,38 +319,38 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">()</span>:
-    <span style="color: #bf616a;">subclasses</span> = <span style="color: #8c8c8c;">{}</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">()</span>:
+    <span style="color: #DFAF8F;">subclasses</span> = <span style="color: #DCDCCC;">{}</span>
 
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">register_subclasses</span><span style="color: #8c8c8c;">(</span>cls, message_type<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">decorator</span><span style="color: #8c8c8c;">(</span>subclass<span style="color: #8c8c8c;">)</span>:
-            <span style="color: #bf616a;">cls.subclasses</span><span style="color: #8c8c8c;">[</span>message_type<span style="color: #8c8c8c;">]</span> = subclass
-            <span style="color: #b48ead;">return</span> subclass
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">register_subclasses</span><span style="color: #DCDCCC;">(</span>cls, message_type<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">decorator</span><span style="color: #DCDCCC;">(</span>subclass<span style="color: #DCDCCC;">)</span>:
+            <span style="color: #DFAF8F;">cls.subclasses</span><span style="color: #DCDCCC;">[</span>message_type<span style="color: #DCDCCC;">]</span> = subclass
+            <span style="color: #F0DFAF; font-weight: bold;">return</span> subclass
 
-        <span style="color: #b48ead;">return</span> decorator
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> decorator
 
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #b48ead;">if</span> message_type <span style="color: #b48ead;">not</span> <span style="color: #b48ead;">in</span> cls.subclasses:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">in</span> cls.subclasses:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> cls.subclasses<span style="color: #8c8c8c;">[</span>message_type<span style="color: #8c8c8c;">](</span>params<span style="color: #8c8c8c;">)</span>
-
-
- <span style="color: #c0c5ce;">@BaseMessage.register_subclass</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'chat'</span><span style="color: #8c8c8c;">)</span>
- <span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">ChatMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-     <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> cls.subclasses<span style="color: #DCDCCC;">[</span>message_type<span style="color: #DCDCCC;">](</span>params<span style="color: #DCDCCC;">)</span>
 
 
- <span style="color: #c0c5ce;">@BaseMessage.register_subclass</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'email'</span><span style="color: #8c8c8c;">)</span>
- <span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">EmailMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-     <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+ <span style="color: #7CB8BB;">@BaseMessage.register_subclass</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'chat'</span><span style="color: #DCDCCC;">)</span>
+ <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">ChatMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+     <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
 
 
- <span style="color: #c0c5ce;">@BaseMessage.register_subclass</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'phone'</span><span style="color: #8c8c8c;">)</span>
- <span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">PhoneMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-     <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">...</span>
+ <span style="color: #7CB8BB;">@BaseMessage.register_subclass</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'email'</span><span style="color: #DCDCCC;">)</span>
+ <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">EmailMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+     <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+
+
+ <span style="color: #7CB8BB;">@BaseMessage.register_subclass</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'phone'</span><span style="color: #DCDCCC;">)</span>
+ <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">PhoneMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+     <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
 </pre>
 </div>
 
@@ -360,8 +360,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orga2a9587" class="outline-2">
-<h2 id="orga2a9587"><span class="section-number-2">6</span> Metaclass</h2>
+<div id="outline-container-orgb7c3776" class="outline-2">
+<h2 id="orgb7c3776"><span class="section-number-2">6</span> Metaclass</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 一个类的 metaclass 同样会被它的子类继承，所以我们可以通过给 BaseMessage 写 metaclass 的方式来自动注册所有的子类。
@@ -376,47 +376,47 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">MessageRegistrator</span><span style="color: #8c8c8c;">(</span><span style="color: #d08770;">type</span><span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">ROOT_CLASS</span> = <span style="color: #d08770;">None</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">MessageRegistrator</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">type</span><span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">ROOT_CLASS</span> = <span style="color: #BFEBBF;">None</span>
 
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">_save_root_class</span><span style="color: #8c8c8c;">(</span>meta, cls<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #b48ead;">if</span> meta.ROOT_CLASS <span style="color: #b48ead;">is</span> <span style="color: #d08770;">None</span>:
-            <span style="color: #bf616a;">meta.ROOT_CLASS</span> = cls
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">_save_root_class</span><span style="color: #DCDCCC;">(</span>meta, cls<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> meta.ROOT_CLASS <span style="color: #F0DFAF; font-weight: bold;">is</span> <span style="color: #BFEBBF;">None</span>:
+            <span style="color: #DFAF8F;">meta.ROOT_CLASS</span> = cls
 
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span>cls, names, bases, dct<span style="color: #8c8c8c;">)</span>:
-        cls._save_root_class<span style="color: #8c8c8c;">(</span>cls<span style="color: #8c8c8c;">)</span>
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span><span style="color: #DCDCCC;">(</span>cls, names, bases, dct<span style="color: #DCDCCC;">)</span>:
+        cls._save_root_class<span style="color: #DCDCCC;">(</span>cls<span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">if</span> cls <span style="color: #b48ead;">is</span> cls.ROOT_CLASS:
-            <span style="color: #c0c5ce;">@classmethod</span>
-            <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-                <span style="color: #b48ead;">if</span> message_type <span style="color: #b48ead;">not</span> <span style="color: #b48ead;">in</span> cls.subclasses:
-                    <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
-                <span style="color: #b48ead;">return</span> cls.subclasses<span style="color: #8c8c8c;">[</span>message_type<span style="color: #8c8c8c;">][</span>params<span style="color: #8c8c8c;">]</span>
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> cls <span style="color: #F0DFAF; font-weight: bold;">is</span> cls.ROOT_CLASS:
+            <span style="color: #7CB8BB;">@classmethod</span>
+            <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+                <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">in</span> cls.subclasses:
+                    <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+                <span style="color: #F0DFAF; font-weight: bold;">return</span> cls.subclasses<span style="color: #DCDCCC;">[</span>message_type<span style="color: #DCDCCC;">][</span>params<span style="color: #DCDCCC;">]</span>
 
-            <span style="color: #bf616a;">cls.subclasses</span> = <span style="color: #8c8c8c;">{}</span>
-            <span style="color: #bf616a;">cls.create</span> = create
+            <span style="color: #DFAF8F;">cls.subclasses</span> = <span style="color: #DCDCCC;">{}</span>
+            <span style="color: #DFAF8F;">cls.create</span> = create
 
-        <span style="color: #b48ead;">elif</span> <span style="color: #d08770;">hasattr</span><span style="color: #8c8c8c;">(</span>cls, <span style="color: #a3be8c;">'_MESSAGE_TYPE'</span><span style="color: #8c8c8c;">)</span> <span style="color: #b48ead;">and</span> cls.ROOT_CLASS <span style="color: #b48ead;">is</span> <span style="color: #b48ead;">not</span> <span style="color: #d08770;">None</span>:
-            <span style="color: #bf616a;">cls.ROOT_CLASS.subclasses</span><span style="color: #8c8c8c;">[</span>cls._MESSAGE_TYPE<span style="color: #8c8c8c;">]</span> = cls
-
-
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span><span style="color: #8c8c8c;">(</span>metaclass=MessageRegistrator<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init__</span><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #b48ead;">pass</span>
+        <span style="color: #F0DFAF; font-weight: bold;">elif</span> <span style="color: #DCDCCC; font-weight: bold;">hasattr</span><span style="color: #DCDCCC;">(</span>cls, <span style="color: #CC9393;">'_MESSAGE_TYPE'</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">and</span> cls.ROOT_CLASS <span style="color: #F0DFAF; font-weight: bold;">is</span> <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #BFEBBF;">None</span>:
+            <span style="color: #DFAF8F;">cls.ROOT_CLASS.subclasses</span><span style="color: #DCDCCC;">[</span>cls._MESSAGE_TYPE<span style="color: #DCDCCC;">]</span> = cls
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">ChatMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">_MESSAGE_TYPE</span> = <span style="color: #a3be8c;">'chat'</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span><span style="color: #DCDCCC;">(</span>metaclass=MessageRegistrator<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #F0DFAF; font-weight: bold;">pass</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">EmailMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">_MESSAGE_TYPE</span> = <span style="color: #a3be8c;">'email'</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">ChatMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">_MESSAGE_TYPE</span> = <span style="color: #CC9393;">'chat'</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">PhoneMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">_MESSAGE_TYPE</span> = <span style="color: #a3be8c;">'phone'</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">EmailMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">_MESSAGE_TYPE</span> = <span style="color: #CC9393;">'email'</span>
+
+
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">PhoneMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">_MESSAGE_TYPE</span> = <span style="color: #CC9393;">'phone'</span>
 </pre>
 </div>
 
@@ -430,39 +430,39 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-orge338960" class="outline-2">
-<h2 id="orge338960"><span class="section-number-2">7</span> 初始化子类钩子</h2>
+<div id="outline-container-org2ee9516" class="outline-2">
+<h2 id="org2ee9516"><span class="section-number-2">7</span> 初始化子类钩子</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 从 Python3.6 开始我们不使用 metaclass 也可以 hook 子类的创建，方法是使用 <span class="underline"><span class="underline">init<sub>subclass</sub></span></span> 魔法方法：
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">BaseMessage</span>:
-    <span style="color: #bf616a;">subclasses</span> = <span style="color: #8c8c8c;">{}</span>
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseMessage</span>:
+    <span style="color: #DFAF8F;">subclasses</span> = <span style="color: #DCDCCC;">{}</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">__init_subclass__</span><span style="color: #8c8c8c;">(</span>cls, **kwargs<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #d08770;">super</span><span style="color: #8c8c8c;">()</span>.__init_subclass__<span style="color: #8c8c8c;">(</span>**kwargs<span style="color: #8c8c8c;">)</span>
-        <span style="color: #bf616a;">cls.subclasses</span><span style="color: #8c8c8c;">[</span>cls._MESSAGE_TYPE<span style="color: #8c8c8c;">]</span> = cls
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init_subclass__</span><span style="color: #DCDCCC;">(</span>cls, **kwargs<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #DCDCCC; font-weight: bold;">super</span><span style="color: #DCDCCC;">()</span>.__init_subclass__<span style="color: #DCDCCC;">(</span>**kwargs<span style="color: #DCDCCC;">)</span>
+        <span style="color: #DFAF8F;">cls.subclasses</span><span style="color: #DCDCCC;">[</span>cls._MESSAGE_TYPE<span style="color: #DCDCCC;">]</span> = cls
 
-    <span style="color: #c0c5ce;">@classmethod</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">create</span><span style="color: #8c8c8c;">(</span>cls, message_type, params<span style="color: #8c8c8c;">)</span>:
-        <span style="color: #b48ead;">if</span> message_type <span style="color: #b48ead;">not</span> <span style="color: #b48ead;">in</span> cls.subclasses:
-            <span style="color: #b48ead;">raise</span> <span style="color: #c0c5ce;">ValueError</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'Bad message type {}'</span>.<span style="color: #d08770;">format</span><span style="color: #93a8c6;">(</span>message_type<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+    <span style="color: #7CB8BB;">@classmethod</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>cls, message_type, params<span style="color: #DCDCCC;">)</span>:
+        <span style="color: #F0DFAF; font-weight: bold;">if</span> message_type <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">in</span> cls.subclasses:
+            <span style="color: #F0DFAF; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">ValueError</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'Bad message type {}'</span>.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #BFEBBF;">(</span>message_type<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 
-        <span style="color: #b48ead;">return</span> cls.subclasses<span style="color: #8c8c8c;">[</span>message_type<span style="color: #8c8c8c;">](</span>params<span style="color: #8c8c8c;">)</span>
-
-
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">ChatMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">_MESSAGE_TYPE</span> = <span style="color: #a3be8c;">'chat'</span>
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> cls.subclasses<span style="color: #DCDCCC;">[</span>message_type<span style="color: #DCDCCC;">](</span>params<span style="color: #DCDCCC;">)</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">EmailMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">_MESSAGE_TYPE</span> = <span style="color: #a3be8c;">'email'</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">ChatMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">_MESSAGE_TYPE</span> = <span style="color: #CC9393;">'chat'</span>
 
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">PhoneMessage</span><span style="color: #8c8c8c;">(</span>BaseMessage<span style="color: #8c8c8c;">)</span>:
-    <span style="color: #bf616a;">_MESSAGE_TYPE</span> = <span style="color: #a3be8c;">'phone'</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">EmailMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">_MESSAGE_TYPE</span> = <span style="color: #CC9393;">'email'</span>
+
+
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">PhoneMessage</span><span style="color: #DCDCCC;">(</span>BaseMessage<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #DFAF8F;">_MESSAGE_TYPE</span> = <span style="color: #CC9393;">'phone'</span>
 </pre>
 </div>
 
@@ -477,7 +477,7 @@ for the JavaScript code in this tag.
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

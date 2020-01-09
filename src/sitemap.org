@@ -1,6 +1,6 @@
 #+TITLE: Sitemap for project baby
 
-- [[file:innodb redolog.org][InnoDB log 文件]]
+- [[file:innodb redolog.org][InnoDB 笔记]]
 - [[file:todo.org][TODOs]]
 - [[file:自定义类实现序列切片.org][自定义类实现序列切片]]
 - [[file:高性能MYSQL.org][高性能 MYSQL]]

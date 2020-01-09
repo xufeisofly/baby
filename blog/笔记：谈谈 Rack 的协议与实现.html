@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,18 +62,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga308871">1. 写在前面</a></li>
-<li><a href="#org8d9dbf1">2. Rack 协议</a></li>
-<li><a href="#orgd26acc5">3. 中间件</a></li>
-<li><a href="#orgb4c117c">4. Rack的实现源码</a></li>
-<li><a href="#org675a5b7">5. 包装应用</a></li>
-<li><a href="#orgb11170f">6. 选择Webserver</a></li>
-<li><a href="#orgf726023">7. Rails和Rack</a></li>
+<li><a href="#org0dcb656">1. 写在前面</a></li>
+<li><a href="#orgb337177">2. Rack 协议</a></li>
+<li><a href="#org89634c7">3. 中间件</a></li>
+<li><a href="#orgb87d77b">4. Rack的实现源码</a></li>
+<li><a href="#orga698120">5. 包装应用</a></li>
+<li><a href="#orgf7ab69a">6. 选择Webserver</a></li>
+<li><a href="#org411f6a1">7. Rails和Rack</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orga308871" class="outline-2">
-<h2 id="orga308871"><span class="section-number-2">1</span> 写在前面</h2>
+<div id="outline-container-org0dcb656" class="outline-2">
+<h2 id="org0dcb656"><span class="section-number-2">1</span> 写在前面</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 本文大量参考了draveness的博客，是该文章的阅读笔记，推荐阅读原文，链接：<a href="https://draveness.me/rack">https://draveness.me/rack</a>
@@ -85,8 +85,8 @@ Rack是应用和Webserver之前的桥梁。Rails就是通过Rack实现webserver�
 </div>
 </div>
 
-<div id="outline-container-org8d9dbf1" class="outline-2">
-<h2 id="org8d9dbf1"><span class="section-number-2">2</span> Rack 协议</h2>
+<div id="outline-container-orgb337177" class="outline-2">
+<h2 id="orgb337177"><span class="section-number-2">2</span> Rack 协议</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Rack应用就是一个能够响应call方法的ruby对象，它接受一个参数env，返回包含http三个基本值的数组，即[status, headers, body]。
@@ -104,25 +104,25 @@ A Rack application is a Ruby object (not a class) that responds to call. It take
 </div>
 </div>
 
-<div id="outline-container-orgd26acc5" class="outline-2">
-<h2 id="orgd26acc5"><span class="section-number-2">3</span> 中间件</h2>
+<div id="outline-container-org89634c7" class="outline-2">
+<h2 id="org89634c7"><span class="section-number-2">3</span> 中间件</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Rack协议规定了webserver和Rack应用之间的通信方式，中间件使之能够在上层改变http响应和请求，而不会影响Rack底层的实现。文中定义了一个中间件StatusLogger
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">StatusLogger</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>app, options=<span style="color: #93a8c6;">{}</span><span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@app</span> = app
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">StatusLogger</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>app, options=<span style="color: #BFEBBF;">{}</span><span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@app</span> = app
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">call</span><span style="color: #8c8c8c;">(</span>env<span style="color: #8c8c8c;">)</span>
-    status, headers, body = <span style="color: #bf616a;">@app</span>.call<span style="color: #8c8c8c;">(</span>env<span style="color: #8c8c8c;">)</span>
-    <span style="color: #d08770;">puts</span> status
-    <span style="color: #8c8c8c;">[</span>status, headers, body<span style="color: #8c8c8c;">]</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">call</span><span style="color: #DCDCCC;">(</span>env<span style="color: #DCDCCC;">)</span>
+    status, headers, body = <span style="color: #DFAF8F;">@app</span>.call<span style="color: #DCDCCC;">(</span>env<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DCDCCC; font-weight: bold;">puts</span> status
+    <span style="color: #DCDCCC;">[</span>status, headers, body<span style="color: #DCDCCC;">]</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -131,8 +131,8 @@ Rack协议规定了webserver和Rack应用之间的通信方式，中间件使之
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">use <span style="color: #c0c5ce;">StatusLogger</span>
-run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #8c8c8c;">{</span> |env| <span style="color: #93a8c6;">[</span><span style="color: #a3be8c;">'200'</span>, <span style="color: #b0b1a3;">{</span> <span style="color: #a3be8c;">'Content-Type'</span> =&gt; <span style="color: #a3be8c;">'text/html'</span> <span style="color: #b0b1a3;">}</span>, <span style="color: #b0b1a3;">[</span><span style="color: #a3be8c;">'get rack\'d'</span><span style="color: #b0b1a3;">]</span><span style="color: #93a8c6;">]</span> <span style="color: #8c8c8c;">}</span>
+<pre class="src src-ruby">use <span style="color: #7CB8BB;">StatusLogger</span>
+run <span style="color: #7CB8BB;">Proc</span>.new <span style="color: #DCDCCC;">{</span> |env| <span style="color: #BFEBBF;">[</span><span style="color: #CC9393;">'200'</span>, <span style="color: #D0BF8F;">{</span> <span style="color: #CC9393;">'Content-Type'</span> =&gt; <span style="color: #CC9393;">'text/html'</span> <span style="color: #D0BF8F;">}</span>, <span style="color: #D0BF8F;">[</span><span style="color: #CC9393;">'get rack\'d'</span><span style="color: #D0BF8F;">]</span><span style="color: #BFEBBF;">]</span> <span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 
@@ -142,16 +142,16 @@ run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #8c8c8c;">
 </div>
 </div>
 
-<div id="outline-container-orgb4c117c" class="outline-2">
-<h2 id="orgb4c117c"><span class="section-number-2">4</span> Rack的实现源码</h2>
+<div id="outline-container-orgb87d77b" class="outline-2">
+<h2 id="orgb87d77b"><span class="section-number-2">4</span> Rack的实现源码</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 当执行rackup config.ru时，实际上是在执行
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">require</span> <span style="color: #a3be8c;">'rack'</span>
-<span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Server</span>.start
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">require</span> <span style="color: #CC9393;">'rack'</span>
+<span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Server</span>.start
 </pre>
 </div>
 
@@ -160,18 +160,18 @@ run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #8c8c8c;">
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">default_options</span>
-  environment  = <span style="color: #c0c5ce;">ENV</span><span style="color: #8c8c8c;">[</span><span style="color: #a3be8c;">'RACK_ENV'</span><span style="color: #8c8c8c;">]</span> || <span style="color: #a3be8c;">'development'</span>
-  default_host = environment == <span style="color: #a3be8c;">'development'</span> ? <span style="color: #a3be8c;">'localhost'</span> : <span style="color: #a3be8c;">'0.0.0.0'</span>
-  <span style="color: #8c8c8c;">{</span>
-    <span style="color: #d08770;">:environment</span> =&gt; environment,
-    <span style="color: #d08770;">:pid</span>         =&gt; <span style="color: #d08770;">nil</span>,
-    <span style="color: #d08770;">:Port</span>        =&gt; <span style="color: #d08770;">9292</span>,
-    <span style="color: #d08770;">:Host</span>        =&gt; default_host,
-    <span style="color: #d08770;">:AccessLog</span>   =&gt; <span style="color: #93a8c6;">[]</span>,
-    <span style="color: #d08770;">:config</span>      =&gt; <span style="color: #a3be8c;">"config.ru"</span>
-  <span style="color: #8c8c8c;">}</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">default_options</span>
+  environment  = <span style="color: #7CB8BB;">ENV</span><span style="color: #DCDCCC;">[</span><span style="color: #CC9393;">'RACK_ENV'</span><span style="color: #DCDCCC;">]</span> || <span style="color: #CC9393;">'development'</span>
+  default_host = environment == <span style="color: #CC9393;">'development'</span> ? <span style="color: #CC9393;">'localhost'</span> : <span style="color: #CC9393;">'0.0.0.0'</span>
+  <span style="color: #DCDCCC;">{</span>
+    <span style="color: #BFEBBF;">:environment</span> =&gt; environment,
+    <span style="color: #BFEBBF;">:pid</span>         =&gt; <span style="color: #BFEBBF;">nil</span>,
+    <span style="color: #BFEBBF;">:Port</span>        =&gt; <span style="color: #BFEBBF;">9292</span>,
+    <span style="color: #BFEBBF;">:Host</span>        =&gt; default_host,
+    <span style="color: #BFEBBF;">:AccessLog</span>   =&gt; <span style="color: #BFEBBF;">[]</span>,
+    <span style="color: #BFEBBF;">:config</span>      =&gt; <span style="color: #CC9393;">"config.ru"</span>
+  <span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -181,16 +181,16 @@ run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #8c8c8c;">
 </div>
 </div>
 
-<div id="outline-container-org675a5b7" class="outline-2">
-<h2 id="org675a5b7"><span class="section-number-2">5</span> 包装应用</h2>
+<div id="outline-container-orga698120" class="outline-2">
+<h2 id="orga698120"><span class="section-number-2">5</span> 包装应用</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 在run应用前，需要先将应用“包装”好，所谓的包装，就是将中间件和rack层按照一定的顺序打包，在Rack::Server中对应的方法是
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">wrapped_app</span>
-  <span style="color: #bf616a;">@wrapped_app</span> ||= build_app app
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">wrapped_app</span>
+  <span style="color: #DFAF8F;">@wrapped_app</span> ||= build_app app
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -199,11 +199,11 @@ run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #8c8c8c;">
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Builder</span>.new <span style="color: #8c8c8c;">{</span>
-  use <span style="color: #c0c5ce;">MiddleWare1</span>
-  use <span style="color: #c0c5ce;">MiddleWare2</span>
-  run <span style="color: #c0c5ce;">Proc</span>.new <span style="color: #93a8c6;">{</span> |env| <span style="color: #b0b1a3;">[</span><span style="color: #a3be8c;">'200'</span>, <span style="color: #97b098;">{</span> <span style="color: #a3be8c;">'Content-Type'</span> =&gt; <span style="color: #a3be8c;">'text/html'</span> <span style="color: #97b098;">}</span>, <span style="color: #97b098;">[</span><span style="color: #a3be8c;">'get rack\'d'</span><span style="color: #97b098;">]</span><span style="color: #b0b1a3;">]</span> <span style="color: #93a8c6;">}</span>
-<span style="color: #8c8c8c;">}</span>.to_app
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Builder</span>.new <span style="color: #DCDCCC;">{</span>
+  use <span style="color: #7CB8BB;">MiddleWare1</span>
+  use <span style="color: #7CB8BB;">MiddleWare2</span>
+  run <span style="color: #7CB8BB;">Proc</span>.new <span style="color: #BFEBBF;">{</span> |env| <span style="color: #D0BF8F;">[</span><span style="color: #CC9393;">'200'</span>, <span style="color: #93E0E3;">{</span> <span style="color: #CC9393;">'Content-Type'</span> =&gt; <span style="color: #CC9393;">'text/html'</span> <span style="color: #93E0E3;">}</span>, <span style="color: #93E0E3;">[</span><span style="color: #CC9393;">'get rack\'d'</span><span style="color: #93E0E3;">]</span><span style="color: #D0BF8F;">]</span> <span style="color: #BFEBBF;">}</span>
+<span style="color: #DCDCCC;">}</span>.to_app
 </pre>
 </div>
 
@@ -212,14 +212,14 @@ build<sub>app的作用是将所有的中间件包裹在Rack的周围</sub>，因
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">build_app</span><span style="color: #8c8c8c;">(</span>app<span style="color: #8c8c8c;">)</span>
-  middleware<span style="color: #8c8c8c;">[</span>options<span style="color: #93a8c6;">[</span><span style="color: #d08770;">:environment</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">]</span>.reverse_each <span style="color: #b48ead;">do</span> |middleware|
-    middleware = middleware.call<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span> <span style="color: #b48ead;">if</span> middleware.respond_to?<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:call</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">build_app</span><span style="color: #DCDCCC;">(</span>app<span style="color: #DCDCCC;">)</span>
+  middleware<span style="color: #DCDCCC;">[</span>options<span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:environment</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">]</span>.reverse_each <span style="color: #F0DFAF; font-weight: bold;">do</span> |middleware|
+    middleware = middleware.call<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">if</span> middleware.respond_to?<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:call</span><span style="color: #DCDCCC;">)</span>
     klass, *args = middleware
-    app = klass.new<span style="color: #8c8c8c;">(</span>app, *args<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
+    app = klass.new<span style="color: #DCDCCC;">(</span>app, *args<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
   app
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -242,33 +242,33 @@ build<sub>app的作用是将所有的中间件包裹在Rack的周围</sub>，因
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;"># </span><span style="color: #65737e;">config.ru</span>
-use <span style="color: #c0c5ce;">MiddleWare1</span>
-use <span style="color: #c0c5ce;">MiddleWare2</span>
-run <span style="color: #c0c5ce;">RackApp</span>
+<pre class="src src-ruby"><span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">config.ru</span>
+use <span style="color: #7CB8BB;">MiddleWare1</span>
+use <span style="color: #7CB8BB;">MiddleWare2</span>
+run <span style="color: #7CB8BB;">RackApp</span>
 
-<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">equals to</span>
-<span style="color: #c0c5ce;">MiddleWare1</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">MiddleWare2</span>.new<span style="color: #93a8c6;">(</span><span style="color: #c0c5ce;">RackApp</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">equals to</span>
+<span style="color: #7CB8BB;">MiddleWare1</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">MiddleWare2</span>.new<span style="color: #BFEBBF;">(</span><span style="color: #7CB8BB;">RackApp</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgb11170f" class="outline-2">
-<h2 id="orgb11170f"><span class="section-number-2">6</span> 选择Webserver</h2>
+<div id="outline-container-orgf7ab69a" class="outline-2">
+<h2 id="orgf7ab69a"><span class="section-number-2">6</span> 选择Webserver</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 webserver选择方法
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">server</span>
-  <span style="color: #bf616a;">@_server</span> ||= <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Handler</span>.get<span style="color: #8c8c8c;">(</span>options<span style="color: #93a8c6;">[</span><span style="color: #d08770;">:server</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">unless</span> <span style="color: #bf616a;">@_server</span>
-    <span style="color: #bf616a;">@_server</span> = <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Handler</span>.default
-  <span style="color: #b48ead;">end</span>
-  <span style="color: #bf616a;">@_server</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">server</span>
+  <span style="color: #DFAF8F;">@_server</span> ||= <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Handler</span>.get<span style="color: #DCDCCC;">(</span>options<span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:server</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">unless</span> <span style="color: #DFAF8F;">@_server</span>
+    <span style="color: #DFAF8F;">@_server</span> = <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Handler</span>.default
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #DFAF8F;">@_server</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -285,8 +285,8 @@ webserver选择方法
 </div>
 </div>
 
-<div id="outline-container-orgf726023" class="outline-2">
-<h2 id="orgf726023"><span class="section-number-2">7</span> Rails和Rack</h2>
+<div id="outline-container-org411f6a1" class="outline-2">
+<h2 id="org411f6a1"><span class="section-number-2">7</span> Rails和Rack</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 执行rake middleware
@@ -295,28 +295,28 @@ webserver选择方法
 <div class="org-src-container">
 <pre class="src src-ruby">$ rake middleware
 
-use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Cors</span>
-use <span style="color: #c0c5ce;">Raven</span>::<span style="color: #c0c5ce;">Rack</span>
-use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Sendfile</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Static</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Executor</span>
-use <span style="color: #c0c5ce;">ActiveSupport</span>::<span style="color: #c0c5ce;">Cache</span>::<span style="color: #c0c5ce;">Strategy</span>::<span style="color: #c0c5ce;">LocalCache</span>::<span style="color: #c0c5ce;">Middleware</span>
-use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Runtime</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">RequestId</span>
-use <span style="color: #c0c5ce;">RequestStore</span>::<span style="color: #c0c5ce;">Middleware</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">RemoteIp</span>
-use <span style="color: #c0c5ce;">Rails</span>::<span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Logger</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">ShowExceptions</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">DebugExceptions</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Reloader</span>
-use <span style="color: #c0c5ce;">ActionDispatch</span>::<span style="color: #c0c5ce;">Callbacks</span>
-use <span style="color: #c0c5ce;">ActiveRecord</span>::<span style="color: #c0c5ce;">Migration</span>::<span style="color: #c0c5ce;">CheckPending</span>
-use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">Head</span>
-use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">ConditionalGet</span>
-use <span style="color: #c0c5ce;">Rack</span>::<span style="color: #c0c5ce;">ETag</span>
-use <span style="color: #c0c5ce;">Warden</span>::<span style="color: #c0c5ce;">Manager</span>
-use <span style="color: #c0c5ce;">RailsEventStore</span>::<span style="color: #c0c5ce;">Middleware</span>
-run <span style="color: #c0c5ce;">Unicrm</span>::<span style="color: #c0c5ce;">Application</span>.routes
+use <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Cors</span>
+use <span style="color: #7CB8BB;">Raven</span>::<span style="color: #7CB8BB;">Rack</span>
+use <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Sendfile</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">Static</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">Executor</span>
+use <span style="color: #7CB8BB;">ActiveSupport</span>::<span style="color: #7CB8BB;">Cache</span>::<span style="color: #7CB8BB;">Strategy</span>::<span style="color: #7CB8BB;">LocalCache</span>::<span style="color: #7CB8BB;">Middleware</span>
+use <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Runtime</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">RequestId</span>
+use <span style="color: #7CB8BB;">RequestStore</span>::<span style="color: #7CB8BB;">Middleware</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">RemoteIp</span>
+use <span style="color: #7CB8BB;">Rails</span>::<span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Logger</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">ShowExceptions</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">DebugExceptions</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">Reloader</span>
+use <span style="color: #7CB8BB;">ActionDispatch</span>::<span style="color: #7CB8BB;">Callbacks</span>
+use <span style="color: #7CB8BB;">ActiveRecord</span>::<span style="color: #7CB8BB;">Migration</span>::<span style="color: #7CB8BB;">CheckPending</span>
+use <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Head</span>
+use <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">ConditionalGet</span>
+use <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">ETag</span>
+use <span style="color: #7CB8BB;">Warden</span>::<span style="color: #7CB8BB;">Manager</span>
+use <span style="color: #7CB8BB;">RailsEventStore</span>::<span style="color: #7CB8BB;">Middleware</span>
+run <span style="color: #7CB8BB;">Unicrm</span>::<span style="color: #7CB8BB;">Application</span>.routes
 </pre>
 </div>
 
@@ -331,7 +331,7 @@ run <span style="color: #c0c5ce;">Unicrm</span>::<span style="color: #c0c5ce;">A
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

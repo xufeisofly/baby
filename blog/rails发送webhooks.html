@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,11 +62,11 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgf102a29">1. 注册webhook endpoints</a></li>
-<li><a href="#org7c48178">2. 构建events</a></li>
-<li><a href="#org4919df9">3. 触发事件</a></li>
-<li><a href="#orgbb64d3f">4. 发送webhooks</a></li>
-<li><a href="#org994c9bd">5. 总结</a></li>
+<li><a href="#orgb1053a6">1. 注册webhook endpoints</a></li>
+<li><a href="#orgc67e89a">2. 构建events</a></li>
+<li><a href="#org5d832f5">3. 触发事件</a></li>
+<li><a href="#org348f898">4. 发送webhooks</a></li>
+<li><a href="#org342327d">5. 总结</a></li>
 </ul>
 </div>
 </div>
@@ -84,8 +84,8 @@ for the JavaScript code in this tag.
 webhook其实就是：让别人在你这里注册一个终端地址，并在发生事件的时候给他们发送消息。通过这种方式把别人的服务集成到你的应用中。
 </pre>
 
-<div id="outline-container-orgf102a29" class="outline-2">
-<h2 id="orgf102a29"><span class="section-number-2">1</span> 注册webhook endpoints</h2>
+<div id="outline-container-orgb1053a6" class="outline-2">
+<h2 id="orgb1053a6"><span class="section-number-2">1</span> 注册webhook endpoints</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 首先应当有个model，允许通过页面让别人输入他们需要收到通知的url，表单很简单就不写了。我们定义一个Webhook::Endpointmodel。
@@ -93,17 +93,17 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">CreateWebhookEndpoints</span> &lt; <span style="color: #c0c5ce;">ActiveRecord</span>::<span style="color: #c0c5ce;">Migration</span><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">5</span>.<span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">change</span>
-    create_table <span style="color: #d08770;">:webhook_endpoints</span> <span style="color: #b48ead;">do</span> |t|
-      t.string <span style="color: #d08770;">:target_url</span>, <span style="color: #d08770;">null:</span> <span style="color: #d08770;">false</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">null: false&#19981;&#20801;&#35768;&#26159;null</span>
-      t.string <span style="color: #d08770;">:events</span>, <span style="color: #d08770;">null:</span> <span style="color: #d08770;">false</span>, <span style="color: #d08770;">array:</span> <span style="color: #d08770;">true</span>
-      t.references <span style="color: #d08770;">:acount</span>, <span style="color: #d08770;">foreign_key:</span> <span style="color: #d08770;">true</span>, <span style="color: #d08770;">null:</span> <span style="color: #d08770;">false</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#20648;&#23384;account_id</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">CreateWebhookEndpoints</span> &lt; <span style="color: #7CB8BB;">ActiveRecord</span>::<span style="color: #7CB8BB;">Migration</span><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">5</span>.<span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">change</span>
+    create_table <span style="color: #BFEBBF;">:webhook_endpoints</span> <span style="color: #F0DFAF; font-weight: bold;">do</span> |t|
+      t.string <span style="color: #BFEBBF;">:target_url</span>, <span style="color: #BFEBBF;">null:</span> <span style="color: #BFEBBF;">false</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">null: false&#19981;&#20801;&#35768;&#26159;null</span>
+      t.string <span style="color: #BFEBBF;">:events</span>, <span style="color: #BFEBBF;">null:</span> <span style="color: #BFEBBF;">false</span>, <span style="color: #BFEBBF;">array:</span> <span style="color: #BFEBBF;">true</span>
+      t.references <span style="color: #BFEBBF;">:acount</span>, <span style="color: #BFEBBF;">foreign_key:</span> <span style="color: #BFEBBF;">true</span>, <span style="color: #BFEBBF;">null:</span> <span style="color: #BFEBBF;">false</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#20648;&#23384;account_id</span>
       t.timestamps
-      t.index <span style="color: #d08770;">:events</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#35774;&#32622;events&#20026;&#32034;&#24341;</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+      t.index <span style="color: #BFEBBF;">:events</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#35774;&#32622;events&#20026;&#32034;&#24341;</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -112,18 +112,18 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Webhook</span>
-  <span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Endpoint</span> &lt; <span style="color: #c0c5ce;">ApplicationRecord</span>
-    attribute <span style="color: #d08770;">:events</span>, <span style="color: #d08770;">:string</span>, <span style="color: #d08770;">array:</span> <span style="color: #d08770;">true</span>, <span style="color: #d08770;">default:</span> <span style="color: #8c8c8c;">[]</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#23450;&#20041;events&#20026;array</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Webhook</span>
+  <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Endpoint</span> &lt; <span style="color: #7CB8BB;">ApplicationRecord</span>
+    attribute <span style="color: #BFEBBF;">:events</span>, <span style="color: #BFEBBF;">:string</span>, <span style="color: #BFEBBF;">array:</span> <span style="color: #BFEBBF;">true</span>, <span style="color: #BFEBBF;">default:</span> <span style="color: #DCDCCC;">[]</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#23450;&#20041;events&#20026;array</span>
 
-    validates <span style="color: #d08770;">:target_url</span>, <span style="color: #d08770;">presence:</span> <span style="color: #d08770;">true</span>, <span style="color: #d08770;">format</span>: <span style="color: #c0c5ce;">URI</span>.regexp<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">%w(http https)</span><span style="color: #8c8c8c;">)</span>
-    validates <span style="color: #d08770;">:events</span>, <span style="color: #d08770;">presence:</span> <span style="color: #d08770;">true</span>
+    validates <span style="color: #BFEBBF;">:target_url</span>, <span style="color: #BFEBBF;">presence:</span> <span style="color: #BFEBBF;">true</span>, <span style="color: #DCDCCC; font-weight: bold;">format</span>: <span style="color: #7CB8BB;">URI</span>.regexp<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">%w(http https)</span><span style="color: #DCDCCC;">)</span>
+    validates <span style="color: #BFEBBF;">:events</span>, <span style="color: #BFEBBF;">presence:</span> <span style="color: #BFEBBF;">true</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #b48ead;">self</span>.<span style="color: #8fa1b3;">table_name_prefix</span>
-      <span style="color: #a3be8c;">'webhook_'</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #93E0E3;">table_name_prefix</span>
+      <span style="color: #CC9393;">'webhook_'</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -132,7 +132,7 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">scope <span style="color: #d08770;">:for_event</span>, -&gt; <span style="color: #8c8c8c;">(</span>events<span style="color: #8c8c8c;">){</span> where<span style="color: #93a8c6;">(</span><span style="color: #a3be8c;">'events @&gt; ARRAY[?]::varchar[]'</span>, <span style="color: #d08770;">Array</span><span style="color: #b0b1a3;">(</span>events<span style="color: #b0b1a3;">)</span><span style="color: #93a8c6;">)</span> <span style="color: #8c8c8c;">}</span>
+<pre class="src src-ruby">scope <span style="color: #BFEBBF;">:for_event</span>, -&gt; <span style="color: #DCDCCC;">(</span>events<span style="color: #DCDCCC;">){</span> where<span style="color: #BFEBBF;">(</span><span style="color: #CC9393;">'events @&gt; ARRAY[?]::varchar[]'</span>, <span style="color: #DCDCCC; font-weight: bold;">Array</span><span style="color: #D0BF8F;">(</span>events<span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 
@@ -141,10 +141,10 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">events=</span><span style="color: #8c8c8c;">(</span>events<span style="color: #8c8c8c;">)</span>
-  events = <span style="color: #d08770;">Array</span><span style="color: #8c8c8c;">(</span>events<span style="color: #8c8c8c;">)</span>.map <span style="color: #8c8c8c;">{</span> |event|.to_s.underscore <span style="color: #8c8c8c;">}</span>
-  <span style="color: #b48ead;">super</span><span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">WebhookL</span>::<span style="color: #c0c5ce;">Event</span>::<span style="color: #c0c5ce;">EVENT_TYPES</span> &amp; events<span style="color: #8c8c8c;">)</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">events=</span><span style="color: #DCDCCC;">(</span>events<span style="color: #DCDCCC;">)</span>
+  events = <span style="color: #DCDCCC; font-weight: bold;">Array</span><span style="color: #DCDCCC;">(</span>events<span style="color: #DCDCCC;">)</span>.map <span style="color: #DCDCCC;">{</span> |event|.to_s.underscore <span style="color: #DCDCCC;">}</span>
+  <span style="color: #F0DFAF; font-weight: bold;">super</span><span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">WebhookL</span>::<span style="color: #7CB8BB;">Event</span>::<span style="color: #7CB8BB;">EVENT_TYPES</span> &amp; events<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -153,8 +153,8 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">deliver</span><span style="color: #8c8c8c;">(</span>event<span style="color: #8c8c8c;">)</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">deliver</span><span style="color: #DCDCCC;">(</span>event<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -166,19 +166,19 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </div>
 </div>
 
-<div id="outline-container-org7c48178" class="outline-2">
-<h2 id="org7c48178"><span class="section-number-2">2</span> 构建events</h2>
+<div id="outline-container-orgc67e89a" class="outline-2">
+<h2 id="orgc67e89a"><span class="section-number-2">2</span> 构建events</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 设想一下event的对象应该是个什么样，大概这样
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">{</span>
-  <span style="color: #a3be8c;">"event_name"</span>: <span style="color: #a3be8c;">"project_created"</span>,
-  <span style="color: #a3be8c;">"project"</span>: <span style="color: #93a8c6;">{</span>
-    <span style="color: #a3be8c;">"name"</span>: <span style="color: #a3be8c;">"Example Project"</span>
-  <span style="color: #93a8c6;">}</span>
-<span style="color: #8c8c8c;">}</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">{</span>
+  <span style="color: #CC9393;">"event_name"</span>: <span style="color: #CC9393;">"project_created"</span>,
+  <span style="color: #CC9393;">"project"</span>: <span style="color: #BFEBBF;">{</span>
+    <span style="color: #CC9393;">"name"</span>: <span style="color: #CC9393;">"Example Project"</span>
+  <span style="color: #BFEBBF;">}</span>
+<span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 
@@ -187,38 +187,38 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Webhook</span>
-  <span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Event</span>
-    <span style="color: #c0c5ce;">EVENT_TYPS</span> = <span style="color: #a3be8c;">%w(</span>
-<span style="color: #a3be8c;">      project_created</span>
-<span style="color: #a3be8c;">      project_updated</span>
-<span style="color: #a3be8c;">      project_destroyed</span>
-<span style="color: #a3be8c;">    )</span>.freeze
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Webhook</span>
+  <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Event</span>
+    <span style="color: #7CB8BB;">EVENT_TYPS</span> = <span style="color: #CC9393;">%w(</span>
+<span style="color: #CC9393;">      project_created</span>
+<span style="color: #CC9393;">      project_updated</span>
+<span style="color: #CC9393;">      project_destroyed</span>
+<span style="color: #CC9393;">    )</span>.freeze
 
-    <span style="color: #d08770;">attr_reader</span> <span style="color: #d08770;">:event_name</span>, <span style="color: #d08770;">:payload</span>
+    <span style="color: #DCDCCC; font-weight: bold;">attr_reader</span> <span style="color: #BFEBBF;">:event_name</span>, <span style="color: #BFEBBF;">:payload</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>event_name, payload = <span style="color: #93a8c6;">{}</span><span style="color: #8c8c8c;">)</span>
-      <span style="color: #bf616a;">@event_name</span> = event_name <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">event&#21517;&#23383;</span>
-      <span style="color: #bf616a;">@payload</span> = payload <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">hash project </span>
-    <span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>event_name, payload = <span style="color: #BFEBBF;">{}</span><span style="color: #DCDCCC;">)</span>
+      <span style="color: #DFAF8F;">@event_name</span> = event_name <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">event&#21517;&#23383;</span>
+      <span style="color: #DFAF8F;">@payload</span> = payload <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">hash project </span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-    <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#25105;&#20204;&#24819;&#25226;events&#36716;&#25104;&#19978;&#38754;&#25105;&#20204;&#24819;&#35201;&#30340;json&#26684;&#24335;&#65292;&#21487;&#20197;&#23450;&#20041;&#19968;&#20010;as_json</span>
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">as_json</span><span style="color: #8c8c8c;">(</span>*args<span style="color: #8c8c8c;">)</span>
-      hash = payload.transform_values <span style="color: #b48ead;">do</span> |value|
-        serialize_resource<span style="color: #8c8c8c;">(</span>value<span style="color: #8c8c8c;">)</span>.as_json<span style="color: #8c8c8c;">(</span>*args<span style="color: #8c8c8c;">)</span>
-      <span style="color: #b48ead;">end</span>
+    <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#25105;&#20204;&#24819;&#25226;events&#36716;&#25104;&#19978;&#38754;&#25105;&#20204;&#24819;&#35201;&#30340;json&#26684;&#24335;&#65292;&#21487;&#20197;&#23450;&#20041;&#19968;&#20010;as_json</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">as_json</span><span style="color: #DCDCCC;">(</span>*args<span style="color: #DCDCCC;">)</span>
+      hash = payload.transform_values <span style="color: #F0DFAF; font-weight: bold;">do</span> |value|
+        serialize_resource<span style="color: #DCDCCC;">(</span>value<span style="color: #DCDCCC;">)</span>.as_json<span style="color: #DCDCCC;">(</span>*args<span style="color: #DCDCCC;">)</span>
+      <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-      hash<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:event_name</span><span style="color: #8c8c8c;">]</span> = event_name
+      hash<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:event_name</span><span style="color: #DCDCCC;">]</span> = event_name
       hash
-    <span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-    <span style="color: #d08770;">private</span>
+    <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">serialize_resource</span><span style="color: #8c8c8c;">(</span>resource<span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#21487;&#20197;&#22312;serializer&#30340;class&#20013;&#23450;&#20041;&#21253;&#21547;&#30340;&#23383;&#27573;&#65292;&#36825;&#26679;&#23601;&#19981;&#26159;&#25152;&#26377;&#23383;&#27573;&#37117;&#20250;&#26377;&#20102;</span>
-      <span style="color: #c0c5ce;">ActiveModelSerializers</span>::<span style="color: #c0c5ce;">SerializableResource</span>.new<span style="color: #8c8c8c;">(</span>resource, <span style="color: #93a8c6;">{}</span><span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">serialize_resource</span><span style="color: #DCDCCC;">(</span>resource<span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#21487;&#20197;&#22312;serializer&#30340;class&#20013;&#23450;&#20041;&#21253;&#21547;&#30340;&#23383;&#27573;&#65292;&#36825;&#26679;&#23601;&#19981;&#26159;&#25152;&#26377;&#23383;&#27573;&#37117;&#20250;&#26377;&#20102;</span>
+      <span style="color: #7CB8BB;">ActiveModelSerializers</span>::<span style="color: #7CB8BB;">SerializableResource</span>.new<span style="color: #DCDCCC;">(</span>resource, <span style="color: #BFEBBF;">{}</span><span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -227,14 +227,14 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">Event</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:project_created</span>, <span style="color: #93a8c6;">{</span> <span style="color: #d08770;">project:</span> project <span style="color: #93a8c6;">}</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">Event</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:project_created</span>, <span style="color: #BFEBBF;">{</span> <span style="color: #BFEBBF;">project:</span> project <span style="color: #BFEBBF;">}</span><span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org4919df9" class="outline-2">
-<h2 id="org4919df9"><span class="section-number-2">3</span> 触发事件</h2>
+<div id="outline-container-org5d832f5" class="outline-2">
+<h2 id="org5d832f5"><span class="section-number-2">3</span> 触发事件</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 我们把触发事件的方法放入一个module中，这样想触发事件的model只需要include这个module就好了。
@@ -242,15 +242,15 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Webhook</span>
-  <span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Delivery</span>
-    <span style="color: #d08770;">extend</span> <span style="color: #c0c5ce;">ActiveSupport</span>::<span style="color: #c0c5ce;">Concern</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Webhook</span>
+  <span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Delivery</span>
+    <span style="color: #DCDCCC; font-weight: bold;">extend</span> <span style="color: #7CB8BB;">ActiveSupport</span>::<span style="color: #7CB8BB;">Concern</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">webhook_scope</span>
-      <span style="color: #d08770;">raise</span> <span style="color: #c0c5ce;">NotImplementedError</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">webhook_scope</span>
+      <span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">NotImplementedError</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -259,12 +259,12 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">deliver_webhook_event</span><span style="color: #8c8c8c;">(</span>event_name, payload<span style="color: #8c8c8c;">)</span>
-  event = <span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">Event</span>.new<span style="color: #8c8c8c;">(</span>event_name, payload || <span style="color: #93a8c6;">{}</span><span style="color: #8c8c8c;">)</span>
-  webhook_scope.webhook_endpoints.for_event<span style="color: #8c8c8c;">(</span>event_name<span style="color: #8c8c8c;">)</span>.each <span style="color: #b48ead;">do</span> |endpoint|
-    endpoint.deliver<span style="color: #8c8c8c;">(</span>event<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">deliver_webhook_event</span><span style="color: #DCDCCC;">(</span>event_name, payload<span style="color: #DCDCCC;">)</span>
+  event = <span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">Event</span>.new<span style="color: #DCDCCC;">(</span>event_name, payload || <span style="color: #BFEBBF;">{}</span><span style="color: #DCDCCC;">)</span>
+  webhook_scope.webhook_endpoints.for_event<span style="color: #DCDCCC;">(</span>event_name<span style="color: #DCDCCC;">)</span>.each <span style="color: #F0DFAF; font-weight: bold;">do</span> |endpoint|
+    endpoint.deliver<span style="color: #DCDCCC;">(</span>event<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -273,14 +273,14 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">webhook_payload</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">&#36825;&#20010;&#26041;&#27861;&#26126;&#26174;&#38656;&#35201;&#22312;model&#24403;&#20013;&#37325;&#26032;&#23450;&#20041;</span>
-  <span style="color: #8c8c8c;">{}</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">webhook_payload</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#36825;&#20010;&#26041;&#27861;&#26126;&#26174;&#38656;&#35201;&#22312;model&#24403;&#20013;&#37325;&#26032;&#23450;&#20041;</span>
+  <span style="color: #DCDCCC;">{}</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">deliver_webhook</span><span style="color: #8c8c8c;">(</span>action<span style="color: #8c8c8c;">)</span>
-  event_name = <span style="color: #a3be8c;">"</span><span style="color: #bf616a;">#{self.class.name.underscore}</span><span style="color: #a3be8c;">_</span><span style="color: #bf616a;">#{action}</span><span style="color: #a3be8c;">"</span>
-  deliver_webhook_event<span style="color: #8c8c8c;">(</span>event_name, webhook_payload<span style="color: #8c8c8c;">)</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">deliver_webhook</span><span style="color: #DCDCCC;">(</span>action<span style="color: #DCDCCC;">)</span>
+  event_name = <span style="color: #CC9393;">"</span><span style="color: #DFAF8F;">#{self.class.name.underscore}</span><span style="color: #CC9393;">_</span><span style="color: #DFAF8F;">#{action}</span><span style="color: #CC9393;">"</span>
+  deliver_webhook_event<span style="color: #DCDCCC;">(</span>event_name, webhook_payload<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -289,25 +289,25 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Project</span> &lt; <span style="color: #c0c5ce;">ApplicationRecord</span>
-  <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">Delivery</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Project</span> &lt; <span style="color: #7CB8BB;">ApplicationRecord</span>
+  <span style="color: #DCDCCC; font-weight: bold;">include</span> <span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">Delivery</span>
 
-  after_commit <span style="color: #d08770;">on:</span> <span style="color: #d08770;">:create</span> <span style="color: #b48ead;">do</span>
-    deliver_webhook<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:created</span><span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
+  after_commit <span style="color: #BFEBBF;">on:</span> <span style="color: #BFEBBF;">:create</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
+    deliver_webhook<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:created</span><span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  belongs_to <span style="color: #d08770;">:account</span>
+  belongs_to <span style="color: #BFEBBF;">:account</span>
 
-  <span style="color: #d08770;">private</span>
+  <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">webhook_scope</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">webhook_scope</span>
     account
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">webhook_payload</span>
-    <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">project:</span> <span style="color: #b48ead;">self</span> <span style="color: #8c8c8c;">}</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">webhook_payload</span>
+    <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">project:</span> <span style="color: #F0DFAF; font-weight: bold;">self</span> <span style="color: #DCDCCC;">}</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -321,26 +321,26 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </blockquote>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Webhook</span>
-  <span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Observable</span>
-    <span style="color: #d08770;">extend</span> <span style="color: #c0c5ce;">ActiveSupport</span>::<span style="color: #c0c5ce;">Concern</span>
-    <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">Delivery</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Webhook</span>
+  <span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Observable</span>
+    <span style="color: #DCDCCC; font-weight: bold;">extend</span> <span style="color: #7CB8BB;">ActiveSupport</span>::<span style="color: #7CB8BB;">Concern</span>
+    <span style="color: #DCDCCC; font-weight: bold;">include</span> <span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">Delivery</span>
 
-    included <span style="color: #b48ead;">do</span>
-      after_commit <span style="color: #d08770;">on:</span> <span style="color: #d08770;">:create</span> <span style="color: #b48ead;">do</span>
-        deliver_webhook<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:created</span><span style="color: #8c8c8c;">)</span>
-      <span style="color: #b48ead;">end</span>
+    included <span style="color: #F0DFAF; font-weight: bold;">do</span>
+      after_commit <span style="color: #BFEBBF;">on:</span> <span style="color: #BFEBBF;">:create</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
+        deliver_webhook<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:created</span><span style="color: #DCDCCC;">)</span>
+      <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-      after_commit <span style="color: #d08770;">on:</span> <span style="color: #d08770;">:update</span> <span style="color: #b48ead;">do</span>
-        deliver_webhook<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:updated</span><span style="color: #8c8c8c;">)</span>
-      <span style="color: #b48ead;">end</span>
+      after_commit <span style="color: #BFEBBF;">on:</span> <span style="color: #BFEBBF;">:update</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
+        deliver_webhook<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:updated</span><span style="color: #DCDCCC;">)</span>
+      <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-      after_commit <span style="color: #d08770;">on:</span> <span style="color: #d08770;">:destroy</span> <span style="color: #b48ead;">do</span>
-        deliver_webhook<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:destroyed</span><span style="color: #8c8c8c;">)</span>
-      <span style="color: #b48ead;">end</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+      after_commit <span style="color: #BFEBBF;">on:</span> <span style="color: #BFEBBF;">:destroy</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
+        deliver_webhook<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:destroyed</span><span style="color: #DCDCCC;">)</span>
+      <span style="color: #F0DFAF; font-weight: bold;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -355,53 +355,53 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Project</span> &lt; <span style="color: #c0c5ce;">ApplicationRecord</span>
-  <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">Observable</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Project</span> &lt; <span style="color: #7CB8BB;">ApplicationRecord</span>
+  <span style="color: #DCDCCC; font-weight: bold;">include</span> <span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">Observable</span>
 
-  belongs_to <span style="color: #d08770;">:account</span>
+  belongs_to <span style="color: #BFEBBF;">:account</span>
 
-  <span style="color: #d08770;">private</span>
+  <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">webhook_scope</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">webhook_scope</span>
     account
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">webhook_payload</span>
-    <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">project:</span> <span style="color: #b48ead;">self</span> <span style="color: #8c8c8c;">}</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">webhook_payload</span>
+    <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">project:</span> <span style="color: #F0DFAF; font-weight: bold;">self</span> <span style="color: #DCDCCC;">}</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbb64d3f" class="outline-2">
-<h2 id="orgbb64d3f"><span class="section-number-2">4</span> 发送webhooks</h2>
+<div id="outline-container-org348f898" class="outline-2">
+<h2 id="org348f898"><span class="section-number-2">4</span> 发送webhooks</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 这里强烈建议使用异步任务来发送webhook，因为你是给第三方发送请求，你丫根本没法保证会发生什么。在这里我们就用sidekiq。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">require</span> <span style="color: #a3be8c;">'net/http'</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">require</span> <span style="color: #CC9393;">'net/http'</span>
 
-<span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Webhook</span>
-  <span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">DeliveryWorker</span>
-    <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">Sidekiq</span>::<span style="color: #c0c5ce;">Worker</span>
+<span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Webhook</span>
+  <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">DeliveryWorker</span>
+    <span style="color: #DCDCCC; font-weight: bold;">include</span> <span style="color: #7CB8BB;">Sidekiq</span>::<span style="color: #7CB8BB;">Worker</span>
 
-    <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">perform</span><span style="color: #8c8c8c;">(</span>endpoint_id, payload<span style="color: #8c8c8c;">)</span>
-      <span style="color: #b48ead;">return</span> <span style="color: #b48ead;">unless</span> endpoint = <span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">Endpoint</span>.find<span style="color: #8c8c8c;">(</span>endpoint_id<span style="color: #8c8c8c;">)</span>
-      response = request<span style="color: #8c8c8c;">(</span>endpoint.target_url, payload<span style="color: #8c8c8c;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">perform</span><span style="color: #DCDCCC;">(</span>endpoint_id, payload<span style="color: #DCDCCC;">)</span>
+      <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">unless</span> endpoint = <span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">Endpoint</span>.find<span style="color: #DCDCCC;">(</span>endpoint_id<span style="color: #DCDCCC;">)</span>
+      response = request<span style="color: #DCDCCC;">(</span>endpoint.target_url, payload<span style="color: #DCDCCC;">)</span>
 
-      <span style="color: #b48ead;">case</span> response.code
-      <span style="color: #b48ead;">when</span> <span style="color: #d08770;">410</span>
+      <span style="color: #F0DFAF; font-weight: bold;">case</span> response.code
+      <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">410</span>
         endpoint.destroy
-      <span style="color: #b48ead;">when</span> <span style="color: #d08770;">400</span>..<span style="color: #d08770;">599</span>
-        <span style="color: #d08770;">raise</span> response.to_s
-      <span style="color: #b48ead;">end</span>
-    <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+      <span style="color: #F0DFAF; font-weight: bold;">when</span> <span style="color: #BFEBBF;">400</span>..<span style="color: #BFEBBF;">599</span>
+        <span style="color: #DCDCCC; font-weight: bold;">raise</span> response.to_s
+      <span style="color: #F0DFAF; font-weight: bold;">end</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -417,16 +417,16 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">deliver</span><span style="color: #8c8c8c;">(</span>event<span style="color: #8c8c8c;">)</span>
-  <span style="color: #c0c5ce;">Webhook</span>::<span style="color: #c0c5ce;">DeliveryWorker</span>.perform_async<span style="color: #8c8c8c;">(</span>id, event.to_json<span style="color: #8c8c8c;">)</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">deliver</span><span style="color: #DCDCCC;">(</span>event<span style="color: #DCDCCC;">)</span>
+  <span style="color: #7CB8BB;">Webhook</span>::<span style="color: #7CB8BB;">DeliveryWorker</span>.perform_async<span style="color: #DCDCCC;">(</span>id, event.to_json<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org994c9bd" class="outline-2">
-<h2 id="org994c9bd"><span class="section-number-2">5</span> 总结</h2>
+<div id="outline-container-org342327d" class="outline-2">
+<h2 id="org342327d"><span class="section-number-2">5</span> 总结</h2>
 <div class="outline-text-2" id="text-5">
 <ol class="org-ol">
 <li>deliver<sub>webhook</sub><sub>event方法是关键</sub>，把当前model的endpoints包含event<sub>name的全都执行</sub>，作用域很重要</li>
@@ -441,7 +441,7 @@ webhook其实就是：让别人在你这里注册一个终端地址，并在发�
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,11 +62,11 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orge9fdbeb">1. 简单的表达背后的强大力量</a></li>
-<li><a href="#org0bf228e">2. "binding"和"pry"</a></li>
-<li><a href="#org228bbe5">3. "binding"</a></li>
-<li><a href="#org6aa392f">4. "pry"</a></li>
-<li><a href="#org5559c71">5. "binding"和"pry"在一起</a></li>
+<li><a href="#org23ee3f2">1. 简单的表达背后的强大力量</a></li>
+<li><a href="#org92e3210">2. "binding"和"pry"</a></li>
+<li><a href="#orgf52e2ba">3. "binding"</a></li>
+<li><a href="#org20c44b1">4. "pry"</a></li>
+<li><a href="#orgbd56032">5. "binding"和"pry"在一起</a></li>
 </ul>
 </div>
 </div>
@@ -80,8 +80,8 @@ for the JavaScript code in this tag.
 你一定知道"binding.pry"，因为你到处在用并且越用越兴奋。确实，binding.pry能让程序员的日子好过很多，但是你有没有想过"binding.pry"究竟是什么？果然没有。当我第一次看到binding.pry的时候，我觉得它好像是一种不可思议的魔法，但其实这些新鲜的东西并没有我们想的那么玄幻，读完这篇文章，你就会对pry有趣的特性有一个深刻的了解。
 </p>
 
-<div id="outline-container-orge9fdbeb" class="outline-2">
-<h2 id="orge9fdbeb"><span class="section-number-2">1</span> 简单的表达背后的强大力量</h2>
+<div id="outline-container-org23ee3f2" class="outline-2">
+<h2 id="org23ee3f2"><span class="section-number-2">1</span> 简单的表达背后的强大力量</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 binding.pry可以用在很多地方，比如，我们通过命令行进入Pry的时候默认上下文是"main"。Pry会显示出一个"[1]pry(main)&gt;"，对吧。这玩意儿可以反映出你当前的上下文。
@@ -89,41 +89,41 @@ binding.pry可以用在很多地方，比如，我们通过命令行进入Pry的
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Song</span>
-  <span style="color: #d08770;">binding</span>.pry <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">pry(Song)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Song</span>
+  <span style="color: #DCDCCC; font-weight: bold;">binding</span>.pry <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">pry(Song)</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">play</span>
-    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">'Ground control to Major Tom...'</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">play</span>
+    <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">'Ground control to Major Tom...'</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Song</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">play</span>
-    <span style="color: #d08770;">binding</span>.pry <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">pry(#&lt;Song&gt;)</span>
-    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">'Ground control to Major Tom...'</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Song</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">play</span>
+    <span style="color: #DCDCCC; font-weight: bold;">binding</span>.pry <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">pry(#&lt;Song&gt;)</span>
+    <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">'Ground control to Major Tom...'</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Song</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">play</span>
-    <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">'Ground control to Major Tom...'</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Song</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">play</span>
+    <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">'Ground control to Major Tom...'</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #d08770;">binding</span>.pry <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">pry(main)</span>
+<span style="color: #DCDCCC; font-weight: bold;">binding</span>.pry <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">pry(main)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org0bf228e" class="outline-2">
-<h2 id="org0bf228e"><span class="section-number-2">2</span> "binding"和"pry"</h2>
+<div id="outline-container-org92e3210" class="outline-2">
+<h2 id="org92e3210"><span class="section-number-2">2</span> "binding"和"pry"</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 现在让我们来揭开她的神秘面纱。估计有些人知道Ruby中的Binding类，但我猜也有一些人压根没有听过。这并不是每个Ruby程序员都必须知道的那种东西，但"binding.pry"就是它赋予的神力。下面我们详细分析一下。
@@ -131,17 +131,17 @@ binding.pry可以用在很多地方，比如，我们通过命令行进入Pry的
 </div>
 </div>
 
-<div id="outline-container-org228bbe5" class="outline-2">
-<h2 id="org228bbe5"><span class="section-number-2">3</span> "binding"</h2>
+<div id="outline-container-orgf52e2ba" class="outline-2">
+<h2 id="orgf52e2ba"><span class="section-number-2">3</span> "binding"</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 "binding"是一个method，是Binding类的对象实例。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #d08770;">binding</span>.class <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; Binding</span>
-<span style="color: #d08770;">binding</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; #&lt;Binding:0xa9dcefc&gt;</span>
-<span style="color: #d08770;">binding</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; #&lt;Binding:0xa9ee490&gt;</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">binding</span>.class <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; Binding</span>
+<span style="color: #DCDCCC; font-weight: bold;">binding</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; #&lt;Binding:0xa9dcefc&gt;</span>
+<span style="color: #DCDCCC; font-weight: bold;">binding</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; #&lt;Binding:0xa9ee490&gt;</span>
 </pre>
 </div>
 
@@ -158,23 +158,23 @@ binding.pry可以用在很多地方，比如，我们通过命令行进入Pry的
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Room</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span>
-    <span style="color: #bf616a;">@items</span> = <span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:teddy_bear</span><span style="color: #8c8c8c;">]</span>
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Room</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>
+    <span style="color: #DFAF8F;">@items</span> = <span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:teddy_bear</span><span style="color: #DCDCCC;">]</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">window</span>
-    <span style="color: #d08770;">binding</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">window</span>
+    <span style="color: #DCDCCC; font-weight: bold;">binding</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-backpack = <span style="color: #8c8c8c;">[]</span>
-bedroom = <span style="color: #c0c5ce;">Room</span>.new
+backpack = <span style="color: #DCDCCC;">[]</span>
+bedroom = <span style="color: #7CB8BB;">Room</span>.new
 
-bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'@items'</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; [:teddy_bear]</span>
-backpack &lt;&lt; bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'@items.pop'</span><span style="color: #8c8c8c;">)</span>
-backpack.inspect <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; [:teddy_bear]</span>
-bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'@items'</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; []</span>
+bedroom.window.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'@items'</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; [:teddy_bear]</span>
+backpack &lt;&lt; bedroom.window.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'@items.pop'</span><span style="color: #DCDCCC;">)</span>
+backpack.inspect <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; [:teddy_bear]</span>
+bedroom.window.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'@items'</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; []</span>
 </pre>
 </div>
 
@@ -183,39 +183,39 @@ bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">module</span> <span style="color: #c0c5ce;">Maria</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #b48ead;">self</span>.<span style="color: #8fa1b3;">tack_back</span><span style="color: #8c8c8c;">(</span>item, from, to<span style="color: #8c8c8c;">)</span>
-    <span style="color: #d08770;">eval</span><span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">"@items &lt;&lt; </span><span style="color: #bf616a;">#{ from.delete(item).inspect }</span><span style="color: #a3be8c;">"</span>, to<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">module</span> <span style="color: #7CB8BB;">Maria</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #93E0E3;">tack_back</span><span style="color: #DCDCCC;">(</span>item, from, to<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DCDCCC; font-weight: bold;">eval</span><span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">"@items &lt;&lt; </span><span style="color: #DFAF8F;">#{ from.delete(item).inspect }</span><span style="color: #CC9393;">"</span>, to<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #c0c5ce;">Maria</span>.take_back<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:teddy_bear</span>, backpack, bedroom.window<span style="color: #8c8c8c;">)</span>
-backpack.inspect <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; []</span>
-bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'@items'</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; [:teddy_bear]</span>
+<span style="color: #7CB8BB;">Maria</span>.take_back<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:teddy_bear</span>, backpack, bedroom.window<span style="color: #DCDCCC;">)</span>
+backpack.inspect <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; []</span>
+bedroom.window.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'@items'</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; [:teddy_bear]</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org6aa392f" class="outline-2">
-<h2 id="org6aa392f"><span class="section-number-2">4</span> "pry"</h2>
+<div id="outline-container-org20c44b1" class="outline-2">
+<h2 id="org20c44b1"><span class="section-number-2">4</span> "pry"</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 下面来看另一半，"pry"。实际上任何Ruby对象都可以调用pry方法，因为它是定义在Object类中的，而Object类是所有Ruby类的祖先。这个方法会针对当前对象的上下文开启一个“pry”的会话。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #8c8c8c;">[</span><span style="color: #a3be8c;">'andrew'</span>, <span style="color: #a3be8c;">'alexander'</span>, <span style="color: #a3be8c;">'vladimir'</span><span style="color: #8c8c8c;">]</span>.pry
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Array&gt;)&gt; map &amp;:capitalize</span>
-=&gt; <span style="color: #93a8c6;">[</span><span style="color: #a3be8c;">"Andrew"</span>, <span style="color: #a3be8c;">"Alexander"</span>, <span style="color: #a3be8c;">"Vladimir"</span><span style="color: #93a8c6;">]</span>
-<span style="color: #93a8c6;">[</span><span style="color: #d08770;">2</span><span style="color: #93a8c6;">]</span> pry<span style="color: #93a8c6;">(</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Array&gt;)&gt; exit</span>
-=&gt; <span style="color: #d08770;">nil</span>
-<span style="color: #b0b1a3;">[</span><span style="color: #d08770;">2</span><span style="color: #b0b1a3;">]</span> pry<span style="color: #b0b1a3;">(</span>main<span style="color: #b0b1a3;">)</span>&gt; <span style="color: #a3be8c;">"do you hear me?"</span>.pry
-<span style="color: #b0b1a3;">[</span><span style="color: #d08770;">1</span><span style="color: #b0b1a3;">]</span> pry<span style="color: #b0b1a3;">(</span><span style="color: #a3be8c;">"do you hear me?"</span><span style="color: #b0b1a3;">)</span>&gt; upcase
-=&gt; <span style="color: #a3be8c;">"DO YOU HEAR ME?"</span>
-<span style="color: #b0b1a3;">[</span><span style="color: #d08770;">2</span><span style="color: #b0b1a3;">]</span> pry<span style="color: #b0b1a3;">(</span><span style="color: #a3be8c;">"do you hear me?"</span><span style="color: #b0b1a3;">)</span>&gt; <span style="color: #d08770;">exit</span>
-=&gt; <span style="color: #d08770;">nil</span>
-<span style="color: #b0b1a3;">[</span><span style="color: #d08770;">3</span><span style="color: #b0b1a3;">]</span> pry<span style="color: #b0b1a3;">(</span>main<span style="color: #b0b1a3;">)</span>&gt;
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC;">[</span><span style="color: #CC9393;">'andrew'</span>, <span style="color: #CC9393;">'alexander'</span>, <span style="color: #CC9393;">'vladimir'</span><span style="color: #DCDCCC;">]</span>.pry
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Array&gt;)&gt; map &amp;:capitalize</span>
+=&gt; <span style="color: #BFEBBF;">[</span><span style="color: #CC9393;">"Andrew"</span>, <span style="color: #CC9393;">"Alexander"</span>, <span style="color: #CC9393;">"Vladimir"</span><span style="color: #BFEBBF;">]</span>
+<span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #BFEBBF;">]</span> pry<span style="color: #BFEBBF;">(</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Array&gt;)&gt; exit</span>
+=&gt; <span style="color: #BFEBBF;">nil</span>
+<span style="color: #D0BF8F;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #D0BF8F;">]</span> pry<span style="color: #D0BF8F;">(</span>main<span style="color: #D0BF8F;">)</span>&gt; <span style="color: #CC9393;">"do you hear me?"</span>.pry
+<span style="color: #D0BF8F;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #D0BF8F;">]</span> pry<span style="color: #D0BF8F;">(</span><span style="color: #CC9393;">"do you hear me?"</span><span style="color: #D0BF8F;">)</span>&gt; upcase
+=&gt; <span style="color: #CC9393;">"DO YOU HEAR ME?"</span>
+<span style="color: #D0BF8F;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #D0BF8F;">]</span> pry<span style="color: #D0BF8F;">(</span><span style="color: #CC9393;">"do you hear me?"</span><span style="color: #D0BF8F;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">exit</span>
+=&gt; <span style="color: #BFEBBF;">nil</span>
+<span style="color: #D0BF8F;">[</span><span style="color: #BFEBBF;">3</span><span style="color: #D0BF8F;">]</span> pry<span style="color: #D0BF8F;">(</span>main<span style="color: #D0BF8F;">)</span>&gt;
 </pre>
 </div>
 
@@ -228,20 +228,20 @@ bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Song</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">play</span>
-    music = <span style="color: #a3be8c;">'rock &amp; roll'</span>
-    <span style="color: #a3be8c;">"I love </span><span style="color: #bf616a;">#{ binding.pry }</span><span style="color: #a3be8c;">"</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Song</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">play</span>
+    music = <span style="color: #CC9393;">'rock &amp; roll'</span>
+    <span style="color: #CC9393;">"I love </span><span style="color: #DFAF8F;">#{ binding.pry }</span><span style="color: #CC9393;">"</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #c0c5ce;">Song</span>.new.play
+<span style="color: #7CB8BB;">Song</span>.new.play
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Song&gt;)&gt; music</span>
-=&gt; <span style="color: #a3be8c;">"rock &amp; roll"</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Song&gt;)&gt; music</span>
+=&gt; <span style="color: #CC9393;">"rock &amp; roll"</span>
 </pre>
 </div>
 
@@ -250,26 +250,26 @@ bedroom.window.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Song</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">play</span>
-    music = <span style="color: #a3be8c;">'rock &amp; roll'</span>
-    <span style="color: #a3be8c;">"I love </span><span style="color: #bf616a;">#{pry}</span><span style="color: #a3be8c;">"</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Song</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">play</span>
+    music = <span style="color: #CC9393;">'rock &amp; roll'</span>
+    <span style="color: #CC9393;">"I love </span><span style="color: #DFAF8F;">#{pry}</span><span style="color: #CC9393;">"</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-song = <span style="color: #c0c5ce;">Song</span>.new <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; #&lt;Song:0x9d89588&gt;</span>
-<span style="color: #bf616a;">$old_id</span> = song.object_id <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; 82594500</span>
+song = <span style="color: #7CB8BB;">Song</span>.new <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; #&lt;Song:0x9d89588&gt;</span>
+<span style="color: #DFAF8F;">$old_id</span> = song.object_id <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; 82594500</span>
 song.play
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Song&gt;)&gt; music</span>
-<span style="color: #c0c5ce;">NameError</span>: undefined local variable <span style="color: #b48ead;">or</span> method <span style="color: #a3be8c;">`music`</span> <span style="color: #b48ead;">for</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Song:0xbd2fe00&gt; from (pry):7:in `__pry__`</span>
-<span style="color: #93a8c6;">[</span><span style="color: #d08770;">2</span><span style="color: #93a8c6;">]</span> pry<span style="color: #93a8c6;">(</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Song&gt;)&gt; whereami</span>
-<span style="color: #c0c5ce;">Inside</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Song&gt;.</span>
-<span style="color: #b0b1a3;">[</span><span style="color: #d08770;">3</span><span style="color: #b0b1a3;">]</span> pry<span style="color: #b0b1a3;">(</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;Song&gt;)&gt; object_id == $old_id</span>
-=&gt; <span style="color: #d08770;">true</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Song&gt;)&gt; music</span>
+<span style="color: #7CB8BB;">NameError</span>: undefined local variable <span style="color: #F0DFAF; font-weight: bold;">or</span> method <span style="color: #CC9393;">`music`</span> <span style="color: #F0DFAF; font-weight: bold;">for</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Song:0xbd2fe00&gt; from (pry):7:in `__pry__`</span>
+<span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #BFEBBF;">]</span> pry<span style="color: #BFEBBF;">(</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Song&gt;)&gt; whereami</span>
+<span style="color: #7CB8BB;">Inside</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Song&gt;.</span>
+<span style="color: #D0BF8F;">[</span><span style="color: #BFEBBF;">3</span><span style="color: #D0BF8F;">]</span> pry<span style="color: #D0BF8F;">(</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;Song&gt;)&gt; object_id == $old_id</span>
+=&gt; <span style="color: #BFEBBF;">true</span>
 </pre>
 </div>
 
@@ -282,8 +282,8 @@ song.play
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">basic = <span style="color: #c0c5ce;">BasicObject</span>.new <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; #&lt;BasicObject:0x512c30c&gt;</span>
-basic.pry <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; NoMethodError: undefined method `pry` for #&lt;BasicObject:0xa258618&gt;</span>
+<pre class="src src-ruby">basic = <span style="color: #7CB8BB;">BasicObject</span>.new <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; #&lt;BasicObject:0x512c30c&gt;</span>
+basic.pry <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; NoMethodError: undefined method `pry` for #&lt;BasicObject:0xa258618&gt;</span>
 </pre>
 </div>
 
@@ -296,9 +296,9 @@ basic.pry <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #c0c5ce;">BasicObject</span>.pry
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">BasicObject</span><span style="color: #8c8c8c;">)</span>&gt; __id__
-=&gt; <span style="color: #d08770;">81839890</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #7CB8BB;">BasicObject</span>.pry
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">BasicObject</span><span style="color: #DCDCCC;">)</span>&gt; __id__
+=&gt; <span style="color: #BFEBBF;">81839890</span>
 </pre>
 </div>
 
@@ -311,20 +311,20 @@ pry另外一个有趣的特性是它支持参数，所以pry, self.pry, pry(self
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; pry <span style="color: #d08770;">1337</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">1337</span><span style="color: #8c8c8c;">)</span> pry <span style="color: #a3be8c;">''</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">""</span><span style="color: #8c8c8c;">)</span> pry <span style="color: #d08770;">:awesome!</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:awesome!</span><span style="color: #8c8c8c;">)</span>&gt;
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:awesome!</span><span style="color: #8c8c8c;">)</span> nesting
-<span style="color: #c0c5ce;">Nesting</span> <span style="color: #d08770;">status:</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; pry <span style="color: #BFEBBF;">1337</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">1337</span><span style="color: #DCDCCC;">)</span> pry <span style="color: #CC9393;">''</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">""</span><span style="color: #DCDCCC;">)</span> pry <span style="color: #BFEBBF;">:awesome!</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:awesome!</span><span style="color: #DCDCCC;">)</span>&gt;
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:awesome!</span><span style="color: #DCDCCC;">)</span> nesting
+<span style="color: #7CB8BB;">Nesting</span> <span style="color: #BFEBBF;">status:</span>
 --
-<span style="color: #d08770;">0</span>. <span style="color: #d08770;">:awesome!</span> <span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">Pry</span> top level<span style="color: #8c8c8c;">)</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:awesome!</span><span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">exit</span>
-=&gt; <span style="color: #d08770;">nil</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">""</span><span style="color: #8c8c8c;">)</span>&gt; nesting
-<span style="color: #c0c5ce;">Nesting</span> <span style="color: #d08770;">status:</span>
+<span style="color: #BFEBBF;">0</span>. <span style="color: #BFEBBF;">:awesome!</span> <span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">Pry</span> top level<span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:awesome!</span><span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">exit</span>
+=&gt; <span style="color: #BFEBBF;">nil</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">""</span><span style="color: #DCDCCC;">)</span>&gt; nesting
+<span style="color: #7CB8BB;">Nesting</span> <span style="color: #BFEBBF;">status:</span>
 --
-<span style="color: #d08770;">0</span>. <span style="color: #a3be8c;">""</span> <span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">Pry</span> top level<span style="color: #8c8c8c;">)</span>
+<span style="color: #BFEBBF;">0</span>. <span style="color: #CC9393;">""</span> <span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">Pry</span> top level<span style="color: #DCDCCC;">)</span>
 </pre>
 </div>
 
@@ -337,45 +337,45 @@ pry另外一个有趣的特性是它支持参数，所以pry, self.pry, pry(self
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; output_history = <span style="color: #c0c5ce;">StringhIO</span>.new
-=&gt; <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;StringIO:0xab8978c&gt;</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">:universe</span>.pry <span style="color: #d08770;">:output</span> =&gt; output_history, <span style="color: #d08770;">:extra_sticky_locals</span> =&gt; <span style="color: #8c8c8c;">{</span> <span style="color: #d08770;">:time</span> =&gt; <span style="color: #c0c5ce;">Time</span>.now <span style="color: #8c8c8c;">}</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:universe</span><span style="color: #8c8c8c;">)</span>&gt; whereami
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:universe</span><span style="color: #8c8c8c;">)</span>&gt; ls
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:universe</span><span style="color: #8c8c8c;">)</span>&gt; time
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">4</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:universe</span><span style="color: #8c8c8c;">)</span>&gt; <span style="color: #c0c5ce;">Help</span> me out!
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">5</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:universe</span><span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">exit</span>
-=&gt; <span style="color: #d08770;">nil</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">puts</span> output_history.string
-<span style="color: #c0c5ce;">Inside</span> <span style="color: #d08770;">:universe</span>.
-<span style="color: #c0c5ce;">Comparable</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">methods: &lt;  &lt;=  &gt;  &gt;=  between?</span>
-<span style="color: #c0c5ce;">Symbol</span><span style="color: #c0c5ce;">#</span><span style="color: #65737e;">methods: </span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; output_history = <span style="color: #7CB8BB;">StringhIO</span>.new
+=&gt; <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;StringIO:0xab8978c&gt;</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #BFEBBF;">:universe</span>.pry <span style="color: #BFEBBF;">:output</span> =&gt; output_history, <span style="color: #BFEBBF;">:extra_sticky_locals</span> =&gt; <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">:time</span> =&gt; <span style="color: #7CB8BB;">Time</span>.now <span style="color: #DCDCCC;">}</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:universe</span><span style="color: #DCDCCC;">)</span>&gt; whereami
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:universe</span><span style="color: #DCDCCC;">)</span>&gt; ls
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:universe</span><span style="color: #DCDCCC;">)</span>&gt; time
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">4</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:universe</span><span style="color: #DCDCCC;">)</span>&gt; <span style="color: #7CB8BB;">Help</span> me out!
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">5</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:universe</span><span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">exit</span>
+=&gt; <span style="color: #BFEBBF;">nil</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">puts</span> output_history.string
+<span style="color: #7CB8BB;">Inside</span> <span style="color: #BFEBBF;">:universe</span>.
+<span style="color: #7CB8BB;">Comparable</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">methods: &lt;  &lt;=  &gt;  &gt;=  between?</span>
+<span style="color: #7CB8BB;">Symbol</span><span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">methods: </span>
   &lt;=&gt;  =~       capitalize  empty?    inspect  match               size   swapcase  to_sym
-  ==   <span style="color: #8c8c8c;">[]</span>       casecmp     encoding  intern   <span style="color: #b48ead;">next</span>                slice  to_proc   upcase
+  ==   <span style="color: #DCDCCC;">[]</span>       casecmp     encoding  intern   <span style="color: #F0DFAF; font-weight: bold;">next</span>                slice  to_proc   upcase
   ===  __pry__  downcase    id2name   length   pretty_print_cycle  succ   to_s    
-<span style="color: #d08770;">locals:</span> _  __  _dir_  _ex_  _file_  _in_  _out_  _pry_  time
-=&gt; <span style="color: #d08770;">2013</span>-<span style="color: #d08770;">05</span>-<span style="color: #d08770;">25</span> <span style="color: #d08770;">14</span>:<span style="color: #d08770;">22</span>:<span style="color: #d08770;">34</span> +<span style="color: #d08770;">0300</span>
-<span style="color: #c0c5ce;">NoMethodError</span>: undefined method <span style="color: #a3be8c;">`out!' for :universe:Symbol</span>
-<span style="color: #a3be8c;">from (pry):3:in `</span>__pry__<span style="color: #a3be8c;">'</span>
-<span style="color: #a3be8c;">=&gt; nil</span>
-<span style="color: #a3be8c;">[4] pry(main)&gt; time</span>
-<span style="color: #a3be8c;">NameError: undefined local variable or method `time'</span> <span style="color: #b48ead;">for</span> main<span style="color: #d08770;">:Object</span>
-from <span style="color: #8c8c8c;">(</span>pry<span style="color: #8c8c8c;">)</span>:<span style="color: #d08770;">8</span>:in <span style="color: #a3be8c;">`__pry__'</span>
+<span style="color: #BFEBBF;">locals:</span> _  __  _dir_  _ex_  _file_  _in_  _out_  _pry_  time
+=&gt; <span style="color: #BFEBBF;">2013</span>-<span style="color: #BFEBBF;">05</span>-<span style="color: #BFEBBF;">25</span> <span style="color: #BFEBBF;">14</span>:<span style="color: #BFEBBF;">22</span>:<span style="color: #BFEBBF;">34</span> +<span style="color: #BFEBBF;">0300</span>
+<span style="color: #7CB8BB;">NoMethodError</span>: undefined method <span style="color: #CC9393;">`out!' for :universe:Symbol</span>
+<span style="color: #CC9393;">from (pry):3:in `</span>__pry__<span style="color: #CC9393;">'</span>
+<span style="color: #CC9393;">=&gt; nil</span>
+<span style="color: #CC9393;">[4] pry(main)&gt; time</span>
+<span style="color: #CC9393;">NameError: undefined local variable or method `time'</span> <span style="color: #F0DFAF; font-weight: bold;">for</span> main<span style="color: #BFEBBF;">:Object</span>
+from <span style="color: #DCDCCC;">(</span>pry<span style="color: #DCDCCC;">)</span>:<span style="color: #BFEBBF;">8</span>:in <span style="color: #CC9393;">`__pry__'</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org5559c71" class="outline-2">
-<h2 id="org5559c71"><span class="section-number-2">5</span> "binding"和"pry"在一起</h2>
+<div id="outline-container-orgbd56032" class="outline-2">
+<h2 id="orgbd56032"><span class="section-number-2">5</span> "binding"和"pry"在一起</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 现在你已经基本了解"binding"和"pry"，那么问题来了。Pry怎么知道在哪开始一次read-eval-print-loop？"binding.pry"为什么会起作用？简单来说， 当你在一个对象上调用pry的时候，Pry获取这个对象的binding并且开始执行一次REPL。获取binding的方法十分简单，叫做"Pry.binding<sub>for</sub>".
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">b = <span style="color: #c0c5ce;">Pry</span>.binding_for<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">:universe</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; #&lt;Binding:0xb2e7ad8&gt;</span>
-b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'</span><span style="color: #8c8c8c;">)</span> <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; :universe</span>
+<pre class="src src-ruby">b = <span style="color: #7CB8BB;">Pry</span>.binding_for<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:universe</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; #&lt;Binding:0xb2e7ad8&gt;</span>
+b.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'self'</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; :universe</span>
 </pre>
 </div>
 
@@ -388,18 +388,18 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">:universe</span>.__pry__
-<span style="color: #c0c5ce;">NoMethodError</span>: undefined method <span style="color: #a3be8c;">`__pry__' for :universe:Symbol</span>
-<span style="color: #a3be8c;">from (pry):1:in `</span>__pry__<span style="color: #a3be8c;">'</span>
-<span style="color: #a3be8c;">[2] pry(main)&gt; :universe.pry</span>
-<span style="color: #a3be8c;">[1] pry(:universe)&gt; :universe.__pry__</span>
-<span style="color: #a3be8c;">=&gt; #&lt;Binding:0xadf1a74&gt;</span>
-<span style="color: #a3be8c;">[2] pry(:universe)&gt; </span>
-<span style="color: #a3be8c;">=&gt; nil</span>
-<span style="color: #a3be8c;">[3] pry(main)&gt; :universe.__pry__</span>
-<span style="color: #a3be8c;">=&gt; #&lt;Binding:0x91a27c4&gt;</span>
-<span style="color: #a3be8c;">[4] pry(main)&gt; :universe.__pry__.eval('</span><span style="color: #b48ead;">self</span><span style="color: #a3be8c;">')</span>
-<span style="color: #a3be8c;">=&gt; :universe</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #BFEBBF;">:universe</span>.__pry__
+<span style="color: #7CB8BB;">NoMethodError</span>: undefined method <span style="color: #CC9393;">`__pry__' for :universe:Symbol</span>
+<span style="color: #CC9393;">from (pry):1:in `</span>__pry__<span style="color: #CC9393;">'</span>
+<span style="color: #CC9393;">[2] pry(main)&gt; :universe.pry</span>
+<span style="color: #CC9393;">[1] pry(:universe)&gt; :universe.__pry__</span>
+<span style="color: #CC9393;">=&gt; #&lt;Binding:0xadf1a74&gt;</span>
+<span style="color: #CC9393;">[2] pry(:universe)&gt; </span>
+<span style="color: #CC9393;">=&gt; nil</span>
+<span style="color: #CC9393;">[3] pry(main)&gt; :universe.__pry__</span>
+<span style="color: #CC9393;">=&gt; #&lt;Binding:0x91a27c4&gt;</span>
+<span style="color: #CC9393;">[4] pry(main)&gt; :universe.__pry__.eval('</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #CC9393;">')</span>
+<span style="color: #CC9393;">=&gt; :universe</span>
 </pre>
 </div>
 
@@ -408,13 +408,13 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">1337</span>.pry
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">1337</span><span style="color: #8c8c8c;">)</span>&gt; <span style="color: #bf616a;">@leet_number</span> = <span style="color: #d08770;">:so_leet</span>
-=&gt; <span style="color: #d08770;">:so_leet</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">1337</span><span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">exit</span>
-=&gt; <span style="color: #d08770;">nil</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">1337</span>.__pry__.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'@leet_number'</span><span style="color: #8c8c8c;">)</span>
-=&gt; <span style="color: #d08770;">:so_leet</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #BFEBBF;">1337</span>.pry
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">1337</span><span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DFAF8F;">@leet_number</span> = <span style="color: #BFEBBF;">:so_leet</span>
+=&gt; <span style="color: #BFEBBF;">:so_leet</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">1337</span><span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">exit</span>
+=&gt; <span style="color: #BFEBBF;">nil</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #BFEBBF;">1337</span>.__pry__.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'@leet_number'</span><span style="color: #DCDCCC;">)</span>
+=&gt; <span style="color: #BFEBBF;">:so_leet</span>
 </pre>
 </div>
 
@@ -423,8 +423,8 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">:universe</span>.__binding__.eval <span style="color: #a3be8c;">'upcase'</span>
-=&gt; <span style="color: #d08770;">:UNIVERSE</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #BFEBBF;">:universe</span>.__binding__.eval <span style="color: #CC9393;">'upcase'</span>
+=&gt; <span style="color: #BFEBBF;">:UNIVERSE</span>
 </pre>
 </div>
 
@@ -433,13 +433,13 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #c0c5ce;">A</span> = <span style="color: #c0c5ce;">Class</span>.new
-<span style="color: #c0c5ce;">A</span>.__pry__ <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; NoMethodError</span>
-<span style="color: #c0c5ce;">A</span>.__binding__ <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; #&lt;Binding:0xb0e8570&gt;</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">A</span> = <span style="color: #7CB8BB;">Class</span>.new
+<span style="color: #7CB8BB;">A</span>.__pry__ <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; NoMethodError</span>
+<span style="color: #7CB8BB;">A</span>.__binding__ <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; #&lt;Binding:0xb0e8570&gt;</span>
 
-<span style="color: #c0c5ce;">A</span>.pry
-<span style="color: #d08770;">exit</span> <span style="color: #c0c5ce;"># </span><span style="color: #65737e;">Exits from the nested session.</span>
-<span style="color: #c0c5ce;">A</span>.__pry__ <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">=&gt; NoMethodError, still undefined.</span>
+<span style="color: #7CB8BB;">A</span>.pry
+<span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">Exits from the nested session.</span>
+<span style="color: #7CB8BB;">A</span>.__pry__ <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; NoMethodError, still undefined.</span>
 </pre>
 </div>
 
@@ -448,14 +448,14 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #c0c5ce;">M</span> = <span style="color: #c0c5ce;">Module</span>.new
-=&gt; <span style="color: #c0c5ce;">M</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">2</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #c0c5ce;">M</span>.__binding__.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'def magnifico; :splendid end'</span><span style="color: #8c8c8c;">)</span>
-=&gt; <span style="color: #d08770;">nil</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">3</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">include</span> <span style="color: #c0c5ce;">M</span>
-=&gt; <span style="color: #c0c5ce;">Object</span>
-<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">4</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; magnifico
-=&gt; <span style="color: #d08770;">:splendid</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #7CB8BB;">M</span> = <span style="color: #7CB8BB;">Module</span>.new
+=&gt; <span style="color: #7CB8BB;">M</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">2</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #7CB8BB;">M</span>.__binding__.eval<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'def magnifico; :splendid end'</span><span style="color: #DCDCCC;">)</span>
+=&gt; <span style="color: #BFEBBF;">nil</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">include</span> <span style="color: #7CB8BB;">M</span>
+=&gt; <span style="color: #7CB8BB;">Object</span>
+<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">4</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; magnifico
+=&gt; <span style="color: #BFEBBF;">:splendid</span>
 </pre>
 </div>
 
@@ -464,11 +464,11 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">]</span> pry<span style="color: #8c8c8c;">(</span>main<span style="color: #8c8c8c;">)</span>&gt; <span style="color: #d08770;">loop</span> <span style="color: #b48ead;">do</span>
-             |   <span style="color: #d08770;">print</span> <span style="color: #a3be8c;">'&gt;&gt; '</span>
-             |   <span style="color: #d08770;">puts</span> <span style="color: #a3be8c;">"=&gt; </span><span style="color: #bf616a;">#{ TOPLEVEL_BINDING.eval(gets) }</span><span style="color: #a3be8c;">"</span>
-             | <span style="color: #b48ead;">end</span>
-&gt;&gt; <span style="color: #b48ead;">def</span> hello; <span style="color: #d08770;">:hi</span> <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> pry<span style="color: #DCDCCC;">(</span>main<span style="color: #DCDCCC;">)</span>&gt; <span style="color: #DCDCCC; font-weight: bold;">loop</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
+             |   <span style="color: #DCDCCC; font-weight: bold;">print</span> <span style="color: #CC9393;">'&gt;&gt; '</span>
+             |   <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"=&gt; </span><span style="color: #DFAF8F;">#{ TOPLEVEL_BINDING.eval(gets) }</span><span style="color: #CC9393;">"</span>
+             | <span style="color: #F0DFAF; font-weight: bold;">end</span>
+&gt;&gt; <span style="color: #F0DFAF; font-weight: bold;">def</span> hello; <span style="color: #BFEBBF;">:hi</span> <span style="color: #F0DFAF; font-weight: bold;">end</span>
 =&gt;
 &gt;&gt; hello
 =&gt; hi
@@ -486,7 +486,7 @@ b.eval<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">'self'
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

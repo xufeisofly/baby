@@ -6,16 +6,23 @@
 *** 新 live 爬虫问题
 *** publication 后台结算迁移，调度任务整理
 *** DONE 推广页 button 加字段 <2019-12-26 Thu>
-*** TODO 后台优化三期
-**** TODO 会员推荐页
+*** DONE 后台优化三期
+**** DONE 会员推荐页
 ***** DONE 排序，筛选（前端处理）0d
 ***** TODO 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d
 ***** DONE 增加排序规则：权重 + 创建时间倒叙 0d
-***** DONE ~sku_id~ => ~business_id~ 1d
-**** TODO sku 专题和推广活动
+***** ~sku_id~ => ~business_id~ 1d
+**** DONE sku 专题和推广活动
 ***** DONE 精选专题单增加跳转链接和图片 1d
 ***** DONE 精选专题多/单 ~sku_id~ => ~business_id~ 0.5d
 ***** TODO 模块配置列表去掉一些模块 0d 
 **** DONE 线下活动复制。榜单复制 <2019-12-26 Thu>
 ***** DONE 榜单复制 0.5 d
 ***** DONE 线下活动复制 0.5 d
+*** TODO 分期上线 <2020-01-07 Tue>
+**** TODO 一次性上线公开时判断期数和总期数
+**** TODO 私家课编辑页和盐选专栏编辑页增加修改分期上线功能 bug notify!
+***** ~is_staged~ 总期数和总时长不能为0，album 的 schema 有验证，不是很重要
+***** ~is_staged~ 和 ~is_serial~ 不能同时为 True，schema 中应该有 validate
+***** 什么 VipFreeUploadingAlbumController 里面有加入 ~is_staged~ 为 True 的数据，但是只有一个 rpc 用到，这个 rpc 目前没有 qps，暂时不管了
+***** ~is_staged~ = True, 可以， 为 False 时如果 ~is_public=True~ 则 ~section_count~ assert equal ~update_section_count~

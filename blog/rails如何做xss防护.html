@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,41 +62,41 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgef0e6fb">1. 什么是HTML Escaping</a></li>
-<li><a href="#orgfabe4f2">2. html<sub>safe</sub></a></li>
-<li><a href="#org3655122">3. 从Rails传递给HTML</a>
+<li><a href="#orga708065">1. 什么是HTML Escaping</a></li>
+<li><a href="#org654feb8">2. html<sub>safe</sub></a></li>
+<li><a href="#org98298b0">3. 从Rails传递给HTML</a>
 <ul>
-<li><a href="#org337370e">3.1. HTML elements</a></li>
-<li><a href="#orgb25a629">3.2. Attributes or Tag Names</a></li>
-<li><a href="#org1f2cb05">3.3. Attribute Values</a></li>
+<li><a href="#org15bdfdd">3.1. HTML elements</a></li>
+<li><a href="#org6cf0d92">3.2. Attributes or Tag Names</a></li>
+<li><a href="#org337e435">3.3. Attribute Values</a></li>
 </ul>
 </li>
-<li><a href="#org811a282">4. 从Rails传递给JavaScript</a>
+<li><a href="#orga0270e7">4. 从Rails传递给JavaScript</a>
 <ul>
-<li><a href="#org19950a9">4.1. 原则</a>
+<li><a href="#org8943bf2">4.1. 原则</a>
 <ul>
-<li><a href="#orgef69740">4.1.1. 传递numbers to JavaScript</a></li>
-<li><a href="#orgcdaa8dc">4.1.2. 传递text to JavaScript</a></li>
+<li><a href="#org4c10d79">4.1.1. 传递numbers to JavaScript</a></li>
+<li><a href="#org68a862a">4.1.2. 传递text to JavaScript</a></li>
 </ul>
 </li>
-<li><a href="#orgc53f502">4.2. </a></li>
+<li><a href="#org5f55efc">4.2. </a></li>
 </ul>
 </li>
-<li><a href="#orgf4560fe">5. 传递Json to HTML/JavaScript</a>
+<li><a href="#orga77abee">5. 传递Json to HTML/JavaScript</a>
 <ul>
-<li><a href="#org9843811">5.1. Json Escaping</a></li>
-<li><a href="#org028cf1c">5.2. Json to HTML</a>
+<li><a href="#org183edbf">5.1. Json Escaping</a></li>
+<li><a href="#orgc3ff736">5.2. Json to HTML</a>
 <ul>
-<li><a href="#orgc558125">5.2.1. to HTML elements</a></li>
-<li><a href="#orgcb5fda2">5.2.2. to HTML attributes</a></li>
-<li><a href="#org7cbaab8">5.2.3. 为什么要用to<sub>json</sub></a></li>
+<li><a href="#org3712c3f">5.2.1. to HTML elements</a></li>
+<li><a href="#org763f071">5.2.2. to HTML attributes</a></li>
+<li><a href="#org845a188">5.2.3. 为什么要用to<sub>json</sub></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org121f409">6. 一些不安全的helpers</a>
+<li><a href="#org7b71bd3">6. 一些不安全的helpers</a>
 <ul>
-<li><a href="#orgc245f42">6.1. link<sub>to</sub></a></li>
+<li><a href="#org37ab027">6.1. link<sub>to</sub></a></li>
 </ul>
 </li>
 </ul>
@@ -110,8 +110,8 @@ xss攻击是一种十分常见的web攻击形式，它是通过在客户端注�
 Rails自带xss防护，它会将所有的html escape掉，html需要手动标记才能正常显示。这个特性简直是爽到爆，然而只是对于全栈使用Rails的情况才能发挥功能，对于前后端分离的情况，需要探索其他方案。
 </p>
 
-<div id="outline-container-orgef0e6fb" class="outline-2">
-<h2 id="orgef0e6fb"><span class="section-number-2">1</span> 什么是HTML Escaping</h2>
+<div id="outline-container-orga708065" class="outline-2">
+<h2 id="orga708065"><span class="section-number-2">1</span> 什么是HTML Escaping</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 对于脚本编程语言，经常会从代码中转移出一些特殊的数据。比如我们可能通过&lt;&gt;判断HTML，然而问题是，有的正常数据当中可能也包含这些tags。
@@ -122,7 +122,7 @@ Rails使用ERB:Util#html<sub>escape方法来回避真正的HTML标签</sub>，�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">{</span> <span style="color: #a3be8c;">'&amp;'</span> =&gt; <span style="color: #a3be8c;">'&amp;amp;'</span>, <span style="color: #a3be8c;">'&gt;'</span> =&gt; <span style="color: #a3be8c;">'&amp;gt;'</span>, <span style="color: #a3be8c;">'&lt;'</span> =&gt; <span style="color: #a3be8c;">'&amp;lt;'</span>, <span style="color: #a3be8c;">'"'</span> =&gt; <span style="color: #a3be8c;">'&amp;quot;'</span>, <span style="color: #a3be8c;">"'"</span> =&gt; <span style="color: #a3be8c;">'&amp;#39;'</span> <span style="color: #8c8c8c;">}</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">{</span> <span style="color: #CC9393;">'&amp;'</span> =&gt; <span style="color: #CC9393;">'&amp;amp;'</span>, <span style="color: #CC9393;">'&gt;'</span> =&gt; <span style="color: #CC9393;">'&amp;gt;'</span>, <span style="color: #CC9393;">'&lt;'</span> =&gt; <span style="color: #CC9393;">'&amp;lt;'</span>, <span style="color: #CC9393;">'"'</span> =&gt; <span style="color: #CC9393;">'&amp;quot;'</span>, <span style="color: #CC9393;">"'"</span> =&gt; <span style="color: #CC9393;">'&amp;#39;'</span> <span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 
@@ -131,8 +131,8 @@ Rails默认对HTML进行escape，从而防止带有xss攻击行为的非法dom�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">params<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:name</span><span style="color: #8c8c8c;">]</span> = <span style="color: #a3be8c;">'&lt;script&gt;alert(1)&lt;/script&gt;'</span>
-&lt;b&gt;<span style="color: #c0c5ce;">Hello</span> &lt;<span style="color: #a3be8c;">%= params[:name] %&gt;&lt;/b&gt;</span>
+<pre class="src src-ruby">params<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:name</span><span style="color: #DCDCCC;">]</span> = <span style="color: #CC9393;">'&lt;script&gt;alert(1)&lt;/script&gt;'</span>
+&lt;b&gt;<span style="color: #7CB8BB;">Hello</span> &lt;<span style="color: #CC9393;">%= params[:name] %&gt;&lt;/b&gt;</span>
 </pre>
 </div>
 
@@ -141,22 +141,22 @@ Rails默认输出为
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b&gt; <span style="color: #c0c5ce;">Hello</span> &amp;lt;script&amp;gt;alert<span style="color: #8c8c8c;">(</span><span style="color: #d08770;">1</span><span style="color: #8c8c8c;">)</span>&amp;lt;<span style="color: #a3be8c;">/script&amp;gt;gt; &lt;/</span>b&gt;
+<pre class="src src-ruby">&lt;b&gt; <span style="color: #7CB8BB;">Hello</span> &amp;lt;script&amp;gt;alert<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">)</span>&amp;lt;<span style="color: #CC9393;">/script&amp;gt;gt; &lt;/</span>b&gt;
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-orgfabe4f2" class="outline-2">
-<h2 id="orgfabe4f2"><span class="section-number-2">2</span> html<sub>safe</sub></h2>
+<div id="outline-container-org654feb8" class="outline-2">
+<h2 id="org654feb8"><span class="section-number-2">2</span> html<sub>safe</sub></h2>
 <div class="outline-text-2" id="text-2">
 <p>
 如果想要正常输出html，就需要认为标记html<sub>safe</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b&gt;<span style="color: #c0c5ce;">Hello</span> &lt;<span style="color: #a3be8c;">%=params[:name].html_safe%&gt;&lt;/b&gt;</span>
+<pre class="src src-ruby">&lt;b&gt;<span style="color: #7CB8BB;">Hello</span> &lt;<span style="color: #CC9393;">%=params[:name].html_safe%&gt;&lt;/b&gt;</span>
 </pre>
 </div>
 
@@ -166,12 +166,12 @@ Rails默认输出为
 </div>
 </div>
 
-<div id="outline-container-org3655122" class="outline-2">
-<h2 id="org3655122"><span class="section-number-2">3</span> 从Rails传递给HTML</h2>
+<div id="outline-container-org98298b0" class="outline-2">
+<h2 id="org98298b0"><span class="section-number-2">3</span> 从Rails传递给HTML</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-org337370e" class="outline-3">
-<h3 id="org337370e"><span class="section-number-3">3.1</span> HTML elements</h3>
+<div id="outline-container-org15bdfdd" class="outline-3">
+<h3 id="org15bdfdd"><span class="section-number-3">3.1</span> HTML elements</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 Rails会自动编码，所以必须要标记html<sub>safe</sub>，刚才已经说了
@@ -179,8 +179,8 @@ Rails会自动编码，所以必须要标记html<sub>safe</sub>，刚才已经�
 </div>
 </div>
 
-<div id="outline-container-orgb25a629" class="outline-3">
-<h3 id="orgb25a629"><span class="section-number-3">3.2</span> Attributes or Tag Names</h3>
+<div id="outline-container-org6cf0d92" class="outline-3">
+<h3 id="org6cf0d92"><span class="section-number-3">3.2</span> Attributes or Tag Names</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 无论编码与否，attributes和tag names不允许被外部数据创建，因为这是数据html本身的一部分，如果不这样做就相当于给了外部写html的权限
@@ -188,26 +188,26 @@ Rails会自动编码，所以必须要标记html<sub>safe</sub>，刚才已经�
 </div>
 </div>
 
-<div id="outline-container-org1f2cb05" class="outline-3">
-<h3 id="org1f2cb05"><span class="section-number-3">3.3</span> Attribute Values</h3>
+<div id="outline-container-org337e435" class="outline-3">
+<h3 id="org337e435"><span class="section-number-3">3.3</span> Attribute Values</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 比如src href style等，这些attributes的值不允许直接从数据中传入，rails编码后可以直接传入
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b name=<span style="color: #a3be8c;">"&lt;%= params[:name] %&gt;""&gt;&lt;/b&gt;</span>
+<pre class="src src-ruby">&lt;b name=<span style="color: #CC9393;">"&lt;%= params[:name] %&gt;""&gt;&lt;/b&gt;</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org811a282" class="outline-2">
-<h2 id="org811a282"><span class="section-number-2">4</span> 从Rails传递给JavaScript</h2>
+<div id="outline-container-orga0270e7" class="outline-2">
+<h2 id="orga0270e7"><span class="section-number-2">4</span> 从Rails传递给JavaScript</h2>
 <div class="outline-text-2" id="text-4">
 </div>
-<div id="outline-container-org19950a9" class="outline-3">
-<h3 id="org19950a9"><span class="section-number-3">4.1</span> 原则</h3>
+<div id="outline-container-org8943bf2" class="outline-3">
+<h3 id="org8943bf2"><span class="section-number-3">4.1</span> 原则</h3>
 <div class="outline-text-3" id="text-4-1">
 <blockquote>
 <ol class="org-ol">
@@ -219,8 +219,8 @@ eval, setInterval, setTimeOut, execScript, write, writeLn, body.innerHtml</li>
 </blockquote>
 </div>
 
-<div id="outline-container-orgef69740" class="outline-4">
-<h4 id="orgef69740"><span class="section-number-4">4.1.1</span> 传递numbers to JavaScript</h4>
+<div id="outline-container-org4c10d79" class="outline-4">
+<h4 id="org4c10d79"><span class="section-number-4">4.1.1</span> 传递numbers to JavaScript</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <p>
 javascript不像html，有明显的html标签可以encode，下面的例子是个标准的注入
@@ -233,7 +233,7 @@ javascript注入貌似只存在于全栈框架，前后端分离要怎么注入j
 </blockquote>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;current_user_id = &lt;<span style="color: #a3be8c;">%= params[:id] %&gt;&lt;/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;current_user_id = &lt;<span style="color: #CC9393;">%= params[:id] %&gt;&lt;/script&gt;</span>
 </pre>
 </div>
 
@@ -242,7 +242,7 @@ javascript注入貌似只存在于全栈框架，前后端分离要怎么注入j
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;current_user_id = alert<span style="color: #8c8c8c;">(</span>document.cookie<span style="color: #8c8c8c;">)</span>&lt;<span style="color: #a3be8c;">/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;current_user_id = alert<span style="color: #DCDCCC;">(</span>document.cookie<span style="color: #DCDCCC;">)</span>&lt;<span style="color: #CC9393;">/script&gt;</span>
 </pre>
 </div>
 
@@ -251,7 +251,7 @@ javascript注入貌似只存在于全栈框架，前后端分离要怎么注入j
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;current_user_id = &lt;<span style="color: #a3be8c;">%= params[:id].to_i %&gt;&lt;/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;current_user_id = &lt;<span style="color: #CC9393;">%= params[:id].to_i %&gt;&lt;/script&gt;</span>
 </pre>
 </div>
 
@@ -261,15 +261,15 @@ javascript注入貌似只存在于全栈框架，前后端分离要怎么注入j
 </div>
 </div>
 
-<div id="outline-container-orgcdaa8dc" class="outline-4">
-<h4 id="orgcdaa8dc"><span class="section-number-4">4.1.2</span> 传递text to JavaScript</h4>
+<div id="outline-container-org68a862a" class="outline-4">
+<h4 id="org68a862a"><span class="section-number-4">4.1.2</span> 传递text to JavaScript</h4>
 <div class="outline-text-4" id="text-4-1-2">
 <p>
 javascript是一种很有意思的语言，包含了大量的特殊的字符，显然这些字符全都escape掉不切实际。Rails采用的办法是。escape掉html字符，然后用单引号包裹起来。
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;current_user_id = <span style="color: #a3be8c;">'&lt;%=param[:id] %&gt;'</span> &lt;<span style="color: #a3be8c;">/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;current_user_id = <span style="color: #CC9393;">'&lt;%=param[:id] %&gt;'</span> &lt;<span style="color: #CC9393;">/script&gt;</span>
 </pre>
 </div>
 
@@ -278,7 +278,7 @@ javascript是一种很有意思的语言，包含了大量的特殊的字符，�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;current_user_id = <span style="color: #a3be8c;">'&amp;#39;+alert(1)+&amp;#39;'</span>&lt;<span style="color: #a3be8c;">/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;current_user_id = <span style="color: #CC9393;">'&amp;#39;+alert(1)+&amp;#39;'</span>&lt;<span style="color: #CC9393;">/script&gt;</span>
 </pre>
 </div>
 
@@ -287,7 +287,7 @@ javascript是一种很有意思的语言，包含了大量的特殊的字符，�
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;current_user_id = <span style="color: #a3be8c;">'&amp;quot;/&amp;gt;&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;'</span>&lt;<span style="color: #a3be8c;">/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;current_user_id = <span style="color: #CC9393;">'&amp;quot;/&amp;gt;&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;'</span>&lt;<span style="color: #CC9393;">/script&gt;</span>
 </pre>
 </div>
 
@@ -300,50 +300,50 @@ javascript是一种很有意思的语言，包含了大量的特殊的字符，�
 </div>
 </div>
 
-<div id="outline-container-orgc53f502" class="outline-3">
-<h3 id="orgc53f502"><span class="section-number-3">4.2</span> </h3>
+<div id="outline-container-org5f55efc" class="outline-3">
+<h3 id="org5f55efc"><span class="section-number-3">4.2</span> </h3>
 </div>
 </div>
 
-<div id="outline-container-orgf4560fe" class="outline-2">
-<h2 id="orgf4560fe"><span class="section-number-2">5</span> 传递Json to HTML/JavaScript</h2>
+<div id="outline-container-orga77abee" class="outline-2">
+<h2 id="orga77abee"><span class="section-number-2">5</span> 传递Json to HTML/JavaScript</h2>
 <div class="outline-text-2" id="text-5">
 </div>
-<div id="outline-container-org9843811" class="outline-3">
-<h3 id="org9843811"><span class="section-number-3">5.1</span> Json Escaping</h3>
+<div id="outline-container-org183edbf" class="outline-3">
+<h3 id="org183edbf"><span class="section-number-3">5.1</span> Json Escaping</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 Rails通过ERB::Util#json<sub>escape编码json的特殊字符</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">{</span> <span style="color: #a3be8c;">'&amp;'</span> =&gt; <span style="color: #a3be8c;">'\u0026'</span>, <span style="color: #a3be8c;">'&gt;'</span> =&gt; <span style="color: #a3be8c;">'\u003e'</span>, <span style="color: #a3be8c;">'&lt;'</span> =&gt; <span style="color: #a3be8c;">'\u003c'</span>, <span style="color: #a3be8c;">"\u2028"</span> =&gt; <span style="color: #a3be8c;">'\u2028'</span>, <span style="color: #a3be8c;">"\u2029"</span> =&gt; <span style="color: #a3be8c;">'\u2029'</span> <span style="color: #8c8c8c;">}</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">{</span> <span style="color: #CC9393;">'&amp;'</span> =&gt; <span style="color: #CC9393;">'\u0026'</span>, <span style="color: #CC9393;">'&gt;'</span> =&gt; <span style="color: #CC9393;">'\u003e'</span>, <span style="color: #CC9393;">'&lt;'</span> =&gt; <span style="color: #CC9393;">'\u003c'</span>, <span style="color: #CC9393;">"\u2028"</span> =&gt; <span style="color: #CC9393;">'\u2028'</span>, <span style="color: #CC9393;">"\u2029"</span> =&gt; <span style="color: #CC9393;">'\u2029'</span> <span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;<span style="color: #a3be8c;">%= json_escape (User.last.to_json) %&gt;</span>
+<pre class="src src-ruby">&lt;<span style="color: #CC9393;">%= json_escape (User.last.to_json) %&gt;</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #8c8c8c;">{</span><span style="color: #a3be8c;">"id"</span>:<span style="color: #d08770;">1</span>,<span style="color: #a3be8c;">"name"</span>:<span style="color: #a3be8c;">"\u003cgreat\u003e"</span>,<span style="color: #a3be8c;">"created_at"</span>:<span style="color: #a3be8c;">"2016-02-24T13:14:05.049Z"</span>,<span style="color: #a3be8c;">"updated_at"</span>:<span style="color: #a3be8c;">"2016-02-24T13:14:05.049Z"</span><span style="color: #8c8c8c;">}</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC;">{</span><span style="color: #CC9393;">"id"</span>:<span style="color: #BFEBBF;">1</span>,<span style="color: #CC9393;">"name"</span>:<span style="color: #CC9393;">"\u003cgreat\u003e"</span>,<span style="color: #CC9393;">"created_at"</span>:<span style="color: #CC9393;">"2016-02-24T13:14:05.049Z"</span>,<span style="color: #CC9393;">"updated_at"</span>:<span style="color: #CC9393;">"2016-02-24T13:14:05.049Z"</span><span style="color: #DCDCCC;">}</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org028cf1c" class="outline-3">
-<h3 id="org028cf1c"><span class="section-number-3">5.2</span> Json to HTML</h3>
+<div id="outline-container-orgc3ff736" class="outline-3">
+<h3 id="orgc3ff736"><span class="section-number-3">5.2</span> Json to HTML</h3>
 <div class="outline-text-3" id="text-5-2">
 </div>
-<div id="outline-container-orgc558125" class="outline-4">
-<h4 id="orgc558125"><span class="section-number-4">5.2.1</span> to HTML elements</h4>
+<div id="outline-container-org3712c3f" class="outline-4">
+<h4 id="org3712c3f"><span class="section-number-4">5.2.1</span> to HTML elements</h4>
 <div class="outline-text-4" id="text-5-2-1">
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b&gt;<span style="color: #c0c5ce;">Here</span> is some json <span style="color: #d08770;">data:</span>
-&lt;<span style="color: #a3be8c;">%={:name =</span>&gt; <span style="color: #a3be8c;">"jack"</span>, <span style="color: #d08770;">:id</span> =&gt; params<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:id</span><span style="color: #8c8c8c;">]</span><span style="color: #88090B;">}</span>.to_json%&gt;
-&lt;<span style="color: #a3be8c;">/b&gt;</span>
+<pre class="src src-ruby">&lt;b&gt;<span style="color: #7CB8BB;">Here</span> is some json <span style="color: #BFEBBF;">data:</span>
+&lt;<span style="color: #CC9393;">%={:name =</span>&gt; <span style="color: #CC9393;">"jack"</span>, <span style="color: #BFEBBF;">:id</span> =&gt; params<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:id</span><span style="color: #DCDCCC;">]</span><span style="color: #88090B;">}</span>.to_json%&gt;
+&lt;<span style="color: #CC9393;">/b&gt;</span>
 </pre>
 </div>
 
@@ -352,21 +352,21 @@ Rails通过ERB::Util#json<sub>escape编码json的特殊字符</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b&gt;<span style="color: #c0c5ce;">Here</span> is some json <span style="color: #d08770;">data:</span> <span style="color: #8c8c8c;">{</span>&amp;quot;name&amp;quot;<span style="color: #d08770;">:&amp;quot</span>;jack&amp;quot;,&amp;quot;id&amp;quot;<span style="color: #d08770;">:&amp;quot</span>;\u003cscript\u003ealert<span style="color: #93a8c6;">(</span><span style="color: #d08770;">1</span><span style="color: #93a8c6;">)</span>\u003c/script\u003e&amp;quot;<span style="color: #8c8c8c;">}</span>&lt;<span style="color: #a3be8c;">/b&gt;</span>
+<pre class="src src-ruby">&lt;b&gt;<span style="color: #7CB8BB;">Here</span> is some json <span style="color: #BFEBBF;">data:</span> <span style="color: #DCDCCC;">{</span>&amp;quot;name&amp;quot;<span style="color: #BFEBBF;">:&amp;quot</span>;jack&amp;quot;,&amp;quot;id&amp;quot;<span style="color: #BFEBBF;">:&amp;quot</span>;\u003cscript\u003ealert<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">1</span><span style="color: #BFEBBF;">)</span>\u003c/script\u003e&amp;quot;<span style="color: #DCDCCC;">}</span>&lt;<span style="color: #CC9393;">/b&gt;</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgcb5fda2" class="outline-4">
-<h4 id="orgcb5fda2"><span class="section-number-4">5.2.2</span> to HTML attributes</h4>
+<div id="outline-container-org763f071" class="outline-4">
+<h4 id="org763f071"><span class="section-number-4">5.2.2</span> to HTML attributes</h4>
 <div class="outline-text-4" id="text-5-2-2">
 <p>
 json string同样也会被html<sub>escape编码</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b user-info=<span style="color: #a3be8c;">"&lt;%={:name =&gt; "</span>jack<span style="color: #a3be8c;">", :id =&gt; params[:id]}.to_json%&gt;"</span>&lt;<span style="color: #a3be8c;">/b&gt;</span>
+<pre class="src src-ruby">&lt;b user-info=<span style="color: #CC9393;">"&lt;%={:name =&gt; "</span>jack<span style="color: #CC9393;">", :id =&gt; params[:id]}.to_json%&gt;"</span>&lt;<span style="color: #CC9393;">/b&gt;</span>
 </pre>
 </div>
 
@@ -375,24 +375,24 @@ json string同样也会被html<sub>escape编码</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;b user-info=<span style="color: #a3be8c;">"{&amp;quot;name&amp;quot;:&amp;quot;jack&amp;quot;,&amp;quot;id&amp;quot;:&amp;quot;\&amp;quot; onmouseover=alert(1)&amp;quot;}"</span>&lt;<span style="color: #a3be8c;">/b&gt;</span>
+<pre class="src src-ruby">&lt;b user-info=<span style="color: #CC9393;">"{&amp;quot;name&amp;quot;:&amp;quot;jack&amp;quot;,&amp;quot;id&amp;quot;:&amp;quot;\&amp;quot; onmouseover=alert(1)&amp;quot;}"</span>&lt;<span style="color: #CC9393;">/b&gt;</span>
 </pre>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org7cbaab8" class="outline-4">
-<h4 id="org7cbaab8"><span class="section-number-4">5.2.3</span> 为什么要用to<sub>json</sub></h4>
+<div id="outline-container-org845a188" class="outline-4">
+<h4 id="org845a188"><span class="section-number-4">5.2.3</span> 为什么要用to<sub>json</sub></h4>
 <div class="outline-text-4" id="text-5-2-3">
 <p>
 如果不是用合理的方式构建json，那么json<sub>escape没有用</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #bf616a;">@json_crafted</span> = <span style="color: #a3be8c;">'{"name":"jack","id":&#8221;'</span>+ params<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:id</span><span style="color: #8c8c8c;">]</span> +<span style="color: #a3be8c;">'&#8221;}'</span>
+<pre class="src src-ruby"><span style="color: #DFAF8F;">@json_crafted</span> = <span style="color: #CC9393;">'{"name":"jack","id":&#8221;'</span>+ params<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:id</span><span style="color: #DCDCCC;">]</span> +<span style="color: #CC9393;">'&#8221;}'</span>
 
-&lt;script&gt;user=&lt;<span style="color: #a3be8c;">%= json_escape(@json_crafted.html_safe) %&gt;&lt;/script&gt;</span>
+&lt;script&gt;user=&lt;<span style="color: #CC9393;">%= json_escape(@json_crafted.html_safe) %&gt;&lt;/script&gt;</span>
 </pre>
 </div>
 <p>
@@ -400,7 +400,7 @@ json string同样也会被html<sub>escape编码</sub>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">&lt;script&gt;user=<span style="color: #8c8c8c;">{</span><span style="color: #a3be8c;">"name"</span>:<span style="color: #a3be8c;">"jack"</span>,<span style="color: #a3be8c;">"id"</span>:<span style="color: #a3be8c;">""</span>+alert<span style="color: #93a8c6;">(</span><span style="color: #d08770;">1</span><span style="color: #93a8c6;">)</span>+<span style="color: #a3be8c;">""</span><span style="color: #8c8c8c;">}</span>&lt;<span style="color: #a3be8c;">/script&gt;</span>
+<pre class="src src-ruby">&lt;script&gt;user=<span style="color: #DCDCCC;">{</span><span style="color: #CC9393;">"name"</span>:<span style="color: #CC9393;">"jack"</span>,<span style="color: #CC9393;">"id"</span>:<span style="color: #CC9393;">""</span>+alert<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">1</span><span style="color: #BFEBBF;">)</span>+<span style="color: #CC9393;">""</span><span style="color: #DCDCCC;">}</span>&lt;<span style="color: #CC9393;">/script&gt;</span>
 </pre>
 </div>
 <p>
@@ -411,21 +411,21 @@ json string同样也会被html<sub>escape编码</sub>
 </div>
 </div>
 
-<div id="outline-container-org121f409" class="outline-2">
-<h2 id="org121f409"><span class="section-number-2">6</span> 一些不安全的helpers</h2>
+<div id="outline-container-org7b71bd3" class="outline-2">
+<h2 id="org7b71bd3"><span class="section-number-2">6</span> 一些不安全的helpers</h2>
 <div class="outline-text-2" id="text-6">
 </div>
-<div id="outline-container-orgc245f42" class="outline-3">
-<h3 id="orgc245f42"><span class="section-number-3">6.1</span> link<sub>to</sub></h3>
+<div id="outline-container-org37ab027" class="outline-3">
+<h3 id="org37ab027"><span class="section-number-3">6.1</span> link<sub>to</sub></h3>
 <div class="outline-text-3" id="text-6-1">
 <p>
 link<sub>to</sub> 是一个生成&lt;a&gt; dom的rails方法
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">link_to <span style="color: #a3be8c;">"Visit Other Site"</span>, <span style="color: #a3be8c;">"http://www.rubyonrails.org/"</span>
+<pre class="src src-ruby">link_to <span style="color: #CC9393;">"Visit Other Site"</span>, <span style="color: #CC9393;">"http://www.rubyonrails.org/"</span>
 
-<span style="color: #c0c5ce;"># </span><span style="color: #65737e;">=&gt; &lt;a href="http://www.rubyonrails.org/" &gt;Visit Other Site&lt;/a&gt;</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; &lt;a href="http://www.rubyonrails.org/" &gt;Visit Other Site&lt;/a&gt;</span>
 </pre>
 </div>
 
@@ -434,9 +434,9 @@ link<sub>to</sub> 是一个生成&lt;a&gt; dom的rails方法
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">link_to <span style="color: #a3be8c;">"Great link"</span>, params<span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:link</span><span style="color: #8c8c8c;">]</span>
+<pre class="src src-ruby">link_to <span style="color: #CC9393;">"Great link"</span>, params<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:link</span><span style="color: #DCDCCC;">]</span>
 
-&lt;a href=<span style="color: #a3be8c;">"javascript:alert(document.domain)"</span>&gt;<span style="color: #c0c5ce;">Great</span> link&lt;<span style="color: #a3be8c;">/a&gt;</span>
+&lt;a href=<span style="color: #CC9393;">"javascript:alert(document.domain)"</span>&gt;<span style="color: #7CB8BB;">Great</span> link&lt;<span style="color: #CC9393;">/a&gt;</span>
 </pre>
 </div>
 
@@ -453,19 +453,19 @@ link<sub>to</sub> 是一个生成&lt;a&gt; dom的rails方法
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">$ bundle <span style="color: #d08770;">exec</span> rails c
+<pre class="src src-ruby">$ bundle <span style="color: #DCDCCC; font-weight: bold;">exec</span> rails c
 
-<span style="color: #c0c5ce;">Running</span> via <span style="color: #c0c5ce;">Spring</span> preloader <span style="color: #b48ead;">in</span> process <span style="color: #d08770;">39287</span>
+<span style="color: #7CB8BB;">Running</span> via <span style="color: #7CB8BB;">Spring</span> preloader <span style="color: #F0DFAF; font-weight: bold;">in</span> process <span style="color: #BFEBBF;">39287</span>
 
-<span style="color: #c0c5ce;">Loading</span> development environment <span style="color: #8c8c8c;">(</span><span style="color: #c0c5ce;">Rails</span> <span style="color: #d08770;">4</span>.<span style="color: #d08770;">2</span>.<span style="color: #d08770;">5</span>.<span style="color: #d08770;">1</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #7CB8BB;">Loading</span> development environment <span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">Rails</span> <span style="color: #BFEBBF;">4</span>.<span style="color: #BFEBBF;">2</span>.<span style="color: #BFEBBF;">5</span>.<span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">)</span>
 
-<span style="color: #d08770;">2</span>.<span style="color: #d08770;">1</span>.<span style="color: #d08770;">1</span> :<span style="color: #d08770;">001</span> &gt; <span style="color: #c0c5ce;">URI</span>.parse<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">"javascript:alert(1)"</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #BFEBBF;">2</span>.<span style="color: #BFEBBF;">1</span>.<span style="color: #BFEBBF;">1</span> :<span style="color: #BFEBBF;">001</span> &gt; <span style="color: #7CB8BB;">URI</span>.parse<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">"javascript:alert(1)"</span><span style="color: #DCDCCC;">)</span>
 
-=&gt; <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">&lt;URI::Generic:0x00000101bf1970 URL:javascript:alert(1)&gt;</span>
+=&gt; <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&lt;URI::Generic:0x00000101bf1970 URL:javascript:alert(1)&gt;</span>
 
-<span style="color: #d08770;">2</span>.<span style="color: #d08770;">1</span>.<span style="color: #d08770;">1</span> :<span style="color: #d08770;">002</span> &gt; <span style="color: #c0c5ce;">URI</span>.parse<span style="color: #8c8c8c;">(</span><span style="color: #a3be8c;">"javascript:alert(1)"</span><span style="color: #8c8c8c;">)</span>.scheme
+<span style="color: #BFEBBF;">2</span>.<span style="color: #BFEBBF;">1</span>.<span style="color: #BFEBBF;">1</span> :<span style="color: #BFEBBF;">002</span> &gt; <span style="color: #7CB8BB;">URI</span>.parse<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">"javascript:alert(1)"</span><span style="color: #DCDCCC;">)</span>.scheme
 
-=&gt; <span style="color: #a3be8c;">"javascript"</span>
+=&gt; <span style="color: #CC9393;">"javascript"</span>
 </pre>
 </div>
 </div>
@@ -477,7 +477,7 @@ link<sub>to</sub> 是一个生成&lt;a&gt; dom的rails方法
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

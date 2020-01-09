@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -63,33 +63,46 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org937dda1">1. LIVE sla，涉及新 live rpc 迁移修改</a></li>
-<li><a href="#org81e0c1f">2. oncall 机器人</a></li>
-<li><a href="#orge96f3aa">3. 老 live 迁移</a></li>
-<li><a href="#org96e0366">4. 新 live 爬虫问题</a></li>
-<li><a href="#org1473248">5. publication 后台结算迁移，调度任务整理</a></li>
-<li><a href="#org659e75b">6. <span class="done DONE">DONE</span> 推广页 button 加字段 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></a></li>
-<li><a href="#org1228f9e">7. <span class="todo TODO">TODO</span> 后台优化三期</a>
+<li><a href="#orge8e4828">1. LIVE sla，涉及新 live rpc 迁移修改</a></li>
+<li><a href="#org11e7a3a">2. oncall 机器人</a></li>
+<li><a href="#org794d483">3. 老 live 迁移</a></li>
+<li><a href="#org680ee1e">4. 新 live 爬虫问题</a></li>
+<li><a href="#orga05670d">5. publication 后台结算迁移，调度任务整理</a></li>
+<li><a href="#org2b8d50f">6. <span class="done DONE">DONE</span> 推广页 button 加字段 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></a></li>
+<li><a href="#orgb544dbb">7. <span class="done DONE">DONE</span> 后台优化三期</a>
 <ul>
-<li><a href="#org137f758">7.1. <span class="todo TODO">TODO</span> 会员推荐页</a>
+<li><a href="#org2599163">7.1. <span class="done DONE">DONE</span> 会员推荐页</a>
 <ul>
-<li><a href="#orgfdfce30">7.1.1. <span class="done DONE">DONE</span> 排序，筛选（前端处理）0d</a></li>
-<li><a href="#orgb677f59">7.1.2. <span class="todo TODO">TODO</span> 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d</a></li>
-<li><a href="#orgc5cc146">7.1.3. <span class="done DONE">DONE</span> 增加排序规则：权重 + 创建时间倒叙 0d</a></li>
-<li><a href="#orgcc970bd">7.1.4. <span class="done DONE">DONE</span> <code>sku_id</code> =&gt; <code>business_id</code> 1d</a></li>
+<li><a href="#org4608a66">7.1.1. <span class="done DONE">DONE</span> 排序，筛选（前端处理）0d</a></li>
+<li><a href="#orgf7ca659">7.1.2. <span class="todo TODO">TODO</span> 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d</a></li>
+<li><a href="#org4404169">7.1.3. <span class="done DONE">DONE</span> 增加排序规则：权重 + 创建时间倒叙 0d</a></li>
+<li><a href="#org2f9761a">7.1.4. <code>sku_id</code> =&gt; <code>business_id</code> 1d</a></li>
 </ul>
 </li>
-<li><a href="#org9268540">7.2. <span class="todo TODO">TODO</span> sku 专题和推广活动</a>
+<li><a href="#orgbaf90e7">7.2. <span class="done DONE">DONE</span> sku 专题和推广活动</a>
 <ul>
-<li><a href="#org88e2ac0">7.2.1. <span class="done DONE">DONE</span> 精选专题单增加跳转链接和图片 1d</a></li>
-<li><a href="#org65924ef">7.2.2. <span class="done DONE">DONE</span> 精选专题多/单 <code>sku_id</code> =&gt; <code>business_id</code> 0.5d</a></li>
-<li><a href="#org82568a7">7.2.3. <span class="todo TODO">TODO</span> 模块配置列表去掉一些模块 0d</a></li>
+<li><a href="#org7c6d717">7.2.1. <span class="done DONE">DONE</span> 精选专题单增加跳转链接和图片 1d</a></li>
+<li><a href="#orgde9b377">7.2.2. <span class="done DONE">DONE</span> 精选专题多/单 <code>sku_id</code> =&gt; <code>business_id</code> 0.5d</a></li>
+<li><a href="#org5602900">7.2.3. <span class="todo TODO">TODO</span> 模块配置列表去掉一些模块 0d</a></li>
 </ul>
 </li>
-<li><a href="#org90752ed">7.3. <span class="done DONE">DONE</span> 线下活动复制。榜单复制 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></a>
+<li><a href="#org1267e97">7.3. <span class="done DONE">DONE</span> 线下活动复制。榜单复制 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></a>
 <ul>
-<li><a href="#orgc3570c5">7.3.1. <span class="done DONE">DONE</span> 榜单复制 0.5 d</a></li>
-<li><a href="#org8d5770c">7.3.2. <span class="done DONE">DONE</span> 线下活动复制 0.5 d</a></li>
+<li><a href="#org8b54b3e">7.3.1. <span class="done DONE">DONE</span> 榜单复制 0.5 d</a></li>
+<li><a href="#orge707ef8">7.3.2. <span class="done DONE">DONE</span> 线下活动复制 0.5 d</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org9a497c2">8. <span class="todo TODO">TODO</span> 分期上线 <span class="timestamp-wrapper"><span class="timestamp">&lt;2020-01-07 Tue&gt;</span></span></a>
+<ul>
+<li><a href="#org7fc1529">8.1. <span class="todo TODO">TODO</span> 一次性上线公开时判断期数和总期数</a></li>
+<li><a href="#org1e07097">8.2. <span class="todo TODO">TODO</span> 私家课编辑页和盐选专栏编辑页增加修改分期上线功能 bug notify!</a>
+<ul>
+<li><a href="#orgbb12878">8.2.1. <code>is_staged</code> 总期数和总时长不能为0，album 的 schema 有验证，不是很重要</a></li>
+<li><a href="#orgaf7744e">8.2.2. <code>is_staged</code> 和 <code>is_serial</code> 不能同时为 True，schema 中应该有 validate</a></li>
+<li><a href="#orgbb7b801">8.2.3. 什么 VipFreeUploadingAlbumController 里面有加入 <code>is_staged</code> 为 True 的数据，但是只有一个 rpc 用到，这个 rpc 目前没有 qps，暂时不管了</a></li>
+<li><a href="#orgfe79759">8.2.4. <code>is_staged</code> = True, 可以， 为 False 时如果 <code>is_public=True</code> 则 <code>section_count</code> assert equal <code>update_section_count</code></a></li>
 </ul>
 </li>
 </ul>
@@ -98,68 +111,93 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org937dda1" class="outline-2">
-<h2 id="org937dda1"><span class="section-number-2">1</span> LIVE sla，涉及新 live rpc 迁移修改</h2>
+<div id="outline-container-orge8e4828" class="outline-2">
+<h2 id="orge8e4828"><span class="section-number-2">1</span> LIVE sla，涉及新 live rpc 迁移修改</h2>
 </div>
-<div id="outline-container-org81e0c1f" class="outline-2">
-<h2 id="org81e0c1f"><span class="section-number-2">2</span> oncall 机器人</h2>
+<div id="outline-container-org11e7a3a" class="outline-2">
+<h2 id="org11e7a3a"><span class="section-number-2">2</span> oncall 机器人</h2>
 </div>
-<div id="outline-container-orge96f3aa" class="outline-2">
-<h2 id="orge96f3aa"><span class="section-number-2">3</span> 老 live 迁移</h2>
+<div id="outline-container-org794d483" class="outline-2">
+<h2 id="org794d483"><span class="section-number-2">3</span> 老 live 迁移</h2>
 </div>
-<div id="outline-container-org96e0366" class="outline-2">
-<h2 id="org96e0366"><span class="section-number-2">4</span> 新 live 爬虫问题</h2>
+<div id="outline-container-org680ee1e" class="outline-2">
+<h2 id="org680ee1e"><span class="section-number-2">4</span> 新 live 爬虫问题</h2>
 </div>
-<div id="outline-container-org1473248" class="outline-2">
-<h2 id="org1473248"><span class="section-number-2">5</span> publication 后台结算迁移，调度任务整理</h2>
+<div id="outline-container-orga05670d" class="outline-2">
+<h2 id="orga05670d"><span class="section-number-2">5</span> publication 后台结算迁移，调度任务整理</h2>
 </div>
-<div id="outline-container-org659e75b" class="outline-2">
-<h2 id="org659e75b"><span class="section-number-2">6</span> <span class="done DONE">DONE</span> 推广页 button 加字段 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></h2>
+<div id="outline-container-org2b8d50f" class="outline-2">
+<h2 id="org2b8d50f"><span class="section-number-2">6</span> <span class="done DONE">DONE</span> 推广页 button 加字段 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></h2>
 </div>
-<div id="outline-container-org1228f9e" class="outline-2">
-<h2 id="org1228f9e"><span class="section-number-2">7</span> <span class="todo TODO">TODO</span> 后台优化三期</h2>
+<div id="outline-container-orgb544dbb" class="outline-2">
+<h2 id="orgb544dbb"><span class="section-number-2">7</span> <span class="done DONE">DONE</span> 后台优化三期</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-org137f758" class="outline-3">
-<h3 id="org137f758"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> 会员推荐页</h3>
+<div id="outline-container-org2599163" class="outline-3">
+<h3 id="org2599163"><span class="section-number-3">7.1</span> <span class="done DONE">DONE</span> 会员推荐页</h3>
 <div class="outline-text-3" id="text-7-1">
 </div>
-<div id="outline-container-orgfdfce30" class="outline-4">
-<h4 id="orgfdfce30"><span class="section-number-4">7.1.1</span> <span class="done DONE">DONE</span> 排序，筛选（前端处理）0d</h4>
+<div id="outline-container-org4608a66" class="outline-4">
+<h4 id="org4608a66"><span class="section-number-4">7.1.1</span> <span class="done DONE">DONE</span> 排序，筛选（前端处理）0d</h4>
 </div>
-<div id="outline-container-orgb677f59" class="outline-4">
-<h4 id="orgb677f59"><span class="section-number-4">7.1.2</span> <span class="todo TODO">TODO</span> 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d</h4>
+<div id="outline-container-orgf7ca659" class="outline-4">
+<h4 id="orgf7ca659"><span class="section-number-4">7.1.2</span> <span class="todo TODO">TODO</span> 增加模块创建人, 最新修改人，创建时间，最新修改时间 1d</h4>
 </div>
-<div id="outline-container-orgc5cc146" class="outline-4">
-<h4 id="orgc5cc146"><span class="section-number-4">7.1.3</span> <span class="done DONE">DONE</span> 增加排序规则：权重 + 创建时间倒叙 0d</h4>
+<div id="outline-container-org4404169" class="outline-4">
+<h4 id="org4404169"><span class="section-number-4">7.1.3</span> <span class="done DONE">DONE</span> 增加排序规则：权重 + 创建时间倒叙 0d</h4>
 </div>
-<div id="outline-container-orgcc970bd" class="outline-4">
-<h4 id="orgcc970bd"><span class="section-number-4">7.1.4</span> <span class="done DONE">DONE</span> <code>sku_id</code> =&gt; <code>business_id</code> 1d</h4>
+<div id="outline-container-org2f9761a" class="outline-4">
+<h4 id="org2f9761a"><span class="section-number-4">7.1.4</span> <code>sku_id</code> =&gt; <code>business_id</code> 1d</h4>
 </div>
 </div>
-<div id="outline-container-org9268540" class="outline-3">
-<h3 id="org9268540"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> sku 专题和推广活动</h3>
+<div id="outline-container-orgbaf90e7" class="outline-3">
+<h3 id="orgbaf90e7"><span class="section-number-3">7.2</span> <span class="done DONE">DONE</span> sku 专题和推广活动</h3>
 <div class="outline-text-3" id="text-7-2">
 </div>
-<div id="outline-container-org88e2ac0" class="outline-4">
-<h4 id="org88e2ac0"><span class="section-number-4">7.2.1</span> <span class="done DONE">DONE</span> 精选专题单增加跳转链接和图片 1d</h4>
+<div id="outline-container-org7c6d717" class="outline-4">
+<h4 id="org7c6d717"><span class="section-number-4">7.2.1</span> <span class="done DONE">DONE</span> 精选专题单增加跳转链接和图片 1d</h4>
 </div>
-<div id="outline-container-org65924ef" class="outline-4">
-<h4 id="org65924ef"><span class="section-number-4">7.2.2</span> <span class="done DONE">DONE</span> 精选专题多/单 <code>sku_id</code> =&gt; <code>business_id</code> 0.5d</h4>
+<div id="outline-container-orgde9b377" class="outline-4">
+<h4 id="orgde9b377"><span class="section-number-4">7.2.2</span> <span class="done DONE">DONE</span> 精选专题多/单 <code>sku_id</code> =&gt; <code>business_id</code> 0.5d</h4>
 </div>
-<div id="outline-container-org82568a7" class="outline-4">
-<h4 id="org82568a7"><span class="section-number-4">7.2.3</span> <span class="todo TODO">TODO</span> 模块配置列表去掉一些模块 0d</h4>
+<div id="outline-container-org5602900" class="outline-4">
+<h4 id="org5602900"><span class="section-number-4">7.2.3</span> <span class="todo TODO">TODO</span> 模块配置列表去掉一些模块 0d</h4>
 </div>
 </div>
-<div id="outline-container-org90752ed" class="outline-3">
-<h3 id="org90752ed"><span class="section-number-3">7.3</span> <span class="done DONE">DONE</span> 线下活动复制。榜单复制 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></h3>
+<div id="outline-container-org1267e97" class="outline-3">
+<h3 id="org1267e97"><span class="section-number-3">7.3</span> <span class="done DONE">DONE</span> 线下活动复制。榜单复制 <span class="timestamp-wrapper"><span class="timestamp">&lt;2019-12-26 Thu&gt;</span></span></h3>
 <div class="outline-text-3" id="text-7-3">
 </div>
-<div id="outline-container-orgc3570c5" class="outline-4">
-<h4 id="orgc3570c5"><span class="section-number-4">7.3.1</span> <span class="done DONE">DONE</span> 榜单复制 0.5 d</h4>
+<div id="outline-container-org8b54b3e" class="outline-4">
+<h4 id="org8b54b3e"><span class="section-number-4">7.3.1</span> <span class="done DONE">DONE</span> 榜单复制 0.5 d</h4>
 </div>
-<div id="outline-container-org8d5770c" class="outline-4">
-<h4 id="org8d5770c"><span class="section-number-4">7.3.2</span> <span class="done DONE">DONE</span> 线下活动复制 0.5 d</h4>
+<div id="outline-container-orge707ef8" class="outline-4">
+<h4 id="orge707ef8"><span class="section-number-4">7.3.2</span> <span class="done DONE">DONE</span> 线下活动复制 0.5 d</h4>
+</div>
+</div>
+</div>
+<div id="outline-container-org9a497c2" class="outline-2">
+<h2 id="org9a497c2"><span class="section-number-2">8</span> <span class="todo TODO">TODO</span> 分期上线 <span class="timestamp-wrapper"><span class="timestamp">&lt;2020-01-07 Tue&gt;</span></span></h2>
+<div class="outline-text-2" id="text-8">
+</div>
+<div id="outline-container-org7fc1529" class="outline-3">
+<h3 id="org7fc1529"><span class="section-number-3">8.1</span> <span class="todo TODO">TODO</span> 一次性上线公开时判断期数和总期数</h3>
+</div>
+<div id="outline-container-org1e07097" class="outline-3">
+<h3 id="org1e07097"><span class="section-number-3">8.2</span> <span class="todo TODO">TODO</span> 私家课编辑页和盐选专栏编辑页增加修改分期上线功能 bug notify!</h3>
+<div class="outline-text-3" id="text-8-2">
+</div>
+<div id="outline-container-orgbb12878" class="outline-4">
+<h4 id="orgbb12878"><span class="section-number-4">8.2.1</span> <code>is_staged</code> 总期数和总时长不能为0，album 的 schema 有验证，不是很重要</h4>
+</div>
+<div id="outline-container-orgaf7744e" class="outline-4">
+<h4 id="orgaf7744e"><span class="section-number-4">8.2.2</span> <code>is_staged</code> 和 <code>is_serial</code> 不能同时为 True，schema 中应该有 validate</h4>
+</div>
+<div id="outline-container-orgbb7b801" class="outline-4">
+<h4 id="orgbb7b801"><span class="section-number-4">8.2.3</span> 什么 VipFreeUploadingAlbumController 里面有加入 <code>is_staged</code> 为 True 的数据，但是只有一个 rpc 用到，这个 rpc 目前没有 qps，暂时不管了</h4>
+</div>
+<div id="outline-container-orgfe79759" class="outline-4">
+<h4 id="orgfe79759"><span class="section-number-4">8.2.4</span> <code>is_staged</code> = True, 可以， 为 False 时如果 <code>is_public=True</code> 则 <code>section_count</code> assert equal <code>update_section_count</code></h4>
 </div>
 </div>
 </div>
@@ -169,7 +207,7 @@ for the JavaScript code in this tag.
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

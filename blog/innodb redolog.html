@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -63,27 +63,84 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0174ef7">1. redo log</a>
+<li><a href="#org6257647">1. double write</a></li>
+<li><a href="#org39d3134">2. redo log</a>
 <ul>
-<li><a href="#orgecfce83">1.1. redo log buffer, os buffer</a></li>
-<li><a href="#org87a7780">1.2. <code>innodb_flush_log_at_trx_commit</code> 参数</a></li>
+<li><a href="#org66c0480">2.1. redo log buffer, os buffer</a></li>
+<li><a href="#org08bfb2c">2.2. <code>innodb_flush_log_at_trx_commit</code> 参数</a></li>
 </ul>
 </li>
-<li><a href="#org3414286">2. InnoDB 逻辑存储结构</a>
+<li><a href="#orga1b098d">3. InnoDB 逻辑存储结构</a>
 <ul>
-<li><a href="#org28d9db0">2.1. 表空间</a></li>
-<li><a href="#org644f558">2.2. 段</a></li>
-<li><a href="#org371bdfb">2.3. 区</a></li>
-<li><a href="#org68a7fb1">2.4. 页</a></li>
+<li><a href="#org2618b23">3.1. 表空间</a></li>
+<li><a href="#orgd110801">3.2. 段</a></li>
+<li><a href="#orgb981d7f">3.3. 区</a></li>
+<li><a href="#org769f74e">3.4. 页</a></li>
+</ul>
+</li>
+<li><a href="#orgd767eb8">4. 索引与算法</a>
+<ul>
+<li><a href="#org7fb9aa7">4.1. B+ 树插入节点</a></li>
+<li><a href="#orgee3ff98">4.2. 在线架构变更</a>
+<ul>
+<li><a href="#orga8bb6e7">4.2.1. Online Schema Change(OSC)</a></li>
+<li><a href="#org2112fa2">4.2.2. Online DDL</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org92a8125">5. 锁</a>
+<ul>
+<li><a href="#org07bb6de">5.1. 加锁范围</a></li>
+</ul>
+</li>
+<li><a href="#org6a7a352">6. 事务</a>
+<ul>
+<li><a href="#orge816855">6.1. 分类</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org0174ef7" class="outline-2">
-<h2 id="org0174ef7"><span class="section-number-2">1</span> redo log</h2>
+<div id="outline-container-org6257647" class="outline-2">
+<h2 id="org6257647"><span class="section-number-2">1</span> double write</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+为什么需要 double write 来保证数据正确性
+</p>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/double_write.png" alt="double_write.png" onerror="this.src='https://i.loli.net/2020/01/09/FqDBoeTlwLXhpJH.png'" />
+</p>
+<p><span class="figure-number">Figure 1: </span>partial write</p>
+</div>
+
+<p>
+　　一个数据页的大小是16K，假设在把内存中的脏页写到数据库的时候，写了2K突然掉电，也就是说前2K数据是新的，后14K是旧的，那么磁盘数据库这个数据页就是不完整的，是一个坏掉的数据页。redo只能加上旧、校检完整的数据页恢复一个脏块，不能修复坏掉的数据页，所以这个数据就丢失了，可能会造成数据不一致，所以需要double write。
+</p>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/double_write_process.png" alt="double_write_process.png" onerror="this.src='https://i.loli.net/2020/01/09/XU3kiwZfhPSBDu2.png'" />
+</p>
+<p><span class="figure-number">Figure 2: </span>double write process</p>
+</div>
+
+<p>
+也就是说，不能用 redo log 恢复的，使用共享表空间里的 double write 段来恢复，如果 double write 段写的也有问题，那说明单表 ibd 的页肯定也是干净的，就可以用 redo log 恢复了。
+</p>
+
+<pre class="example">
+*所以需要 double write 的根本原因就是：innodb 一页 16K, 但磁盘一个单位是 4K，而 16K 的页必须写满，否则 redo log 不可用*
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org39d3134" class="outline-2">
+<h2 id="org39d3134"><span class="section-number-2">2</span> redo log</h2>
+<div class="outline-text-2" id="text-2">
 <p>
 与 binlog, error log 等 mysql server 层提供的日志不同，redo log 是 innodb 存储引擎提供的日志文件，是 innodb 特有的，它记录了对 innodb 的事务日志。通常对于 mysql 的 DML 操作会先通过 innodb change buffer，然后在 doublewrite 到磁盘中，在落盘期间一旦异常宕机，就会造成数据错误，所以 innodb 提供了 WAL 技术，即 Write-Ahead logging，再每次变更数据时，都先写 redo 日志，这样一旦宕机，也可以从 redo log 中恢复数据。
 </p>
@@ -103,9 +160,9 @@ for the JavaScript code in this tag.
 </p>
 </div>
 
-<div id="outline-container-orgecfce83" class="outline-3">
-<h3 id="orgecfce83"><span class="section-number-3">1.1</span> redo log buffer, os buffer</h3>
-<div class="outline-text-3" id="text-1-1">
+<div id="outline-container-org66c0480" class="outline-3">
+<h3 id="org66c0480"><span class="section-number-3">2.1</span> redo log buffer, os buffer</h3>
+<div class="outline-text-3" id="text-2-1">
 <p>
 redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如果一次 DML 就 fsync 一条 write-log 会导致大量磁盘 IO，影响性能。更具体来说，redo log 要经过两层 buffer，分别是 innodb 提供的 redo log buffer 和 操作系统提供的 os buffer。经过一层 os buffer 的好处是即使 mysql 挂掉，只要服务器没有宕机则数据就不会丢失。所以一次 commit 的过程如下。
 </p>
@@ -114,7 +171,7 @@ redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/redo.png.png" alt="redo.png.png" /> 
 </p>
-<p><span class="figure-number">Figure 1: </span>redo.png</p>
+<p><span class="figure-number">Figure 3: </span>redo.png</p>
 </div>
 
 <p>
@@ -123,9 +180,9 @@ redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如
 </div>
 </div>
 
-<div id="outline-container-org87a7780" class="outline-3">
-<h3 id="org87a7780"><span class="section-number-3">1.2</span> <code>innodb_flush_log_at_trx_commit</code> 参数</h3>
-<div class="outline-text-3" id="text-1-2">
+<div id="outline-container-org08bfb2c" class="outline-3">
+<h3 id="org08bfb2c"><span class="section-number-3">2.2</span> <code>innodb_flush_log_at_trx_commit</code> 参数</h3>
+<div class="outline-text-3" id="text-2-2">
 <p>
 innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通过 <code>innodb_flush_log_at_trx_commit</code> 来配置
 </p>
@@ -140,15 +197,15 @@ innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通�
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/flush.png.png" alt="flush.png.png" />
 </p>
-<p><span class="figure-number">Figure 2: </span>flush</p>
+<p><span class="figure-number">Figure 4: </span>flush</p>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3414286" class="outline-2">
-<h2 id="org3414286"><span class="section-number-2">2</span> InnoDB 逻辑存储结构</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-orga1b098d" class="outline-2">
+<h2 id="orga1b098d"><span class="section-number-2">3</span> InnoDB 逻辑存储结构</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 innoDB 存储结构分为
 </p>
@@ -168,13 +225,13 @@ innoDB 存储结构分为
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/innodb_storage_s.png" alt="innodb_storage_s.png" onerror="this.src='https://i.loli.net/2020/01/05/hwfBTnus9W6GjX1.png'" />
 </p>
-<p><span class="figure-number">Figure 3: </span>innodb 逻辑存储结构</p>
+<p><span class="figure-number">Figure 5: </span>innodb 逻辑存储结构</p>
 </div>
 </div>
 
-<div id="outline-container-org28d9db0" class="outline-3">
-<h3 id="org28d9db0"><span class="section-number-3">2.1</span> 表空间</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-org2618b23" class="outline-3">
+<h3 id="org2618b23"><span class="section-number-3">3.1</span> 表空间</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 表空间是存储结构的最上层，存在一个共享表空间 ibddata1，除此之外若启用 <code>innodb_file_per_table</code> 参数，则每一个表都有自己的 ibd 表空间文件。打开 mysql 根目录就可以看到
 </p>
@@ -183,7 +240,7 @@ innoDB 存储结构分为
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/my_ibd.png" alt="my_ibd.png" onerror="this.src='https://i.loli.net/2020/01/05/hlzo54WEfDNG87d.png'" />
 </p>
-<p><span class="figure-number">Figure 4: </span>表空间文件</p>
+<p><span class="figure-number">Figure 6: </span>表空间文件</p>
 </div>
 
 <p>
@@ -210,19 +267,19 @@ innoDB 存储结构分为
 <div class="figure">
 <p><img src="file:///Users/norris/projects/baby/images/my_idb_content.png" alt="my_idb_content.png" onerror="this.src='https://i.loli.net/2020/01/05/BEDqVUPe1a42h7m.png'" />
 </p>
-<p><span class="figure-number">Figure 5: </span>ibd 内容</p>
+<p><span class="figure-number">Figure 7: </span>ibd 内容</p>
 </div>
 </div>
 </div>
 
 
-<div id="outline-container-org644f558" class="outline-3">
-<h3 id="org644f558"><span class="section-number-3">2.2</span> 段</h3>
+<div id="outline-container-orgd110801" class="outline-3">
+<h3 id="orgd110801"><span class="section-number-3">3.2</span> 段</h3>
 </div>
 
-<div id="outline-container-org371bdfb" class="outline-3">
-<h3 id="org371bdfb"><span class="section-number-3">2.3</span> 区</h3>
-<div class="outline-text-3" id="text-2-3">
+<div id="outline-container-orgb981d7f" class="outline-3">
+<h3 id="orgb981d7f"><span class="section-number-3">3.3</span> 区</h3>
+<div class="outline-text-3" id="text-3-3">
 <p>
 页的大小可以配置，区中可以有很多页，但是，*区的大小永远是 1M*，一般的一个页是 16KB，也就是说一个区有64个连续的页
 </p>
@@ -234,9 +291,9 @@ innoDB 存储结构分为
 </div>
 
 
-<div id="outline-container-org68a7fb1" class="outline-3">
-<h3 id="org68a7fb1"><span class="section-number-3">2.4</span> 页</h3>
-<div class="outline-text-3" id="text-2-4">
+<div id="outline-container-org769f74e" class="outline-3">
+<h3 id="org769f74e"><span class="section-number-3">3.4</span> 页</h3>
+<div class="outline-text-3" id="text-3-4">
 <p>
 页是 <code>innodb</code> 管理磁盘的最小单位，一般有如下类型
 </p>
@@ -251,14 +308,210 @@ innoDB 存储结构分为
 <li>未压缩的二进制大对象页(uncompressed blob page)</li>
 <li>压缩的二进制大对象页(compressed blob page)</li>
 </ul>
-
-
-
-<div class="figure">
-<p><img src="file:///Users/norris/projects/baby/images/999.png" alt="999.png" onerror="this.src='https://i.loli.net/2020/01/06/OdBuP8oQgFTe9WA.png'" />
-</p>
-<p><span class="figure-number">Figure 6: </span>999</p>
 </div>
+</div>
+</div>
+
+<div id="outline-container-orgd767eb8" class="outline-2">
+<h2 id="orgd767eb8"><span class="section-number-2">4</span> 索引与算法</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+B+ 树并不能找到具体行，而是找到数据行所在的页，然后把页读到内存，在内存中通过二分法查找到最终的数据。
+</p>
+</div>
+
+<div id="outline-container-org7fb9aa7" class="outline-3">
+<h3 id="org7fb9aa7"><span class="section-number-3">4.1</span> B+ 树插入节点</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+具体方法看书，只需要知道
+</p>
+
+<ul class="org-ul">
+<li>为了保证 B+ 还是平衡的，插入节点经常需要拆分页，造成磁盘 IO</li>
+</ul>
+
+<blockquote>
+<p>
+B+ 树索引的本质就是 B+ 树在数据库中的实现
+</p>
+</blockquote>
+</div>
+</div>
+
+<div id="outline-container-orgee3ff98" class="outline-3">
+<h3 id="orgee3ff98"><span class="section-number-3">4.2</span> 在线架构变更</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+我们肯定尝试过在线增加索引或者增加列，这种在线架构变更耗时过长往往会阻塞当前 DDL，主要处理方式有下面两种：
+</p>
+</div>
+
+<div id="outline-container-orga8bb6e7" class="outline-4">
+<h4 id="orga8bb6e7"><span class="section-number-4">4.2.1</span> Online Schema Change(OSC)</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<p>
+OSC 是 Facebook 用 PHP 写的用户在线架构变更的脚本，大致逻辑如下
+</p>
+
+<ul class="org-ul">
+<li>createCopyTable 创建和原始表一样的新表</li>
+<li>alterCopyTable 对新表增加索引或列等</li>
+<li>createDeltasTable 创建 deltas 表，主要用来保存后面所有对原表的 DML 操作记录，类似于 binlog 作用</li>
+<li>createTriggers 配合 deltas 表，对原表创建触发器，使 DML 记录到 deltas 表</li>
+<li>startSnpshotXact 开始 OSC 操作的事务</li>
+<li>selectTableIntoOutfile 将原表数据写入新表。为了减小对原表锁定时间，这里用分片输出到多个外部文件，然后将外部文件导入新表</li>
+<li>dropNCIndexs 导入新表前，删除新表所有辅助索引 (为了加快速度？)</li>
+<li>loadCopyTable 数据导入新表</li>
+<li>replayChanges 将 OSC 过程中 deltas 记录的 DML 操作应用到新表</li>
+<li>recreateNCIndexs 重新创建辅助索引</li>
+<li>replayChanges 因为创建辅助索引花时间，再次导入 deltas 记录 （直接都这次导入不完了？）</li>
+<li>swapTables 新旧表交换名字，变更生效</li>
+</ul>
+
+<p>
+OSC 还是通过创建新表和交换名字的方式，不过它创建了 deltas 表用来记录期间的 DML 操作，其实如果直接在 mysql 上改也是可以的，那样就要利用 redo log 之类的东西。
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org2112fa2" class="outline-4">
+<h4 id="org2112fa2"><span class="section-number-4">4.2.2</span> Online DDL</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<p>
+mysql 5.6 开始支持 DDL(在线数据定义)，可以在不阻塞的情况下变更数据，但只支持下面的
+</p>
+
+<ul class="org-ul">
+<li>增删改辅助索引</li>
+<li>列重命名</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org92a8125" class="outline-2">
+<h2 id="org92a8125"><span class="section-number-2">5</span> 锁</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+innoDB 的锁(lock) 主要指的是事务锁，而线程等 mutex 在这里叫做闩(latch)
+</p>
+
+<p>
+锁的两种类型
+</p>
+
+<ul class="org-ul">
+<li>S 共享锁</li>
+<li>X 排他锁</li>
+</ul>
+
+<p>
+两个锁之间存在兼容关系，即互相之间是否阻塞，如下
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">S</td>
+<td class="org-left">X</td>
+</tr>
+
+<tr>
+<td class="org-left">S</td>
+<td class="org-left">noblock</td>
+<td class="org-left">block</td>
+</tr>
+
+<tr>
+<td class="org-left">X</td>
+<td class="org-left">block</td>
+<td class="org-left">noblock</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+可见，X 锁与所有锁不兼容，就是说，如果事务中已经有了别的锁，再想加入 X 锁时就会被阻塞
+</p>
+
+<p>
+S, X 加锁的方式如下：
+</p>
+
+<ul class="org-ul">
+<li>加 S 锁: 
+<ol class="org-ol">
+<li>select &#x2026; lock in share mode</li>
+<li>select &#x2026; where foreign key 外键 select 会自动加 S 锁，保证数据一致性</li>
+</ol></li>
+
+<li>加 X 锁:
+<ol class="org-ol">
+<li>select &#x2026; for update</li>
+<li>DML 操作</li>
+</ol></li>
+</ul>
+
+<p>
+那么普通 select 在事务中会不会加 S 呢，答案是不会，普通 select 会使用一致性非锁定读模式，即时事务中有了 X 锁，也不会阻塞读，因为它会读取上一个版本（MVCC）
+</p>
+</div>
+
+<div id="outline-container-org07bb6de" class="outline-3">
+<h3 id="org07bb6de"><span class="section-number-3">5.1</span> 加锁范围</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+有 record, gap, next-key lock 三种
+</p>
+
+<ul class="org-ul">
+<li>record 只针对单行加锁，不会影响其他行插入</li>
+<li>gap 针对上一记录到本记录的间隙加锁，如 insert a = 1, a = 4, a = 7, 那么会对 a (1, 4)(4,7) 区间加锁</li>
+<li>next-key = record + gap，上述变成 a (1, 4] (4, 7]</li>
+</ul>
+
+<blockquote>
+<p>
+repeated read 隔离模式采用 next-key，只有针对唯一索引会降级成 record， 提高并发
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6a7a352" class="outline-2">
+<h2 id="org6a7a352"><span class="section-number-2">6</span> 事务</h2>
+<div class="outline-text-2" id="text-6">
+<blockquote>
+<p>
+数据库和文件系统的区别之一，就是是否能实现事务
+</p>
+</blockquote>
+</div>
+
+<div id="outline-container-orge816855" class="outline-3">
+<h3 id="orge816855"><span class="section-number-3">6.1</span> 分类</h3>
+<div class="outline-text-3" id="text-6-1">
+<ul class="org-ul">
+<li>扁平事务</li>
+<li>带有保存点的扁平事务，可回滚到一个 savepoint</li>
+<li>链事务，T1 提交会出发 T2 开始</li>
+<li>嵌套事务，innodb 不支持，可以用保存点模拟</li>
+<li>分布式事务，监听多个数据库的事务</li>
+</ul>
 </div>
 </div>
 </div>
@@ -268,7 +521,7 @@ innoDB 存储结构分为
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

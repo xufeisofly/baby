@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,17 +62,17 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgab6fd22">1. 1. Replace Temp with Query</a>
+<li><a href="#orgb46a254">1. 1. Replace Temp with Query</a>
 <ul>
-<li><a href="#orgf499350">1.1. 它们只在函数里使用，因此会驱使你写出更长的函数</a></li>
-<li><a href="#org77f7448">1.2. 局部变量会增大Extract Method的难度</a></li>
-<li><a href="#org0306cd3">1.3. 所谓的性能问题可以先不去管它，等真的出现性能问题再去优化</a></li>
+<li><a href="#orga48bf3a">1.1. 它们只在函数里使用，因此会驱使你写出更长的函数</a></li>
+<li><a href="#orgccd1e15">1.2. 局部变量会增大Extract Method的难度</a></li>
+<li><a href="#org1711e90">1.3. 所谓的性能问题可以先不去管它，等真的出现性能问题再去优化</a></li>
 </ul>
 </li>
-<li><a href="#org5e68488">2. Split Temporary Variable</a></li>
-<li><a href="#org792ba57">3. Remove Assignments to Parameters</a></li>
-<li><a href="#org8d9dc12">4. Replace Method with Method Object</a></li>
-<li><a href="#org27f5bb0">5. </a></li>
+<li><a href="#org8b95462">2. Split Temporary Variable</a></li>
+<li><a href="#org5898ede">3. Remove Assignments to Parameters</a></li>
+<li><a href="#org00a1d8b">4. Replace Method with Method Object</a></li>
+<li><a href="#org8065b55">5. </a></li>
 </ul>
 </div>
 </div>
@@ -82,8 +82,8 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 
-<div id="outline-container-orgab6fd22" class="outline-2">
-<h2 id="orgab6fd22"><span class="section-number-2">1</span> 1. Replace Temp with Query</h2>
+<div id="outline-container-orgb46a254" class="outline-2">
+<h2 id="orgb46a254"><span class="section-number-2">1</span> 1. Replace Temp with Query</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 将临时变量的表达式提取到一个方法中，从而去掉临时变量。
@@ -92,19 +92,19 @@ for the JavaScript code in this tag.
 临时变量的问题：
 </p>
 </div>
-<div id="outline-container-orgf499350" class="outline-3">
-<h3 id="orgf499350"><span class="section-number-3">1.1</span> 它们只在函数里使用，因此会驱使你写出更长的函数</h3>
+<div id="outline-container-orga48bf3a" class="outline-3">
+<h3 id="orga48bf3a"><span class="section-number-3">1.1</span> 它们只在函数里使用，因此会驱使你写出更长的函数</h3>
 </div>
-<div id="outline-container-org77f7448" class="outline-3">
-<h3 id="org77f7448"><span class="section-number-3">1.2</span> 局部变量会增大Extract Method的难度</h3>
+<div id="outline-container-orgccd1e15" class="outline-3">
+<h3 id="orgccd1e15"><span class="section-number-3">1.2</span> 局部变量会增大Extract Method的难度</h3>
 </div>
-<div id="outline-container-org0306cd3" class="outline-3">
-<h3 id="org0306cd3"><span class="section-number-3">1.3</span> 所谓的性能问题可以先不去管它，等真的出现性能问题再去优化</h3>
+<div id="outline-container-org1711e90" class="outline-3">
+<h3 id="org1711e90"><span class="section-number-3">1.3</span> 所谓的性能问题可以先不去管它，等真的出现性能问题再去优化</h3>
 </div>
 </div>
 
-<div id="outline-container-org5e68488" class="outline-2">
-<h2 id="org5e68488"><span class="section-number-2">2</span> Split Temporary Variable</h2>
+<div id="outline-container-org8b95462" class="outline-2">
+<h2 id="org8b95462"><span class="section-number-2">2</span> Split Temporary Variable</h2>
 <div class="outline-text-2" id="text-2">
 <blockquote>
 <p>
@@ -117,8 +117,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org792ba57" class="outline-2">
-<h2 id="org792ba57"><span class="section-number-2">3</span> Remove Assignments to Parameters</h2>
+<div id="outline-container-org5898ede" class="outline-2">
+<h2 id="org5898ede"><span class="section-number-2">3</span> Remove Assignments to Parameters</h2>
 <div class="outline-text-2" id="text-3">
 <blockquote>
 <p>
@@ -126,13 +126,13 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span><span style="color: #8c8c8c;">(</span>input<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">if</span> a_condition
-    input = <span style="color: #d08770;">1</span>
-  <span style="color: #b48ead;">else</span>
-    input = <span style="color: #d08770;">2</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span><span style="color: #DCDCCC;">(</span>input<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">if</span> a_condition
+    input = <span style="color: #BFEBBF;">1</span>
+  <span style="color: #F0DFAF; font-weight: bold;">else</span>
+    input = <span style="color: #BFEBBF;">2</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -141,8 +141,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org8d9dc12" class="outline-2">
-<h2 id="org8d9dc12"><span class="section-number-2">4</span> Replace Method with Method Object</h2>
+<div id="outline-container-org00a1d8b" class="outline-2">
+<h2 id="org00a1d8b"><span class="section-number-2">4</span> Replace Method with Method Object</h2>
 <div class="outline-text-2" id="text-4">
 <blockquote>
 <p>
@@ -154,43 +154,43 @@ for the JavaScript code in this tag.
 范例：只是一个简单的例子
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">A</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span><span style="color: #8c8c8c;">(</span>arg1, arg2<span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">A</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span><span style="color: #DCDCCC;">(</span>arg1, arg2<span style="color: #DCDCCC;">)</span>
     temp1 = arg1 - arg2 + a_method
-    temp2 = temp1 * <span style="color: #d08770;">2</span> + arg1
+    temp2 = temp1 * <span style="color: #BFEBBF;">2</span> + arg1
     temp1 + temp2
-  <span style="color: #b48ead;">end</span> 
+  <span style="color: #F0DFAF; font-weight: bold;">end</span> 
 
-  <span style="color: #d08770;">private</span> 
+  <span style="color: #DCDCCC; font-weight: bold;">private</span> 
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">a_method</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">a_method</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
 这只是一个简单情况，但我想Extract Method还是有些困难，因为临时变量较多，所以可以创建一个Temp的类，然后这些局部变量都会变成这个类的实例变量
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Temp</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">initialize</span><span style="color: #8c8c8c;">(</span>a_instance, arg1, arg2<span style="color: #8c8c8c;">)</span>
-    <span style="color: #bf616a;">@a_instance</span> = a_instance
-    <span style="color: #bf616a;">@arg1</span> = arg1
-    <span style="color: #bf616a;">@arg2</span> = arg2
-  <span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Temp</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>a_instance, arg1, arg2<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">@a_instance</span> = a_instance
+    <span style="color: #DFAF8F;">@arg1</span> = arg1
+    <span style="color: #DFAF8F;">@arg2</span> = arg2
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">compute</span>
-    <span style="color: #bf616a;">@temp1</span> = <span style="color: #bf616a;">@arg1</span> - <span style="color: #bf616a;">@arg2</span> + <span style="color: #bf616a;">@a_instance</span>.a_method
-    <span style="color: #bf616a;">@temp2</span> = <span style="color: #bf616a;">@temp1</span> * <span style="color: #d08770;">2</span> + <span style="color: #bf616a;">@arg1</span>
-    <span style="color: #bf616a;">@temp1</span> + <span style="color: #bf616a;">@temp2</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">compute</span>
+    <span style="color: #DFAF8F;">@temp1</span> = <span style="color: #DFAF8F;">@arg1</span> - <span style="color: #DFAF8F;">@arg2</span> + <span style="color: #DFAF8F;">@a_instance</span>.a_method
+    <span style="color: #DFAF8F;">@temp2</span> = <span style="color: #DFAF8F;">@temp1</span> * <span style="color: #BFEBBF;">2</span> + <span style="color: #DFAF8F;">@arg1</span>
+    <span style="color: #DFAF8F;">@temp1</span> + <span style="color: #DFAF8F;">@temp2</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">A</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">method</span><span style="color: #8c8c8c;">(</span>arg1, arg2<span style="color: #8c8c8c;">)</span>
-    <span style="color: #c0c5ce;">Temp</span>.new<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, arg1, arg2<span style="color: #8c8c8c;">)</span>.compute
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">A</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span><span style="color: #DCDCCC;">(</span>arg1, arg2<span style="color: #DCDCCC;">)</span>
+    <span style="color: #7CB8BB;">Temp</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, arg1, arg2<span style="color: #DCDCCC;">)</span>.compute
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 
@@ -198,22 +198,22 @@ for the JavaScript code in this tag.
 现在Temp类中之前的临时变量都变成全局变量了，就可以使用Extract Method
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Temp</span>
-  <span style="color: #c0c5ce;">#</span><span style="color: #65737e;">...</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">compute</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Temp</span>
+  <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">...</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">compute</span>
     temp1_method + temp2_method
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #d08770;">private</span>
+  <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">temp1_method</span>
-    <span style="color: #bf616a;">@temp1</span> = <span style="color: #bf616a;">@arg1</span> - <span style="color: #bf616a;">@arg2</span> + <span style="color: #bf616a;">@a_instance</span>.a_method
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">temp1_method</span>
+    <span style="color: #DFAF8F;">@temp1</span> = <span style="color: #DFAF8F;">@arg1</span> - <span style="color: #DFAF8F;">@arg2</span> + <span style="color: #DFAF8F;">@a_instance</span>.a_method
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">temp2_method</span>
-    <span style="color: #bf616a;">@temp1</span> * <span style="color: #d08770;">2</span> + <span style="color: #bf616a;">@arg1</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">temp2_method</span>
+    <span style="color: #DFAF8F;">@temp1</span> * <span style="color: #BFEBBF;">2</span> + <span style="color: #DFAF8F;">@arg1</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -222,8 +222,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org27f5bb0" class="outline-2">
-<h2 id="org27f5bb0"><span class="section-number-2">5</span> </h2>
+<div id="outline-container-org8065b55" class="outline-2">
+<h2 id="org8065b55"><span class="section-number-2">5</span> </h2>
 </div>
 </div>
 <div id="postamble" class="status">
@@ -231,7 +231,7 @@ for the JavaScript code in this tag.
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

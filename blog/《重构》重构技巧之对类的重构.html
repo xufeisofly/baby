@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,14 +62,14 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb46b643">1. Move Method</a></li>
-<li><a href="#org8c65dcd">2. Extract Class</a></li>
-<li><a href="#org51b4a6a">3. Hide Delegate</a></li>
+<li><a href="#org295aa1e">1. Move Method</a></li>
+<li><a href="#orgccbd47d">2. Extract Class</a></li>
+<li><a href="#org7273603">3. Hide Delegate</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgb46b643" class="outline-2">
-<h2 id="orgb46b643"><span class="section-number-2">1</span> Move Method</h2>
+<div id="outline-container-org295aa1e" class="outline-2">
+<h2 id="org295aa1e"><span class="section-number-2">1</span> Move Method</h2>
 <div class="outline-text-2" id="text-1">
 <blockquote>
 <p>
@@ -83,24 +83,24 @@ for the JavaScript code in this tag.
 所以我们根据这个进行举例。
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">SalesPipelineAnalyticListener</span>
-  <span style="color: #c0c5ce;">TYPE</span> = ...
-  <span style="color: #c0c5ce;">STAGES</span> = ...
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">SalesPipelineAnalyticListener</span>
+  <span style="color: #7CB8BB;">TYPE</span> = ...
+  <span style="color: #7CB8BB;">STAGES</span> = ...
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discuss_proposal</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
-    prepare_proposal<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">if</span> deal.travel_type == <span style="color: #c0c5ce;">TYPE</span><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:tailor</span><span style="color: #8c8c8c;">]</span>
-      add_transitions_log<span style="color: #8c8c8c;">(</span>deal, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:prepare_proposal</span><span style="color: #93a8c6;">]</span>, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:tailor_discuss</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">else</span>
-      add_transitions_log<span style="color: #8c8c8c;">(</span>deal, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:prepare_proposal</span><span style="color: #93a8c6;">]</span>, <span style="color: #c0c5ce;">STAGES</span><span style="color: #93a8c6;">[</span><span style="color: #d08770;">:tour_discuss</span><span style="color: #93a8c6;">]</span><span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">end</span>
-    add_process_log<span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discuss_proposal</span><span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
+    prepare_proposal<span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">if</span> deal.travel_type == <span style="color: #7CB8BB;">TYPE</span><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:tailor</span><span style="color: #DCDCCC;">]</span>
+      add_transitions_log<span style="color: #DCDCCC;">(</span>deal, <span style="color: #7CB8BB;">STAGES</span><span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:prepare_proposal</span><span style="color: #BFEBBF;">]</span>, <span style="color: #7CB8BB;">STAGES</span><span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:tailor_discuss</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">else</span>
+      add_transitions_log<span style="color: #DCDCCC;">(</span>deal, <span style="color: #7CB8BB;">STAGES</span><span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:prepare_proposal</span><span style="color: #BFEBBF;">]</span>, <span style="color: #7CB8BB;">STAGES</span><span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:tour_discuss</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+    add_process_log<span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">prepare_proposal</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>; <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">add_transitions_log</span><span style="color: #8c8c8c;">(</span>deal, from, to<span style="color: #8c8c8c;">)</span>; <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">add_process_log</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>; <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">prepare_proposal</span><span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>; <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">add_transitions_log</span><span style="color: #DCDCCC;">(</span>deal, from, to<span style="color: #DCDCCC;">)</span>; <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">add_process_log</span><span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>; <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -108,26 +108,26 @@ for the JavaScript code in this tag.
 因为里面用到了deal的travel<sub>type</sub>，所以应该在deal类中
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Deal</span>
-  <span style="color: #c0c5ce;">TYPE</span> = ...
-  <span style="color: #c0c5ce;">STAGES</span> = ...
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Deal</span>
+  <span style="color: #7CB8BB;">TYPE</span> = ...
+  <span style="color: #7CB8BB;">STAGES</span> = ...
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discuss_proposal</span><span style="color: #8c8c8c;">(</span>analytic_instance<span style="color: #8c8c8c;">)</span>
-    analytic_instance.prepare_proposal<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">if</span> travel_type == <span style="color: #c0c5ce;">TYPE</span><span style="color: #8c8c8c;">[</span><span style="color: #d08770;">:tailor</span><span style="color: #8c8c8c;">]</span>
-      analytic_instance.add_transitions_log<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, <span style="color: #c0c5ce;">STAGE</span>...<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">else</span>
-      analytic_instance.add_transitions_log<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span>, <span style="color: #c0c5ce;">STAGE</span>...<span style="color: #8c8c8c;">)</span>
-    <span style="color: #b48ead;">end</span>
-    analytic_instance.add_process_log<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discuss_proposal</span><span style="color: #DCDCCC;">(</span>analytic_instance<span style="color: #DCDCCC;">)</span>
+    analytic_instance.prepare_proposal<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">if</span> travel_type == <span style="color: #7CB8BB;">TYPE</span><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">:tailor</span><span style="color: #DCDCCC;">]</span>
+      analytic_instance.add_transitions_log<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, <span style="color: #7CB8BB;">STAGE</span>...<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">else</span>
+      analytic_instance.add_transitions_log<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, <span style="color: #7CB8BB;">STAGE</span>...<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">end</span>
+    analytic_instance.add_process_log<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">SalesPipelineAnalyticListener</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">discuss_proposal</span><span style="color: #8c8c8c;">(</span>deal<span style="color: #8c8c8c;">)</span>
-    deal.discuss_proposal<span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">self</span><span style="color: #8c8c8c;">)</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">SalesPipelineAnalyticListener</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discuss_proposal</span><span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
+    deal.discuss_proposal<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -137,8 +137,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org8c65dcd" class="outline-2">
-<h2 id="org8c65dcd"><span class="section-number-2">2</span> Extract Class</h2>
+<div id="outline-container-orgccbd47d" class="outline-2">
+<h2 id="orgccbd47d"><span class="section-number-2">2</span> Extract Class</h2>
 <div class="outline-text-2" id="text-2">
 <blockquote>
 <p>
@@ -165,8 +165,8 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org51b4a6a" class="outline-2">
-<h2 id="org51b4a6a"><span class="section-number-2">3</span> Hide Delegate</h2>
+<div id="outline-container-org7273603" class="outline-2">
+<h2 id="org7273603"><span class="section-number-2">3</span> Hide Delegate</h2>
 <div class="outline-text-2" id="text-3">
 <blockquote>
 <p>
@@ -185,9 +185,9 @@ for the JavaScript code in this tag.
 <div class="org-src-container">
 <pre class="src src-ruby">deal.customer_name
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">customer_name</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">customer_name</span>
   customer.name
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -212,7 +212,7 @@ for the JavaScript code in this tag.
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

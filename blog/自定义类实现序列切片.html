@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,11 +62,11 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org08d4d48">1. 什么是可切片的序列</a></li>
-<li><a href="#orgd6efb19">2. 协议和鸭子类型</a></li>
-<li><a href="#org2d0264b">3. Python切片原理</a></li>
-<li><a href="#orga8061ef">4. 自己实现一个的可切片的Vector类</a></li>
-<li><a href="#org777f623">5. Navigation</a></li>
+<li><a href="#orge81236e">1. 什么是可切片的序列</a></li>
+<li><a href="#org67912c2">2. 协议和鸭子类型</a></li>
+<li><a href="#org33e3e2d">3. Python切片原理</a></li>
+<li><a href="#org952ef36">4. 自己实现一个的可切片的Vector类</a></li>
+<li><a href="#orgde81cae">5. Navigation</a></li>
 </ul>
 </div>
 </div>
@@ -82,8 +82,8 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 
-<div id="outline-container-org08d4d48" class="outline-2">
-<h2 id="org08d4d48"><span class="section-number-2">1</span> 什么是可切片的序列</h2>
+<div id="outline-container-orge81236e" class="outline-2">
+<h2 id="orge81236e"><span class="section-number-2">1</span> 什么是可切片的序列</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Python中，像list, tuple, set等都是序列，因为他们都有序列的属性（或满足序列的协议），因此可以实现下面的代码操作
@@ -114,8 +114,8 @@ a<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">0</span>:<s
 </div>
 </div>
 
-<div id="outline-container-orgd6efb19" class="outline-2">
-<h2 id="orgd6efb19"><span class="section-number-2">2</span> 协议和鸭子类型</h2>
+<div id="outline-container-org67912c2" class="outline-2">
+<h2 id="org67912c2"><span class="section-number-2">2</span> 协议和鸭子类型</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 在Ruby和Python中，如果想实现一个功能完善的序列类型，不需要使用继承，只需要实现「符合序列的协议」。这里序列的协议定义为length和[]。
@@ -177,8 +177,8 @@ v.length
 </div>
 </div>
 
-<div id="outline-container-org2d0264b" class="outline-2">
-<h2 id="org2d0264b"><span class="section-number-2">3</span> Python切片原理</h2>
+<div id="outline-container-org33e3e2d" class="outline-2">
+<h2 id="org33e3e2d"><span class="section-number-2">3</span> Python切片原理</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 先看一下a[1:4]这种操作的参数到底是什么。
@@ -212,8 +212,8 @@ v<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>:<s
 </div>
 </div>
 
-<div id="outline-container-orga8061ef" class="outline-2">
-<h2 id="orga8061ef"><span class="section-number-2">4</span> 自己实现一个的可切片的Vector类</h2>
+<div id="outline-container-org952ef36" class="outline-2">
+<h2 id="org952ef36"><span class="section-number-2">4</span> 自己实现一个的可切片的Vector类</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 所以我们只需要在_<sub>getitem</sub>_<sub>中对int参数和slice对象参数分别处理就好了</sub>。
@@ -241,8 +241,8 @@ v<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>:<s
 </div>
 </div>
 
-<div id="outline-container-org777f623" class="outline-2">
-<h2 id="org777f623"><span class="section-number-2">5</span> Navigation</h2>
+<div id="outline-container-orgde81cae" class="outline-2">
+<h2 id="orgde81cae"><span class="section-number-2">5</span> Navigation</h2>
 <div class="outline-text-2" id="text-5">
 <div class="div-wrap">
 <div class="div-left">
@@ -273,7 +273,7 @@ v<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>:<s
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>

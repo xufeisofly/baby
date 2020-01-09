@@ -14,7 +14,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -62,8 +62,8 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org04b23c0">1. Form Template Method</a></li>
-<li><a href="#orgdbf9dab">2. Replace Inheritance with Delegation</a></li>
+<li><a href="#orgf44644d">1. Form Template Method</a></li>
+<li><a href="#org73d1a29">2. Replace Inheritance with Delegation</a></li>
 </ul>
 </div>
 </div>
@@ -73,8 +73,8 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 
-<div id="outline-container-org04b23c0" class="outline-2">
-<h2 id="org04b23c0"><span class="section-number-2">1</span> Form Template Method</h2>
+<div id="outline-container-orgf44644d" class="outline-2">
+<h2 id="orgf44644d"><span class="section-number-2">1</span> Form Template Method</h2>
 <div class="outline-text-2" id="text-1">
 <blockquote>
 <p>
@@ -83,19 +83,19 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">TextStatement</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">value</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
-    result = <span style="color: #a3be8c;">'hi'</span>
-    result += <span style="color: #a3be8c;">"</span><span style="color: #bf616a;">#{name}</span><span style="color: #a3be8c;"> \n"</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">TextStatement</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+    result = <span style="color: #CC9393;">'hi'</span>
+    result += <span style="color: #CC9393;">"</span><span style="color: #DFAF8F;">#{name}</span><span style="color: #CC9393;"> \n"</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">HtmlStatement</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">value</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
-    result = <span style="color: #a3be8c;">'&lt;p&gt;hi&lt;/p&gt;'</span>
-    result += <span style="color: #a3be8c;">"&lt;h1&gt;</span><span style="color: #bf616a;">#{name}</span><span style="color: #a3be8c;">&lt;/h1&gt;&lt;br \&gt;"</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">HtmlStatement</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+    result = <span style="color: #CC9393;">'&lt;p&gt;hi&lt;/p&gt;'</span>
+    result += <span style="color: #CC9393;">"&lt;h1&gt;</span><span style="color: #DFAF8F;">#{name}</span><span style="color: #CC9393;">&lt;/h1&gt;&lt;br \&gt;"</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 <p>
@@ -104,48 +104,48 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">Statement</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">value</span><span style="color: #8c8c8c;">(</span>name<span style="color: #8c8c8c;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Statement</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
     result = greeting_string
     result += name_string
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #d08770;">private</span>
+  <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">greeting_string;</span> <span style="color: #b48ead;">end</span>
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name_string;</span> <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">greeting_string;</span> <span style="color: #F0DFAF; font-weight: bold;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">name_string;</span> <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">TextStatement</span> &lt; <span style="color: #c0c5ce;">Statement</span>
-  <span style="color: #d08770;">private</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">TextStatement</span> &lt; <span style="color: #7CB8BB;">Statement</span>
+  <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">greeting_string</span>
-    <span style="color: #a3be8c;">'hi'</span>
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">greeting_string</span>
+    <span style="color: #CC9393;">'hi'</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name_string</span>
-    <span style="color: #a3be8c;">"</span><span style="color: #bf616a;">#{name}</span><span style="color: #a3be8c;"> \n"</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">name_string</span>
+    <span style="color: #CC9393;">"</span><span style="color: #DFAF8F;">#{name}</span><span style="color: #CC9393;"> \n"</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #b48ead;">class</span> <span style="color: #c0c5ce;">HtmlStatement</span> &lt; <span style="color: #c0c5ce;">Statement</span>
-  <span style="color: #d08770;">private</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">HtmlStatement</span> &lt; <span style="color: #7CB8BB;">Statement</span>
+  <span style="color: #DCDCCC; font-weight: bold;">private</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">greeting_string</span>
-    <span style="color: #a3be8c;">'&lt;p&gt;hi&lt;/p&gt;'</span>
-  <span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">greeting_string</span>
+    <span style="color: #CC9393;">'&lt;p&gt;hi&lt;/p&gt;'</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">name_string</span>
-    <span style="color: #a3be8c;">"&lt;h1&gt;</span><span style="color: #bf616a;">#{name}</span><span style="color: #a3be8c;">&lt;/h1&gt;&lt;br \&gt;"</span>
-  <span style="color: #b48ead;">end</span>
-<span style="color: #b48ead;">end</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">name_string</span>
+    <span style="color: #CC9393;">"&lt;h1&gt;</span><span style="color: #DFAF8F;">#{name}</span><span style="color: #CC9393;">&lt;/h1&gt;&lt;br \&gt;"</span>
+  <span style="color: #F0DFAF; font-weight: bold;">end</span>
+<span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgdbf9dab" class="outline-2">
-<h2 id="orgdbf9dab"><span class="section-number-2">2</span> Replace Inheritance with Delegation</h2>
+<div id="outline-container-org73d1a29" class="outline-2">
+<h2 id="org73d1a29"><span class="section-number-2">2</span> Replace Inheritance with Delegation</h2>
 <div class="outline-text-2" id="text-2">
 <blockquote>
 <p>
@@ -167,7 +167,7 @@ for the JavaScript code in this tag.
 <div>
 <p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
 <p class="date">Published: </p>
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.1.13)</p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
 </div>
 </div>
 </body>
