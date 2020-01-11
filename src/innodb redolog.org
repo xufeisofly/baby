@@ -21,6 +21,23 @@
     *所以需要 double write 的根本原因就是：innodb 一页 16K, 但磁盘一个单位是 4K，而 16K 的页必须写满，否则 redo log 不可用*
     #+end_example
 
+** binlog
+   
+   ~binlog_format~
+
+   各自的坏处
+
+   - row
+
+     1. 占用空间大，数据恢复慢
+
+   - statement
+
+     1. read-commited 隔离级别下会造成主从不一致问题（根源：没有 gap key，会造成 replication log 和 innodb log 顺序不一致，因为 statement 是有顺序的）
+     2. 不确定 sql 语句或者函数也会造成主从不一致
+
+   所以如果有主从同步集群，并且不差钱的话建议使用 row 格式
+
 ** redo log
 
    默认 redo log 是两个文件单独存放，循环写入（但并非顺序写入，因为有 redo log header 占位）
@@ -229,3 +246,54 @@
     - 链事务，T1 提交会出发 T2 开始
     - 嵌套事务，innodb 不支持，可以用保存点模拟
     - 分布式事务，监听多个数据库的事务
+
+** Group Commit Issue
+
+*** 什么是 group commit
+    
+    WAL，数据落盘前先写 log，log 顺序写入比数据随机落盘快，可以认为写 log 就是写数据
+    
+*** ~binlog_sync=1~ 时 group commit 失效问题
+
+    innodb 支持 group commit，采用两阶段提交的方式
+
+    #+begin_src c
+      // 第一阶段，内存里注册 commit
+      int innobase_commit() {
+          trx->flush_log_later = TRUE;
+          innobase_commit_low(trx);
+          trx->flush_log_later = FALSE;
+
+          ...
+          // 统一 group commit，write fsync 落盘
+          trx_commit_complete_for_mysql(trx)
+        }
+    #+end_src
+
+    但 mysql 上层不支持，当 ~binlog_sync~ 开启，每次 commit 前都要 write and fsync binlog
+
+    #+begin_src c
+      // prepare 中有 X 锁，会阻塞，innobase_commit 中的 group commit 失去意义
+      innobase_xa_prepare()
+      write() and fsync() binary log
+      innobase_commit()
+    #+end_src
+
+    为什么 binlog 不能也 group commit 呢，因为要保证 binlog 落盘和 redo log 落盘（即 commit）的顺序一致，不然会造成 innodb 从 redo 会恢复数据有问题。看图
+
+    #+CAPTION: binlog group commit 顺序不一致
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/01/10/Cf86szFh1GDQMxO.png'
+[[file:/Users/norris/projects/baby/src/../images/binlog_group_commit_order_problem.png]]
+
+    单纯实现 binlog 的 group commit，会导致 binlog fsync 和 innodb commit 顺序不一致，如，binlog 用于主从同步，T3 在 binlog 当中有，但实际发生 break，并没有落盘，也无法恢复，主从数据也会不一致。
+
+    #+begin_quote
+    [10 Oct 2008 22:39] Peter Zaitsev
+
+    Generally (assuming sync-binlog=1 is defined) we must  have replication log (binlog) in sync with transactional log(redo log).  Otherwise in case of master crash slave can be potentially inconsistent,  LVM backup may not work etc.
+
+    #+end_quote
+
+    参考 [[http://www.orczhou.com/index.php/2010/08/time-to-group-commit-1/][MySQL/InnoDB和Group Commit(1) - Database, Cloud Computing and Life]]
+
+    不得已，mysql server 层才在 ~binlog_sync=1~ 时加入了 X 锁，强制串行 binlog 和 innodb commit，造成了性能大幅降低。可以看 bug 讨论 [[https://bugs.mysql.com/bug.php?id=13669][MySQL Bugs: #13669: Group commit is broken in 5.0]]

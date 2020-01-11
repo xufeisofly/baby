@@ -64,39 +64,47 @@ for the JavaScript code in this tag.
 <div id="text-table-of-contents">
 <ul>
 <li><a href="#org6257647">1. double write</a></li>
-<li><a href="#org39d3134">2. redo log</a>
+<li><a href="#orgbf0cd97">2. binlog</a></li>
+<li><a href="#org39d3134">3. redo log</a>
 <ul>
-<li><a href="#org66c0480">2.1. redo log buffer, os buffer</a></li>
-<li><a href="#org08bfb2c">2.2. <code>innodb_flush_log_at_trx_commit</code> 参数</a></li>
+<li><a href="#org66c0480">3.1. redo log buffer, os buffer</a></li>
+<li><a href="#org08bfb2c">3.2. <code>innodb_flush_log_at_trx_commit</code> 参数</a></li>
 </ul>
 </li>
-<li><a href="#orga1b098d">3. InnoDB 逻辑存储结构</a>
+<li><a href="#orgf3c80cf">4. undo log</a></li>
+<li><a href="#orga1b098d">5. InnoDB 逻辑存储结构</a>
 <ul>
-<li><a href="#org2618b23">3.1. 表空间</a></li>
-<li><a href="#orgd110801">3.2. 段</a></li>
-<li><a href="#orgb981d7f">3.3. 区</a></li>
-<li><a href="#org769f74e">3.4. 页</a></li>
+<li><a href="#org2618b23">5.1. 表空间</a></li>
+<li><a href="#orgd110801">5.2. 段</a></li>
+<li><a href="#orgb981d7f">5.3. 区</a></li>
+<li><a href="#org769f74e">5.4. 页</a></li>
 </ul>
 </li>
-<li><a href="#orgd767eb8">4. 索引与算法</a>
+<li><a href="#orgd767eb8">6. 索引与算法</a>
 <ul>
-<li><a href="#org7fb9aa7">4.1. B+ 树插入节点</a></li>
-<li><a href="#orgee3ff98">4.2. 在线架构变更</a>
+<li><a href="#org7fb9aa7">6.1. B+ 树插入节点</a></li>
+<li><a href="#orgee3ff98">6.2. 在线架构变更</a>
 <ul>
-<li><a href="#orga8bb6e7">4.2.1. Online Schema Change(OSC)</a></li>
-<li><a href="#org2112fa2">4.2.2. Online DDL</a></li>
+<li><a href="#orga8bb6e7">6.2.1. Online Schema Change(OSC)</a></li>
+<li><a href="#org2112fa2">6.2.2. Online DDL</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org92a8125">5. 锁</a>
+<li><a href="#org92a8125">7. 锁</a>
 <ul>
-<li><a href="#org07bb6de">5.1. 加锁范围</a></li>
+<li><a href="#org07bb6de">7.1. 加锁范围</a></li>
 </ul>
 </li>
-<li><a href="#org6a7a352">6. 事务</a>
+<li><a href="#org6a7a352">8. 事务</a>
 <ul>
-<li><a href="#orge816855">6.1. 分类</a></li>
+<li><a href="#orge816855">8.1. 分类</a></li>
+</ul>
+</li>
+<li><a href="#org6d3cd34">9. Group Commit Issue</a>
+<ul>
+<li><a href="#org10222f9">9.1. 什么是 group commit</a></li>
+<li><a href="#org7f1ae06">9.2. <code>binlog_sync=1</code> 时 group commit 失效问题</a></li>
 </ul>
 </li>
 </ul>
@@ -138,9 +146,45 @@ for the JavaScript code in this tag.
 </div>
 </div>
 
-<div id="outline-container-org39d3134" class="outline-2">
-<h2 id="org39d3134"><span class="section-number-2">2</span> redo log</h2>
+<div id="outline-container-orgbf0cd97" class="outline-2">
+<h2 id="orgbf0cd97"><span class="section-number-2">2</span> binlog</h2>
 <div class="outline-text-2" id="text-2">
+<p>
+<code>binlog_format</code>
+</p>
+
+<p>
+各自的坏处
+</p>
+
+<ul class="org-ul">
+<li>row
+
+<ol class="org-ol">
+<li>占用空间大，数据恢复慢</li>
+</ol></li>
+
+<li>statement
+
+<ol class="org-ol">
+<li>read-commited 隔离级别下会造成主从不一致问题（根源：没有 gap key，会造成 replication log 和 innodb log 顺序不一致，因为 statement 是有顺序的）</li>
+<li>不确定 sql 语句或者函数也会造成主从不一致</li>
+</ol></li>
+</ul>
+
+<p>
+所以如果有主从同步集群，并且不差钱的话建议使用 row 格式
+</p>
+</div>
+</div>
+
+<div id="outline-container-org39d3134" class="outline-2">
+<h2 id="org39d3134"><span class="section-number-2">3</span> redo log</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+默认 redo log 是两个文件单独存放，循环写入（但并非顺序写入，因为有 redo log header 占位）
+</p>
+
 <p>
 与 binlog, error log 等 mysql server 层提供的日志不同，redo log 是 innodb 存储引擎提供的日志文件，是 innodb 特有的，它记录了对 innodb 的事务日志。通常对于 mysql 的 DML 操作会先通过 innodb change buffer，然后在 doublewrite 到磁盘中，在落盘期间一旦异常宕机，就会造成数据错误，所以 innodb 提供了 WAL 技术，即 Write-Ahead logging，再每次变更数据时，都先写 redo 日志，这样一旦宕机，也可以从 redo log 中恢复数据。
 </p>
@@ -161,8 +205,8 @@ for the JavaScript code in this tag.
 </div>
 
 <div id="outline-container-org66c0480" class="outline-3">
-<h3 id="org66c0480"><span class="section-number-3">2.1</span> redo log buffer, os buffer</h3>
-<div class="outline-text-3" id="text-2-1">
+<h3 id="org66c0480"><span class="section-number-3">3.1</span> redo log buffer, os buffer</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如果一次 DML 就 fsync 一条 write-log 会导致大量磁盘 IO，影响性能。更具体来说，redo log 要经过两层 buffer，分别是 innodb 提供的 redo log buffer 和 操作系统提供的 os buffer。经过一层 os buffer 的好处是即使 mysql 挂掉，只要服务器没有宕机则数据就不会丢失。所以一次 commit 的过程如下。
 </p>
@@ -181,8 +225,8 @@ redo log file 的写入和 ibd 等文件一样，也要经过 buffer，毕竟如
 </div>
 
 <div id="outline-container-org08bfb2c" class="outline-3">
-<h3 id="org08bfb2c"><span class="section-number-3">2.2</span> <code>innodb_flush_log_at_trx_commit</code> 参数</h3>
-<div class="outline-text-3" id="text-2-2">
+<h3 id="org08bfb2c"><span class="section-number-3">3.2</span> <code>innodb_flush_log_at_trx_commit</code> 参数</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通过 <code>innodb_flush_log_at_trx_commit</code> 来配置
 </p>
@@ -203,9 +247,34 @@ innodb 如何在 commit 的时候将 log buffer 刷新到 log file，可以通�
 </div>
 </div>
 
+<div id="outline-container-orgf3c80cf" class="outline-2">
+<h2 id="orgf3c80cf"><span class="section-number-2">4</span> undo log</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+undo log 实际上并不是一种「日志」，而是一系列 rollback command list. 它是逻辑日志，并不能让数据库恢复到之前的样子，而是做了一系列相反的 DML 操作，回到当时的逻辑状态。
+</p>
+
+<p>
+undo log 执行过程中也会产生 redo log
+</p>
+
+<p>
+undo log 存放在共享表空间（也可以配置参数放在单独的 undo log 文件）
+</p>
+
+<p>
+undo log 的作用：
+</p>
+<ul class="org-ul">
+<li>回滚事务</li>
+<li>实现 MVCC 访问之前版本的数据</li>
+</ul>
+</div>
+</div>
+
 <div id="outline-container-orga1b098d" class="outline-2">
-<h2 id="orga1b098d"><span class="section-number-2">3</span> InnoDB 逻辑存储结构</h2>
-<div class="outline-text-2" id="text-3">
+<h2 id="orga1b098d"><span class="section-number-2">5</span> InnoDB 逻辑存储结构</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 innoDB 存储结构分为
 </p>
@@ -230,8 +299,8 @@ innoDB 存储结构分为
 </div>
 
 <div id="outline-container-org2618b23" class="outline-3">
-<h3 id="org2618b23"><span class="section-number-3">3.1</span> 表空间</h3>
-<div class="outline-text-3" id="text-3-1">
+<h3 id="org2618b23"><span class="section-number-3">5.1</span> 表空间</h3>
+<div class="outline-text-3" id="text-5-1">
 <p>
 表空间是存储结构的最上层，存在一个共享表空间 ibddata1，除此之外若启用 <code>innodb_file_per_table</code> 参数，则每一个表都有自己的 ibd 表空间文件。打开 mysql 根目录就可以看到
 </p>
@@ -274,12 +343,12 @@ innoDB 存储结构分为
 
 
 <div id="outline-container-orgd110801" class="outline-3">
-<h3 id="orgd110801"><span class="section-number-3">3.2</span> 段</h3>
+<h3 id="orgd110801"><span class="section-number-3">5.2</span> 段</h3>
 </div>
 
 <div id="outline-container-orgb981d7f" class="outline-3">
-<h3 id="orgb981d7f"><span class="section-number-3">3.3</span> 区</h3>
-<div class="outline-text-3" id="text-3-3">
+<h3 id="orgb981d7f"><span class="section-number-3">5.3</span> 区</h3>
+<div class="outline-text-3" id="text-5-3">
 <p>
 页的大小可以配置，区中可以有很多页，但是，*区的大小永远是 1M*，一般的一个页是 16KB，也就是说一个区有64个连续的页
 </p>
@@ -292,8 +361,8 @@ innoDB 存储结构分为
 
 
 <div id="outline-container-org769f74e" class="outline-3">
-<h3 id="org769f74e"><span class="section-number-3">3.4</span> 页</h3>
-<div class="outline-text-3" id="text-3-4">
+<h3 id="org769f74e"><span class="section-number-3">5.4</span> 页</h3>
+<div class="outline-text-3" id="text-5-4">
 <p>
 页是 <code>innodb</code> 管理磁盘的最小单位，一般有如下类型
 </p>
@@ -313,16 +382,16 @@ innoDB 存储结构分为
 </div>
 
 <div id="outline-container-orgd767eb8" class="outline-2">
-<h2 id="orgd767eb8"><span class="section-number-2">4</span> 索引与算法</h2>
-<div class="outline-text-2" id="text-4">
+<h2 id="orgd767eb8"><span class="section-number-2">6</span> 索引与算法</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 B+ 树并不能找到具体行，而是找到数据行所在的页，然后把页读到内存，在内存中通过二分法查找到最终的数据。
 </p>
 </div>
 
 <div id="outline-container-org7fb9aa7" class="outline-3">
-<h3 id="org7fb9aa7"><span class="section-number-3">4.1</span> B+ 树插入节点</h3>
-<div class="outline-text-3" id="text-4-1">
+<h3 id="org7fb9aa7"><span class="section-number-3">6.1</span> B+ 树插入节点</h3>
+<div class="outline-text-3" id="text-6-1">
 <p>
 具体方法看书，只需要知道
 </p>
@@ -340,16 +409,16 @@ B+ 树索引的本质就是 B+ 树在数据库中的实现
 </div>
 
 <div id="outline-container-orgee3ff98" class="outline-3">
-<h3 id="orgee3ff98"><span class="section-number-3">4.2</span> 在线架构变更</h3>
-<div class="outline-text-3" id="text-4-2">
+<h3 id="orgee3ff98"><span class="section-number-3">6.2</span> 在线架构变更</h3>
+<div class="outline-text-3" id="text-6-2">
 <p>
 我们肯定尝试过在线增加索引或者增加列，这种在线架构变更耗时过长往往会阻塞当前 DDL，主要处理方式有下面两种：
 </p>
 </div>
 
 <div id="outline-container-orga8bb6e7" class="outline-4">
-<h4 id="orga8bb6e7"><span class="section-number-4">4.2.1</span> Online Schema Change(OSC)</h4>
-<div class="outline-text-4" id="text-4-2-1">
+<h4 id="orga8bb6e7"><span class="section-number-4">6.2.1</span> Online Schema Change(OSC)</h4>
+<div class="outline-text-4" id="text-6-2-1">
 <p>
 OSC 是 Facebook 用 PHP 写的用户在线架构变更的脚本，大致逻辑如下
 </p>
@@ -377,8 +446,8 @@ OSC 还是通过创建新表和交换名字的方式，不过它创建了 deltas
 
 
 <div id="outline-container-org2112fa2" class="outline-4">
-<h4 id="org2112fa2"><span class="section-number-4">4.2.2</span> Online DDL</h4>
-<div class="outline-text-4" id="text-4-2-2">
+<h4 id="org2112fa2"><span class="section-number-4">6.2.2</span> Online DDL</h4>
+<div class="outline-text-4" id="text-6-2-2">
 <p>
 mysql 5.6 开始支持 DDL(在线数据定义)，可以在不阻塞的情况下变更数据，但只支持下面的
 </p>
@@ -393,8 +462,8 @@ mysql 5.6 开始支持 DDL(在线数据定义)，可以在不阻塞的情况下�
 </div>
 
 <div id="outline-container-org92a8125" class="outline-2">
-<h2 id="org92a8125"><span class="section-number-2">5</span> 锁</h2>
-<div class="outline-text-2" id="text-5">
+<h2 id="org92a8125"><span class="section-number-2">7</span> 锁</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 innoDB 的锁(lock) 主要指的是事务锁，而线程等 mutex 在这里叫做闩(latch)
 </p>
@@ -471,8 +540,8 @@ S, X 加锁的方式如下：
 </div>
 
 <div id="outline-container-org07bb6de" class="outline-3">
-<h3 id="org07bb6de"><span class="section-number-3">5.1</span> 加锁范围</h3>
-<div class="outline-text-3" id="text-5-1">
+<h3 id="org07bb6de"><span class="section-number-3">7.1</span> 加锁范围</h3>
+<div class="outline-text-3" id="text-7-1">
 <p>
 有 record, gap, next-key lock 三种
 </p>
@@ -493,8 +562,8 @@ repeated read 隔离模式采用 next-key，只有针对唯一索引会降级成
 </div>
 
 <div id="outline-container-org6a7a352" class="outline-2">
-<h2 id="org6a7a352"><span class="section-number-2">6</span> 事务</h2>
-<div class="outline-text-2" id="text-6">
+<h2 id="org6a7a352"><span class="section-number-2">8</span> 事务</h2>
+<div class="outline-text-2" id="text-8">
 <blockquote>
 <p>
 数据库和文件系统的区别之一，就是是否能实现事务
@@ -503,8 +572,8 @@ repeated read 隔离模式采用 next-key，只有针对唯一索引会降级成
 </div>
 
 <div id="outline-container-orge816855" class="outline-3">
-<h3 id="orge816855"><span class="section-number-3">6.1</span> 分类</h3>
-<div class="outline-text-3" id="text-6-1">
+<h3 id="orge816855"><span class="section-number-3">8.1</span> 分类</h3>
+<div class="outline-text-3" id="text-8-1">
 <ul class="org-ul">
 <li>扁平事务</li>
 <li>带有保存点的扁平事务，可回滚到一个 savepoint</li>
@@ -512,6 +581,88 @@ repeated read 隔离模式采用 next-key，只有针对唯一索引会降级成
 <li>嵌套事务，innodb 不支持，可以用保存点模拟</li>
 <li>分布式事务，监听多个数据库的事务</li>
 </ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6d3cd34" class="outline-2">
+<h2 id="org6d3cd34"><span class="section-number-2">9</span> Group Commit Issue</h2>
+<div class="outline-text-2" id="text-9">
+</div>
+<div id="outline-container-org10222f9" class="outline-3">
+<h3 id="org10222f9"><span class="section-number-3">9.1</span> 什么是 group commit</h3>
+<div class="outline-text-3" id="text-9-1">
+<p>
+WAL，数据落盘前先写 log，log 顺序写入比数据随机落盘快，可以认为写 log 就是写数据
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7f1ae06" class="outline-3">
+<h3 id="org7f1ae06"><span class="section-number-3">9.2</span> <code>binlog_sync=1</code> 时 group commit 失效问题</h3>
+<div class="outline-text-3" id="text-9-2">
+<p>
+innodb 支持 group commit，采用两阶段提交的方式
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#31532;&#19968;&#38454;&#27573;&#65292;&#20869;&#23384;&#37324;&#27880;&#20876; commit</span>
+<span style="color: #7CB8BB;">int</span> <span style="color: #93E0E3;">innobase_commit</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
+    trx-&gt;flush_log_later = TRUE;
+    innobase_commit_low<span style="color: #BFEBBF;">(</span>trx<span style="color: #BFEBBF;">)</span>;
+    trx-&gt;flush_log_later = FALSE;
+
+    ...
+    <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#32479;&#19968; group commit&#65292;write fsync &#33853;&#30424;</span>
+    trx_commit_complete_for_mysql<span style="color: #BFEBBF;">(</span>trx<span style="color: #BFEBBF;">)</span>
+  <span style="color: #DCDCCC;">}</span>
+</pre>
+</div>
+
+<p>
+但 mysql 上层不支持，当 <code>binlog_sync</code> 开启，每次 commit 前都要 write and fsync binlog
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">prepare &#20013;&#26377; X &#38145;&#65292;&#20250;&#38459;&#22622;&#65292;innobase_commit &#20013;&#30340; group commit &#22833;&#21435;&#24847;&#20041;</span>
+<span style="color: #93E0E3;">innobase_xa_prepare</span><span style="color: #DCDCCC;">()</span>
+<span style="color: #93E0E3;">write</span><span style="color: #DCDCCC;">()</span> <span style="color: #7CB8BB;">and</span> <span style="color: #93E0E3;">fsync</span><span style="color: #DCDCCC;">()</span> binary <span style="color: #7CB8BB;">log</span>
+<span style="color: #93E0E3;">innobase_commit</span><span style="color: #DCDCCC;">()</span>
+</pre>
+</div>
+
+<p>
+为什么 binlog 不能也 group commit 呢，因为要保证 binlog 落盘和 redo log 落盘（即 commit）的顺序一致，不然会造成 innodb 从 redo 会恢复数据有问题。看图
+</p>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/binlog_group_commit_order_problem.png" alt="binlog_group_commit_order_problem.png" onerror="this.src='https://i.loli.net/2020/01/10/Cf86szFh1GDQMxO.png'" />
+</p>
+<p><span class="figure-number">Figure 8: </span>binlog group commit 顺序不一致</p>
+</div>
+
+<p>
+单纯实现 binlog 的 group commit，会导致 binlog fsync 和 innodb commit 顺序不一致，如，binlog 用于主从同步，T3 在 binlog 当中有，但实际发生 break，并没有落盘，也无法恢复，主从数据也会不一致。
+</p>
+
+<blockquote>
+<p>
+[10 Oct 2008 22:39] Peter Zaitsev
+</p>
+
+<p>
+Generally (assuming sync-binlog=1 is defined) we must  have replication log (binlog) in sync with transactional log(redo log).  Otherwise in case of master crash slave can be potentially inconsistent,  LVM backup may not work etc.
+</p>
+</blockquote>
+
+<p>
+参考 <a href="http://www.orczhou.com/index.php/2010/08/time-to-group-commit-1/">MySQL/InnoDB和Group Commit(1) - Database, Cloud Computing and Life</a>
+</p>
+
+<p>
+不得已，mysql server 层才在 <code>binlog_sync=1</code> 时加入了 X 锁，强制串行 binlog 和 innodb commit，造成了性能大幅降低。可以看 bug 讨论 <a href="https://bugs.mysql.com/bug.php?id=13669">MySQL Bugs: #13669: Group commit is broken in 5.0</a>
+</p>
 </div>
 </div>
 </div>
