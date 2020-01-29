@@ -1,0 +1,13 @@
+#+TITLE: Go Socket 读写
+
+** Read
+
+- socket 中没有数据：Read 挂起
+- socket 中有部分数据，且长度小于 Read 期望长度：Read 会读取这部分数据并返回
+- socket 中有数据，且超过 Read 期望长度：Read 会读取最大长度，后续会继续读取，即分多次读取
+- socket 有数据关闭：Read 会先读取出来数据，然后返回 EOF error
+- socket 无数据读取：Read 会直接返回 EOF error
+
+** Write
+
+- 写阻塞：不同 os write-buffer 不同，如果持续写但不读取数据，会造成写阻塞

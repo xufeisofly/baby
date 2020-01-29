@@ -576,3 +576,93 @@
 
      ((repeated smooth 10) f)
    #+end_src
+
+** Exercise 2.1
+
+   #+begin_src scheme
+     (define (make-rat n d)
+       (cond ((< d 0) (cons (* -1 n) (* -1 d)))
+             (else (cons n d))))
+   #+end_src
+
+** Exercise 2.2
+
+   #+begin_src scheme
+   (define (make-segment start-seg end-seg)
+  (cons start-seg end-seg))
+
+(define (start-segment line-seg)
+  (car line-seg))
+
+(define (end-segment line-seg)
+  (cdr line-seg))
+
+(define (make-point x-poi y-poi)
+  (cons x-poi y-poi))
+
+(define (x-point point)
+  (car point))
+
+(define (y-point point)
+  (cdr point))
+
+(define (midpoint-segment line-seg)
+  (let ((start-seg (start-segment line-seg))
+        (end-seg (end-segment line-seg)))
+    (let ((start-x-poi (x-point start-seg))
+          (start-y-poi (y-point start-seg))
+          (end-x-poi (x-point end-seg))
+          (end-y-poi (y-point end-seg)))
+      (make-point (/ (+ start-x-poi end-x-poi) 2)
+                  (/ (+ start-x-poi start-y-poi) 2)))))
+
+(define (print-point p)
+  (newline)
+  (display "(")
+  (display (x-point p))
+  (display ",")
+  (display (y-point p))
+  (display ")"))
+
+   #+end_src
+
+** Exercise 2.20
+
+   #+begin_src scheme
+     (define (even? x)
+       (= 0 (remainder x 2)))
+
+     (define (odd? x)
+       (not (even? x)))
+
+     (define (same-parity x . items)
+       (define (select f l)
+         (define (iter ll result)
+           (if (null? ll)
+               result
+               (if (f (car ll))
+                   (iter (cdr ll) (cons result (car ll)))
+                   (iter (cdr ll) result))
+               ))
+         (iter l '()))
+
+       (if (odd? x)
+           (cons x (select odd? items))
+           (cons x (select even? items))))
+   #+end_src
+
+** Exercise 2.23
+
+   #+begin_src scheme
+     (define (for-each proc items)
+       (if (null? items)
+           true
+           (begin
+             (proc (car items))
+             (for-each proc (cdr items)))))
+
+     (for-each (lambda (x)
+                 (newline)
+                 (display x))
+               (list 1 2 3 4))
+   #+end_src
