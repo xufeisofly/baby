@@ -1,4 +1,5 @@
 #+TITLE: Polymorphism of scheme
+#+Html_head: <link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 
 To implement Polymorphism for a programming language, we usually need a Class(for python and ruby OO langs) or Interface implementations(for golang). But, is there a general idea for general language that might not support polymorphism in the very beginning apart from using cases(which is definitly shit when types increase).
 
