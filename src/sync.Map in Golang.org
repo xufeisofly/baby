@@ -1,6 +1,0 @@
-#+TITLE: Sync.Map in Golang
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
-* 1
-Like other programming languages, we use a hash table called map in Golang, until go1.9 the sync.Map became a new kid in the town. If you want to reach for sync.Map, you'd better know the contentions.
-
-The fact is, builtin map has a dirty little secret that it's not thread-safe, which means if a map is read and written by multiple goroutines at the same time, it will producing unexpected key-value result.
