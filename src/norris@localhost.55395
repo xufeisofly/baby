@@ -1,0 +1,81 @@
+#+TITLE: Polymorphism of scheme
+
+To implement Polymorphism for a programming language, we usually need a Class(for python and ruby OO langs) or Interface implementations(for golang). But, is there a general idea for general language that might not support polymorphism in the very beginning apart from using cases(which is definitly shit when types increase).
+
+Fortunatly I get some idea from SICP. The idea is using a global table(may not be a map, a storage anyway) to store the relationship between the "Type", "MethodName" and "Actual Procedure".
+
+Let's see the code.
+
+First we define a object constructor with type and selector to get type. Polymorphism alwarys need a type.
+#+begin_src scheme
+(define (make-obj type data)
+  (cons type data))
+
+(define (get-type obj)
+  (car obj))
+#+end_src
+
+Let's say we have two types, 'a and 'b, and the procedure name which diffs between the two types
+#+begin_src scheme
+;; for 'a
+(define (name obj) 'A)
+
+;; for 'b
+(define (name obj) 'B')
+#+end_src
+
+Unfortunatly we don't have OO methods, but we can define a global table. It can be any type, but of course a list in lisp.
+#+begin_src scheme
+(define table '())
+#+end_src
+
+Well, funcs to put and get are also needed
+#+begin_src scheme
+(define (put type op f)
+  (set! table (cons (list type op f) table)))
+
+(define (get type op)
+  (define (iter a)
+    (if (not (pair? a))
+        'failed
+        (let ((row (car a)))
+          (cond ((and (eq? (car row) type) (eq? (cadr row) op))
+                 (car (cddr row)))
+                (else
+                 (iter (cdr a)))))))
+  (iter table))
+#+end_src
+
+Now we can store type-procedure infos into the table like this
+#+begin_src scheme
+  (put 'a 'func-name func)
+
+  (get 'a 'func-name) #=> <func procedure process>
+#+end_src
+
+OK, now we redefine the name func into internal procedures called install-A and install-B while put the infos to the table.
+#+begin_src scheme
+(define (install-A)
+  (define (name obj) 'A)
+  (put 'a 'name name))
+
+(define (install-B)
+  (define (name obj) 'B)
+  (put 'b 'name name))
+#+end_src
+
+And here is the Polymorphism.
+#+begin_src scheme
+(install-A)
+(install-B)
+
+(define (apply-generic op obj)
+  (let ((type (get-type obj)))
+    (let ((f (get type op)))
+      (apply f (list obj)))))
+
+(apply-generic 'name (make-obj 'b 3)) # => B
+(apply-generic 'name (make-obj 'a 3)) # => A
+#+end_src
+
+This make me think, how object of classes call its receiver method can actually be implemented by the "Table"

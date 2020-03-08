@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Polymorphism of scheme</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Polymorphism of scheme</h1>
+<p>
+To implement Polymorphism for a programming language, we usually need a Class(for python and ruby OO langs) or Interface implementations(for golang). But, is there a general idea for general language that might not support polymorphism in the very beginning apart from using cases(which is definitly shit when types increase).
+</p>
+
+<p>
+Fortunatly I get some idea from SICP. The idea is using a global table(may not be a map, a storage anyway) to store the relationship between the "Type", "MethodName" and "Actual Procedure".
+</p>
+
+<p>
+Let's see the code.
+</p>
+
+<p>
+First we define a object constructor with type and selector to get type. Polymorphism alwarys need a type.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">make-obj</span> type data<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span>cons type data<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">get-type</span> obj<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span>car obj<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<p>
+Let's say we have two types, 'a and 'b, and the procedure name which diffs between the two types
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #5F7F5F;">;; </span><span style="color: #7F9F7F; font-style: italic;">for 'a</span>
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #BFEBBF;">)</span> 'A<span style="color: #DCDCCC;">)</span>
+
+<span style="color: #5F7F5F;">;; </span><span style="color: #7F9F7F; font-style: italic;">for 'b</span>
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #BFEBBF;">)</span> 'B'<span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<p>
+Unfortunatly we don't have OO methods, but we can define a global table. It can be any type, but of course a list in lisp.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #93E0E3;">table</span> '<span style="color: #BFEBBF;">()</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<p>
+Well, funcs to put and get are also needed
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">put</span> type op f<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">set!</span> table <span style="color: #D0BF8F;">(</span>cons <span style="color: #93E0E3;">(</span>list type op f<span style="color: #93E0E3;">)</span> table<span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">get</span> type op<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">iter</span> a<span style="color: #D0BF8F;">)</span>
+    <span style="color: #D0BF8F;">(</span><span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #93E0E3;">(</span>not <span style="color: #9FC59F;">(</span>pair? a<span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span>
+        'failed
+        <span style="color: #93E0E3;">(</span><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #9FC59F;">(</span><span style="color: #94BFF3;">(</span>row <span style="color: #E0CF9F;">(</span>car a<span style="color: #E0CF9F;">)</span><span style="color: #94BFF3;">)</span><span style="color: #9FC59F;">)</span>
+          <span style="color: #9FC59F;">(</span><span style="color: #F0DFAF; font-weight: bold;">cond</span> <span style="color: #94BFF3;">(</span><span style="color: #E0CF9F;">(</span><span style="color: #F0DFAF; font-weight: bold;">and</span> <span style="color: #8FB28F;">(</span>eq? <span style="color: #6CA0A3;">(</span>car row<span style="color: #6CA0A3;">)</span> type<span style="color: #8FB28F;">)</span> <span style="color: #8FB28F;">(</span>eq? <span style="color: #6CA0A3;">(</span>cadr row<span style="color: #6CA0A3;">)</span> op<span style="color: #8FB28F;">)</span><span style="color: #E0CF9F;">)</span>
+                 <span style="color: #E0CF9F;">(</span>car <span style="color: #8FB28F;">(</span>cddr row<span style="color: #8FB28F;">)</span><span style="color: #E0CF9F;">)</span><span style="color: #94BFF3;">)</span>
+                <span style="color: #94BFF3;">(</span><span style="color: #F0DFAF; font-weight: bold;">else</span>
+                 <span style="color: #E0CF9F;">(</span>iter <span style="color: #8FB28F;">(</span>cdr a<span style="color: #8FB28F;">)</span><span style="color: #E0CF9F;">)</span><span style="color: #94BFF3;">)</span><span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span><span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span>iter table<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<p>
+Now we can store type-procedure infos into the table like this
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span>put 'a 'func-name func<span style="color: #DCDCCC;">)</span>
+
+<span style="color: #DCDCCC;">(</span>get 'a 'func-name<span style="color: #DCDCCC;">)</span> #=&gt; &lt;func procedure process&gt;
+</pre>
+</div>
+
+<p>
+OK, now we redefine the name func into internal procedures called install-A and install-B while put the infos to the table.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">install-A</span><span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #D0BF8F;">)</span> 'A<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span>put 'a 'name name<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">install-B</span><span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #D0BF8F;">)</span> 'B<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span>put 'b 'name name<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+</pre>
+</div>
+
+<p>
+And here is the Polymorphism.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span>install-A<span style="color: #DCDCCC;">)</span>
+<span style="color: #DCDCCC;">(</span>install-B<span style="color: #DCDCCC;">)</span>
+
+<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">apply-generic</span> op obj<span style="color: #BFEBBF;">)</span>
+  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">(</span>type <span style="color: #9FC59F;">(</span>get-type obj<span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span><span style="color: #D0BF8F;">)</span>
+    <span style="color: #D0BF8F;">(</span><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #93E0E3;">(</span><span style="color: #9FC59F;">(</span>f <span style="color: #94BFF3;">(</span>get type op<span style="color: #94BFF3;">)</span><span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span>
+      <span style="color: #93E0E3;">(</span>apply f <span style="color: #9FC59F;">(</span>list obj<span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span><span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+
+<span style="color: #DCDCCC;">(</span>apply-generic 'name <span style="color: #BFEBBF;">(</span>make-obj 'b <span style="color: #BFEBBF;">3</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span> # =&gt; B
+<span style="color: #DCDCCC;">(</span>apply-generic 'name <span style="color: #BFEBBF;">(</span>make-obj 'a <span style="color: #BFEBBF;">3</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span> # =&gt; A
+</pre>
+</div>
+
+<p>
+This make me think, how object of classes call its receiver method can actually be implemented by the "Table"
+</p>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,3 +1,4 @@
+
 #+TITLE: TODOs
 
 *** LIVE sla，涉及新 live rpc 迁移修改
@@ -19,10 +20,108 @@
 **** DONE 线下活动复制。榜单复制 <2019-12-26 Thu>
 ***** DONE 榜单复制 0.5 d
 ***** DONE 线下活动复制 0.5 d
-*** TODO 分期上线 <2020-01-07 Tue>
-**** TODO 一次性上线公开时判断期数和总期数
-**** TODO 私家课编辑页和盐选专栏编辑页增加修改分期上线功能 bug notify!
+*** DONE 分期上线 <2020-01-07 Tue>
+    CLOSED: [2020-02-05 Wed 10:53]
+**** DONE 一次性上线公开时判断期数和总期数
+     CLOSED: [2020-02-05 Wed 10:53]
+**** DONE 私家课编辑页和盐选专栏编辑页增加修改分期上线功能 bug notify!
+     CLOSED: [2020-02-05 Wed 10:53]
 ***** ~is_staged~ 总期数和总时长不能为0，album 的 schema 有验证，不是很重要
 ***** ~is_staged~ 和 ~is_serial~ 不能同时为 True，schema 中应该有 validate
 ***** 什么 VipFreeUploadingAlbumController 里面有加入 ~is_staged~ 为 True 的数据，但是只有一个 rpc 用到，这个 rpc 目前没有 qps，暂时不管了
 ***** ~is_staged~ = True, 可以， 为 False 时如果 ~is_public=True~ 则 ~section_count~ assert equal ~update_section_count~
+*** DONE 疫情活动页
+    CLOSED: [2020-02-12 Wed 15:59]
+**** DONE 对接直播 cell
+     CLOSED: [2020-02-12 Wed 15:59]
+     1. 直播信息 rpc 接口
+     2. 直播预约 rpc 接口
+     3. 后台增加直播 cell 存储和前台展示
+
+     - 前端获取直播 http 接口 0d
+     - 创建和更新时增加直播cell支持，~raw content~ 不动，module data 用来存放直播数据 0.5d
+     - 前台渲染, 直播 rpc，直播专用 schema 1d，直播预约状态 rpc
+     - 预约接口，保存，发私信，调用直播预约rpc 0.5d
+***** DONE P0 推广活动增加 cell 后台前台 1d
+      CLOSED: [2020-02-12 Wed 15:59]
+***** DONE P0 预约接口 0.5d
+      CLOSED: [2020-02-12 Wed 16:00]
+***** DONE P1 私信 push 1d
+      CLOSED: [2020-02-12 Wed 16:00]
+***** DONE P1 锚点待定
+      CLOSED: [2020-02-12 Wed 16:00]
+
+*** TODO 问卷 5d
+**** TODO 问题类型整理，确定协议和接口格式 0.5d
+**** TODO 创建数据库 0.5d
+**** TODO 问题模块开发。2d
+     - 单选
+     - 目标学校 select
+     - 多选
+     - 雅思目标分数
+     - 带文本框的单选
+**** TODO 接口开发+测试 2d
+
+*** TODO 教育联运频道页 10.5d + 3d
+**** DONE 创建数据库 0.5d
+     CLOSED: [2020-02-18 Tue 12:26]
+**** TODO Header 1d
+***** TODO 后台 1d
+**** TODO 推荐tab 4d
+***** TODO 逻辑+接口 2d
+***** TODO 后台 2d
+**** TODO 各种模块 5d
+***** TODO banner 模块 1d
+***** TODO 问答模块 1d
+***** TODO 直播模块 1d
+***** TODO 名师专区模块 1d
+***** TODO 单列sku模块 1d 
+**** TODO 联调 3d
+
+
+***** TODO 多列sku模块 1d xxx
+
+
+
+
+***** TODO 热度 2d xxx
+****** TODO 创建离线任务 1d
+****** TODO 热度计算逻辑和接口 1d
+***** TODO 目标 2d
+****** TODO 设置目标接口 1d  xxx
+****** TODO 目标文案解析 1d  xxx
+***** TODO 关注接口 0.5d
+**** TODO 实操
+***** DONE controller model schema handler 框架
+      CLOSED: [2020-02-18 Tue 12:29]
+***** DONE banner module + test
+      CLOSED: [2020-02-18 Tue 12:29]
+***** DONE qa module + test
+      CLOSED: [2020-02-20 Thu 10:09]
+***** DONE cache
+      CLOSED: [2020-02-21 Fri 15:58]
+***** DONE 异常捕获
+      CLOSED: [2020-02-21 Fri 15:58]
+***** TODO log
+***** TODO 代码优化
+***** DONE 直播预告 module + test
+      CLOSED: [2020-02-24 Mon 16:33]
+***** DONE 名人专区 module + test
+      CLOSED: [2020-02-24 Mon 22:14]
+***** TODO Header 接口
+***** TODO 模块后台...
+***** TODO 关注接口
+***** TODO 预约直播接口 
+*** TODO 留资
+**** 问题：1. 同步 
+**** 确认接口失败策略，加密文档
+**** TODO remix 后台添加「免费留资」字段并同步 sku 底栏
+**** TODO 上传手机号和课程信息接口，education?
+***** TODO 手机号校验
+***** TODO 保存 bolzano
+***** TODO 建表
+      - 课程 id， sku id
+      - 合作方 enum
+      - 用户提交手机号
+      - 用户提交时间 ~created_at~ 
+**** TODO 同步用户信息到第三方

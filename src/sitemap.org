@@ -1,5 +1,10 @@
 #+TITLE: Sitemap for project baby
 
+- [[file:Polymorphism of scheme.org][Polymorphism of scheme]]
+- [[file:sync.Map in Golang.org][Sync.Map in Golang]]
+- [[file:aes 加密.org][AES 加密]]
+- [[file:SICP exercises.org][SICP exercises]]
+- [[file:go socket programming.org][Go Socket 读写]]
 - [[file:innodb redolog.org][InnoDB 笔记]]
 - [[file:todo.org][TODOs]]
 - [[file:自定义类实现序列切片.org][自定义类实现序列切片]]
