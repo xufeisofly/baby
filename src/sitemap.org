@@ -1,7 +1,6 @@
 #+TITLE: Sitemap for project baby
 
 - [[file:substitution and environment model.org][Substitution model and Environment model]]
-- [[file:心跳保活.org][IM 心跳保活]]
 - [[file:Polymorphism of scheme.org][Polymorphism of scheme]]
 - [[file:aes 加密.org][AES 加密]]
 - [[file:SICP exercises.org][SICP exercises]]

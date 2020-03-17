@@ -40,6 +40,7 @@
 
     and a procedure object = code + env(wrapping the def)
 
+    #+begin_example
 global   _________________________________
 env  -->|                                 | 
         | square : *                      |
@@ -50,13 +51,16 @@ env  -->|                                 |
               ( *, *-)------
                             
          parameter: x
-         body: (* x x)
+         body: (* x x)    
+    #+end_example
+
 
 *** apply a procedure
 
     When a procedure is applied, it will form a new environment with a frame binding parameter to arguments, and the frame makes a closing by pointing to the environment defines the procedure.
 
-         _________________________________
+    #+begin_example
+         _________________________________ 
 env  -->|                                 |
         | square : *                      |
          -------|-----------------------^-
@@ -67,3 +71,6 @@ env  -->|                                 |
                                 |               |<- E0
                                 |               |
                                  ---------------
+
+    #+end_example
+         

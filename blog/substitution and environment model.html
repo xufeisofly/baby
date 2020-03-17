@@ -143,46 +143,22 @@ How procedures are created? Define a procedure is defining a procedure object, b
 and a procedure object = code + env(wrapping the def)
 </p>
 
-<p>
-global   <span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline">_</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-env  &#x2013;&gt;|                                 | 
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-</colgroup>
-<tbody>
-<tr>
-<td class="org-left">square : *</td>
-</tr>
-</tbody>
-</table>
-<p>
---&#x2013;&#x2014;|-------------------&#x2013;&#x2014;
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<tbody>
-<tr>
-</tr>
-
-<tr>
-</tr>
-</tbody>
-</table>
-<p>
-( *, *-)-&#x2013;&#x2014;
-</p>
-
-<p>
-parameter: x
-body: (* x x)
-</p>
+<pre class="example">
+global   _________________________________
+env  --&gt;|                                 | 
+        | square : *                      |
+         -------|------------------------
+                |          ^
+                |          |
+                |          |
+              ( *, *-)------
+                            
+         parameter: x
+         body: (* x x)    
+</pre>
 </div>
 </div>
+
 
 <div id="outline-container-org34bc438" class="outline-4">
 <h4 id="org34bc438"><span class="section-number-4">2.1.2</span> apply a procedure</h4>
@@ -191,69 +167,20 @@ body: (* x x)
 When a procedure is applied, it will form a new environment with a frame binding parameter to arguments, and the frame makes a closing by pointing to the environment defines the procedure.
 </p>
 
-<p>
-         <span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline">_</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
-env  &#x2013;&gt;|                                 |
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<pre class="example">
+         _________________________________ 
+env  --&gt;|                                 |
+        | square : *                      |
+         -------|-----------------------^-
+                |                       |
+                |                -------Frame 0-
+                |               | x  : 30       |
+              ( *, *-)---------&gt;|               |
+                                |               |&lt;- E0
+                                |               |
+                                 ---------------
 
-
-<colgroup>
-<col  class="org-left" />
-</colgroup>
-<tbody>
-<tr>
-<td class="org-left">square : *</td>
-</tr>
-</tbody>
-</table>
-<p>
---&#x2013;&#x2014;|------------------&#x2013;&#x2014;^-
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-</colgroup>
-<tbody>
-<tr>
-<td class="org-left">&#xa0;</td>
-</tr>
-
-<tr>
-<td class="org-left">--&#x2013;&#x2014;Frame 0-</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">x  : 30</td>
-</tr>
-</tbody>
-</table>
-<p>
-( *, *-)----&#x2013;&#x2014;&gt;|               |
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-left" />
-
-<col  class="org-left" />
-</colgroup>
-<tbody>
-<tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&lt;- E0</td>
-</tr>
-
-<tr>
-<td class="org-left">&#xa0;</td>
-</tr>
-</tbody>
-</table>
-<hr />
+</pre>
 </div>
 </div>
 </div>
