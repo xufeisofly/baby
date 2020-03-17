@@ -1,0 +1,69 @@
+#+TITLE: Substitution model and Environment model
+
+* Substitution model
+
+  #+begin_quote
+  To apply a compound procedure to arguments, evaluate the body of the procedure with each formal parameter replaced by the corresponding argument.
+  #+end_quote
+
+  The premise of substitution model is that the procedure is just the code, so it can be replaced by the sub-codes.
+
+  #+begin_src scheme
+    (sum-of-squares (+ a 1) (* a 2))
+    (+ (square 6) (square 10))
+    (+ (* 6 6) (* 10 10))
+  #+end_src
+
+  However, the substitution model collapse when you bring set! to the procedure, in which what we need is environment model
+
+* Environment model
+
+  In environment model, a variable can no longer be considered to be merely a name for the value, but a storage which can be changed.
+
+  So we say that a procedure = code + environment, so we cannot just substitute code without taking environment into account.
+
+** Rule of Evaluation
+
+*** define a procedure
+
+    How procedures are created? Define a procedure is defining a procedure object, because procedure definition is a syntax sugar
+
+    #+begin_src scheme
+      (define (square x)
+        (* x x))
+    #+end_src
+
+    #+begin_src scheme
+      (define square
+        (lambda (x) (* x x)))
+    #+end_src
+
+    and a procedure object = code + env(wrapping the def)
+
+global   _________________________________
+env  -->|                                 | 
+        | square : *                      |
+         -------|------------------------
+                |          ^
+                |          |
+                |          |
+              ( *, *-)------
+                            
+         parameter: x
+         body: (* x x)
+
+*** apply a procedure
+
+    When a procedure is applied, it will form a new environment with a frame binding parameter to arguments, and the frame makes a closing by pointing to the environment defines the procedure.
+
+         _________________________________
+env  -->|                                 |
+        | square : *                      |
+         -------|-----------------------^-
+                |                       |
+                |                -------Frame 0-
+                |               | x  : 30       |
+              ( *, *-)--------->|               |
+                                |               |<- E0
+                                |               |
+                                 ---------------

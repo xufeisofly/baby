@@ -1,6 +1,11 @@
 
 #+TITLE: TODOs
 
+*** OKR
+**** 预备
+***** 视频 live mqtt 迁移
+***** live 敏感数据迁移
+
 *** LIVE sla，涉及新 live rpc 迁移修改
 *** oncall 机器人
 *** 老 live 迁移
@@ -51,7 +56,7 @@
 ***** DONE P1 锚点待定
       CLOSED: [2020-02-12 Wed 16:00]
 
-*** TODO 问卷 5d
+*** 问卷 5d
 **** TODO 问题类型整理，确定协议和接口格式 0.5d
 **** TODO 创建数据库 0.5d
 **** TODO 问题模块开发。2d
@@ -62,7 +67,8 @@
      - 带文本框的单选
 **** TODO 接口开发+测试 2d
 
-*** TODO 教育联运频道页 10.5d + 3d
+*** DONE 教育联运频道页 10.5d + 3d
+    CLOSED: [2020-03-17 Tue 17:34]
 **** DONE 创建数据库 0.5d
      CLOSED: [2020-02-18 Tue 12:26]
 **** TODO Header 1d
@@ -112,16 +118,35 @@
 ***** TODO 模块后台...
 ***** TODO 关注接口
 ***** TODO 预约直播接口 
-*** TODO 留资
+*** DONE 留资
+    CLOSED: [2020-03-17 Tue 17:35]
 **** 问题：1. 同步 
 **** 确认接口失败策略，加密文档
-**** TODO remix 后台添加「免费留资」字段并同步 sku 底栏
-**** TODO 上传手机号和课程信息接口，education?
-***** TODO 手机号校验
-***** TODO 保存 bolzano
-***** TODO 建表
+**** DONE remix 后台添加「免费留资」字段并同步 sku 底栏
+     CLOSED: [2020-03-17 Tue 17:35]
+**** DONE 上传手机号和课程信息接口，education?
+     CLOSED: [2020-03-17 Tue 17:35]
+***** DONE 手机号校验
+      CLOSED: [2020-03-17 Tue 17:35]
+***** DONE 保存 bolzano
+      CLOSED: [2020-03-17 Tue 17:35]
+***** DONE 建表
+      CLOSED: [2020-03-17 Tue 17:35]
       - 课程 id， sku id
       - 合作方 enum
       - 用户提交手机号
       - 用户提交时间 ~created_at~ 
-**** TODO 同步用户信息到第三方
+**** DONE 同步用户信息到第三方
+     CLOSED: [2020-03-17 Tue 17:35]
+*** TODO 绑定优惠券
+**** DONE 后台绑定 channelkey 1d
+     CLOSED: [2020-03-17 Tue 17:35]
+**** DONE kafka 接口，发优惠券+私信+短信+存 1.5d
+     CLOSED: [2020-03-17 Tue 17:35]
+**** TODO 联调 1d
+*** TODO 教育联运退款
+**** TODO 创建退款接口-退款退货，退款是否支持部分退款？ 1.5d
+**** TODO 退款列表接口-没啥说的 0.5d
+**** TODO 页面权限配置 0.5d
+**** TODO 快页面 1.5d
+

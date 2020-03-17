@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Substitution model and Environment model</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Substitution model and Environment model</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org3819722">1. Substitution model</a></li>
+<li><a href="#orgcb93665">2. Environment model</a>
+<ul>
+<li><a href="#orgbb217f7">2.1. Rule of Evaluation</a>
+<ul>
+<li><a href="#org01b5223">2.1.1. define a procedure</a></li>
+<li><a href="#org34bc438">2.1.2. apply a procedure</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org3819722" class="outline-2">
+<h2 id="org3819722"><span class="section-number-2">1</span> Substitution model</h2>
+<div class="outline-text-2" id="text-1">
+<blockquote>
+<p>
+To apply a compound procedure to arguments, evaluate the body of the procedure with each formal parameter replaced by the corresponding argument.
+</p>
+</blockquote>
+
+<p>
+The premise of substitution model is that the procedure is just the code, so it can be replaced by the sub-codes.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span>sum-of-squares <span style="color: #93a8c6;">(</span>+ a <span style="color: #95a99f;">1</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>* a <span style="color: #95a99f;">2</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #8c8c8c;">(</span>+ <span style="color: #93a8c6;">(</span>square <span style="color: #95a99f;">6</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>square <span style="color: #95a99f;">10</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #8c8c8c;">(</span>+ <span style="color: #93a8c6;">(</span>* <span style="color: #95a99f;">6</span> <span style="color: #95a99f;">6</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>* <span style="color: #95a99f;">10</span> <span style="color: #95a99f;">10</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+However, the substitution model collapse when you bring set! to the procedure, in which what we need is environment model
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgcb93665" class="outline-2">
+<h2 id="orgcb93665"><span class="section-number-2">2</span> Environment model</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+In environment model, a variable can no longer be considered to be merely a name for the value, but a storage which can be changed.
+</p>
+
+<p>
+So we say that a procedure = code + environment, so we cannot just substitute code without taking environment into account.
+</p>
+</div>
+
+<div id="outline-container-orgbb217f7" class="outline-3">
+<h3 id="orgbb217f7"><span class="section-number-3">2.1</span> Rule of Evaluation</h3>
+<div class="outline-text-3" id="text-2-1">
+</div>
+<div id="outline-container-org01b5223" class="outline-4">
+<h4 id="org01b5223"><span class="section-number-4">2.1.1</span> define a procedure</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<p>
+How procedures are created? Define a procedure is defining a procedure object, because procedure definition is a syntax sugar
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span><span style="color: #ffdd33; font-weight: bold;">define</span> <span style="color: #93a8c6;">(</span><span style="color: #96a6c8;">square</span> x<span style="color: #93a8c6;">)</span>
+  <span style="color: #93a8c6;">(</span>* x x<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span><span style="color: #ffdd33; font-weight: bold;">define</span> <span style="color: #96a6c8;">square</span>
+  <span style="color: #93a8c6;">(</span><span style="color: #ffdd33; font-weight: bold;">lambda</span> <span style="color: #b0b1a3;">(</span>x<span style="color: #b0b1a3;">)</span> <span style="color: #b0b1a3;">(</span>* x x<span style="color: #b0b1a3;">)</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+</pre>
+</div>
+
+<p>
+and a procedure object = code + env(wrapping the def)
+</p>
+
+<p>
+global   <span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline">_</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
+env  &#x2013;&gt;|                                 | 
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">square : *</td>
+</tr>
+</tbody>
+</table>
+<p>
+--&#x2013;&#x2014;|-------------------&#x2013;&#x2014;
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<tbody>
+<tr>
+</tr>
+
+<tr>
+</tr>
+</tbody>
+</table>
+<p>
+( *, *-)-&#x2013;&#x2014;
+</p>
+
+<p>
+parameter: x
+body: (* x x)
+</p>
+</div>
+</div>
+
+<div id="outline-container-org34bc438" class="outline-4">
+<h4 id="org34bc438"><span class="section-number-4">2.1.2</span> apply a procedure</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<p>
+When a procedure is applied, it will form a new environment with a frame binding parameter to arguments, and the frame makes a closing by pointing to the environment defines the procedure.
+</p>
+
+<p>
+         <span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline"><span class="underline">_</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>
+env  &#x2013;&gt;|                                 |
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">square : *</td>
+</tr>
+</tbody>
+</table>
+<p>
+--&#x2013;&#x2014;|------------------&#x2013;&#x2014;^-
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">--&#x2013;&#x2014;Frame 0-</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">x  : 30</td>
+</tr>
+</tbody>
+</table>
+<p>
+( *, *-)----&#x2013;&#x2014;&gt;|               |
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&lt;- E0</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
+</div>
+</div>
+</body>
+</html>
