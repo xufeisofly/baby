@@ -1,0 +1,90 @@
+#+TITLE: 获取微信用户信息
+
+* 微信获取信息分类
+  - 公众号网页授权获取
+  - 网页应用登陆授权获取
+    页面是微信授权登陆，而非获取信息
+
+* 公众号网页授权
+  条件：
+  - 公众号认证，而非测试
+
+  scope:
+
+  1. ~snsapi_base~ 获取 ~openid~，静默授权，不会出现授权页，*需要关注公众号*
+  2. ~snsapi_userinfo~ 获取用户基本信息，用户手动点击授权，*无需关注公众号*
+  3. 用户管理类中的获取用户信息，需要关注公众号
+
+  2满足需求。
+
+** ~snsapi_userinfo~ 非关注获取用户信息
+
+[[https://blog.csdn.net/happy_jijiawei/article/details/78612074]]
+
+   代码举例
+
+   #+begin_src ruby
+     //scope=snsapi_userinfo实例
+     $appid='你的AppId';
+     $redirect_uri = urlencode ( 'http://你的域名/getUserInfo.php' );
+     $url ="https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$redirect_uri&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+     header("Location:".$url);
+   #+end_src
+
+   #+begin_src ruby
+     $appid = "你的AppId";  
+     $secret = "你的AppSecret";  
+     $code = $_GET["code"];
+      
+     //第一步:取得openid
+     $oauth2Url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$secret&code=$code&grant_type=authorization_code";
+     $oauth2 = getJson($oauth2Url);
+       
+     //第二步:根据全局access_token和openid查询用户信息  
+     $access_token = $oauth2["access_token"];  
+     $openid = $oauth2['openid'];  
+     $get_user_info_url = "https://api.weixin.qq.com/sns/user/info?access_token=$access_token&openid=$openid&lang=zh_CN";
+     $userinfo = getJson($get_user_info_url);
+      
+     //打印用户信息
+       print_r($userinfo);
+      
+     function getJson($url){
+           $ch = curl_init();
+           curl_setopt($ch, CURLOPT_URL, $url);
+           curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); 
+           curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE); 
+           curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+           $output = curl_exec($ch);
+           curl_close($ch);
+           return json_decode($output, true);
+     }
+   #+end_src
+
+   用户信息
+ 
+   #+begin_src json
+     {
+       "openid":" OPENID",  // 用户和公众号之间唯一的关联 id，无需关注公众号
+       "nickname": NICKNAME,
+       "sex":"1",
+       "province":"PROVINCE"
+       "city":"CITY",
+       "country":"COUNTRY",
+       "headimgurl":    "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46",
+       "privilege":[
+         "PRIVILEGE1"
+         "PRIVILEGE2"
+       ]
+       "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL" // 多个公众号和网页应用之间的 id
+     }  
+   #+end_src
+ 
+
+#+CAPTION: unionid
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/03/27/bdwM79eZynXrL63.png'
+[[file:/Users/norris/projects/baby/private/work/../images/union.png]]
+
+注意：openid 和公众号相关， unionid 和 开放平台账号相关，一个开放平台可以运营多个公众号或网页应用。应该尽量用 unionid 去和 ~member_id~ 关联。
+
+[[https://wohugb.gitbooks.io/wechat/content/authorize/README.html]]

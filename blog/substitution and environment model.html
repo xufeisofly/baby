@@ -92,9 +92,9 @@ The premise of substitution model is that the procedure is just the code, so it 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span>sum-of-squares <span style="color: #93a8c6;">(</span>+ a <span style="color: #95a99f;">1</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>* a <span style="color: #95a99f;">2</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
-<span style="color: #8c8c8c;">(</span>+ <span style="color: #93a8c6;">(</span>square <span style="color: #95a99f;">6</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>square <span style="color: #95a99f;">10</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
-<span style="color: #8c8c8c;">(</span>+ <span style="color: #93a8c6;">(</span>* <span style="color: #95a99f;">6</span> <span style="color: #95a99f;">6</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>* <span style="color: #95a99f;">10</span> <span style="color: #95a99f;">10</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span>sum-of-squares <span style="color: #93a8c6;">(</span>+ a <span style="color: #d08770;">1</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>* a <span style="color: #d08770;">2</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #8c8c8c;">(</span>+ <span style="color: #93a8c6;">(</span>square <span style="color: #d08770;">6</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>square <span style="color: #d08770;">10</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<span style="color: #8c8c8c;">(</span>+ <span style="color: #93a8c6;">(</span>* <span style="color: #d08770;">6</span> <span style="color: #d08770;">6</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">(</span>* <span style="color: #d08770;">10</span> <span style="color: #d08770;">10</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
 </pre>
 </div>
 
@@ -128,14 +128,14 @@ How procedures are created? Define a procedure is defining a procedure object, b
 </p>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span><span style="color: #ffdd33; font-weight: bold;">define</span> <span style="color: #93a8c6;">(</span><span style="color: #96a6c8;">square</span> x<span style="color: #93a8c6;">)</span>
+<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">define</span> <span style="color: #93a8c6;">(</span><span style="color: #8fa1b3;">square</span> x<span style="color: #93a8c6;">)</span>
   <span style="color: #93a8c6;">(</span>* x x<span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span><span style="color: #ffdd33; font-weight: bold;">define</span> <span style="color: #96a6c8;">square</span>
-  <span style="color: #93a8c6;">(</span><span style="color: #ffdd33; font-weight: bold;">lambda</span> <span style="color: #b0b1a3;">(</span>x<span style="color: #b0b1a3;">)</span> <span style="color: #b0b1a3;">(</span>* x x<span style="color: #b0b1a3;">)</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
+<pre class="src src-scheme"><span style="color: #8c8c8c;">(</span><span style="color: #b48ead;">define</span> <span style="color: #8fa1b3;">square</span>
+  <span style="color: #93a8c6;">(</span><span style="color: #b48ead;">lambda</span> <span style="color: #b0b1a3;">(</span>x<span style="color: #b0b1a3;">)</span> <span style="color: #b0b1a3;">(</span>* x x<span style="color: #b0b1a3;">)</span><span style="color: #93a8c6;">)</span><span style="color: #8c8c8c;">)</span>
 </pre>
 </div>
 

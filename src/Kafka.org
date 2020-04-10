@@ -1,0 +1,152 @@
+#+TITLE: Kafka
+
+* Producer
+
+#+CAPTION: Kafka Producer
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/03/30/k1tvZ4r8PLydxow.png'
+[[file:/Users/norris/projects/baby/src/../images/ProducerKafka.png]]
+
+one producer can be used in multi threads
+
+#+begin_quote
+the message will be places in a buffer and will be sent to the broker in a seperate thread
+#+end_quote
+
+so to reach higher throughput
+- add threads
+- add producers
+
+** Send Message to Kafka
+
+*** Synchronously
+
+    #+begin_src python
+    producer.send().get()
+    #+end_src
+
+*** Asynchronously
+
+    #+begin_src python
+    producer.send()
+
+    def onCompletion(): ...
+    #+end_src
+
+** Serializer
+
+   - default serializers: arov thrift protobuf
+   - custom serializer
+
+** Partitions
+
+   key -- hash() --> partition
+
+   #+begin_quote
+   Q: What is the benefit of map of key to partition?
+   #+end_quote
+
+   partition hash can also be customed.
+
+* Consumer
+
+  One Application One Consumer Group
+
+  the consumers in a consumer group averagly consume messages from partitions in a topic
+
+  #+CAPTION: consumergroup 1
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/03/31/8clyxBSRQk3Prtu.png'
+[[file:/Users/norris/projects/baby/src/../images/consumergroup1.png]]
+
+
+
+#+CAPTION: consumergroup2
+#+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/03/31/r3vsLqtyQE9ZXzx.png'
+[[file:/Users/norris/projects/baby/src/../images/consumergroup2.png]]
+
+** Rebalance and heartbeat
+
+   1. when a consumer crash, customer group will start a rebalance. which can cause cache invalidation and messages duplication.
+   2. consumer -- heartbeat --> broker
+
+** The Pool Loop
+
+   #+begin_src java
+     try {
+         while (true) {
+             ConsumerRecords<String, String> records = consumer.poll(100);
+             for (ConsumerRecord<String, String> record : records)
+                 {
+                     log.debug("topic = %s, partition = %s, offset = %d,
+                      customer = %s, country = %s\n",
+                               record.topic(), record.partition(), record.offset(),
+                               record.key(), record.value());
+                     int updatedCount = 1;
+                     if (custCountryMap.countainsValue(record.value())) {
+                         updatedCount = custCountryMap.get(record.value()) + 1;
+                     }
+                     custCountryMap.put(record.value(), updatedCount)
+                         JSONObject json = new JSONObject(custCountryMap);
+                     System.out.println(json.toString(4))
+                         }
+         }
+     } finally {
+         consumer.close();
+     }
+   #+end_src
+
+   consumer use an infinite loop to fetch data.
+
+   #+begin_quote
+   The same way that sharks must keep moving or they die, consumers must keep polling Kafka or they will be con‐ sidered dead and the partitions they are consuming will be handed to another consumer in the group to continue consuming. The parameter we pass, poll(), is a timeout interval and controls how long poll() will block if data is not avail‐ able in the consumer buffer. If this is set to 0, poll() will return immediately; otherwise, it will wait for the specified number of milliseconds for data to arrive from the broker.
+   #+end_quote
+
+   What's in Pool:
+   - get data
+   - heartbeat
+   - rebalance trigger
+
+** Commits and Offsets
+
+   to mark if message has been read
+
+*** AutoCommit
+
+    Every 5 seconds, leading to duplicate messages processing in this period.
+
+*** Commit Manually
+
+    - commitSync()
+    - commitAsync(): can set callback, but don't retry in it, will cause order problem
+
+
+** Rebalance Listeners
+
+* Kafka Internals
+
+
+** Requests Processing
+
+   #+CAPTION: 
+   #+ATTR_HTML: :onerror this.src='https://i.loli.net/2020/04/04/q65uveCd4tWicAy.png'
+   [[file:/Users/norris/projects/baby/src/../images/23746789723894.png]]
+
+   producers and consumers connect broker by TCP long connection. Requests need bring information of which topic and partition it is sending to, to get this, broker support an api to return topic and partition list the producers care about.
+
+** Reliable Data
+
+*** Kafka reliablility guarantees
+
+    - Kafka provides order guarantee of messages in a partition.
+    - Produced messages are considered "committed" when they were written to the partition on all its in-sync replicas.
+    - Messages that are committed will not be lost as long as at least one replica remain alive.
+    - Consumers can only read messages that are commited.
+
+*** Replication
+
+* Data Pipeline
+
+  Kafka can be used for:
+  1. Application integration with producers and consumers mode
+  2. Data integration with Kafka Connect (eg. sync data from mysql to elasticsearch)
+    
+

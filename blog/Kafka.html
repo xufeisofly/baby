@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kafka</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content=" Norris" />
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Kafka</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgf40b0cb">1. Producer</a>
+<ul>
+<li><a href="#org4e0b9d6">1.1. Send Message to Kafka</a>
+<ul>
+<li><a href="#org752ff48">1.1.1. Synchronously</a></li>
+<li><a href="#org6d9a4b4">1.1.2. Asynchronously</a></li>
+</ul>
+</li>
+<li><a href="#orgce16a51">1.2. Serializer</a></li>
+<li><a href="#org7aa5c6e">1.3. Partitions</a></li>
+</ul>
+</li>
+<li><a href="#orgd8b814e">2. Consumer</a>
+<ul>
+<li><a href="#orgb7dd896">2.1. Rebalance and heartbeat</a></li>
+<li><a href="#orgaf88d0f">2.2. The Pool Loop</a></li>
+<li><a href="#org5413ea9">2.3. Commits and Offsets</a>
+<ul>
+<li><a href="#org1b3d4df">2.3.1. AutoCommit</a></li>
+<li><a href="#org8ee85c4">2.3.2. Commit Manually</a></li>
+</ul>
+</li>
+<li><a href="#org922cf99">2.4. Rebalance Listeners</a></li>
+</ul>
+</li>
+<li><a href="#org85e1438">3. Kafka Internals</a>
+<ul>
+<li><a href="#orgbae2491">3.1. Requests Processing</a></li>
+<li><a href="#org7cbf127">3.2. Reliable Data</a>
+<ul>
+<li><a href="#orgee1b29d">3.2.1. Kafka reliablility guarantees</a></li>
+<li><a href="#orgbfa5bcd">3.2.2. Replication</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orga7ac7ab">4. Data Pipeline</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf40b0cb" class="outline-2">
+<h2 id="orgf40b0cb"><span class="section-number-2">1</span> Producer</h2>
+<div class="outline-text-2" id="text-1">
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/ProducerKafka.png" alt="ProducerKafka.png" onerror="this.src='https://i.loli.net/2020/03/30/k1tvZ4r8PLydxow.png'" />
+</p>
+<p><span class="figure-number">Figure 1: </span>Kafka Producer</p>
+</div>
+
+<p>
+one producer can be used in multi threads
+</p>
+
+<blockquote>
+<p>
+the message will be places in a buffer and will be sent to the broker in a seperate thread
+</p>
+</blockquote>
+
+<p>
+so to reach higher throughput
+</p>
+<ul class="org-ul">
+<li>add threads</li>
+<li>add producers</li>
+</ul>
+</div>
+
+<div id="outline-container-org4e0b9d6" class="outline-3">
+<h3 id="org4e0b9d6"><span class="section-number-3">1.1</span> Send Message to Kafka</h3>
+<div class="outline-text-3" id="text-1-1">
+</div>
+<div id="outline-container-org752ff48" class="outline-4">
+<h4 id="org752ff48"><span class="section-number-4">1.1.1</span> Synchronously</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<div class="org-src-container">
+<pre class="src src-python">producer.send<span style="color: #8c8c8c;">()</span>.get<span style="color: #8c8c8c;">()</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6d9a4b4" class="outline-4">
+<h4 id="org6d9a4b4"><span class="section-number-4">1.1.2</span> Asynchronously</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<div class="org-src-container">
+<pre class="src src-python">producer.send<span style="color: #8c8c8c;">()</span>
+
+<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">onCompletion</span><span style="color: #8c8c8c;">()</span>: ...
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgce16a51" class="outline-3">
+<h3 id="orgce16a51"><span class="section-number-3">1.2</span> Serializer</h3>
+<div class="outline-text-3" id="text-1-2">
+<ul class="org-ul">
+<li>default serializers: arov thrift protobuf</li>
+<li>custom serializer</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org7aa5c6e" class="outline-3">
+<h3 id="org7aa5c6e"><span class="section-number-3">1.3</span> Partitions</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+key &#x2013; hash() &#x2013;&gt; partition
+</p>
+
+<blockquote>
+<p>
+Q: What is the benefit of map of key to partition?
+</p>
+</blockquote>
+
+<p>
+partition hash can also be customed.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd8b814e" class="outline-2">
+<h2 id="orgd8b814e"><span class="section-number-2">2</span> Consumer</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+One Application One Consumer Group
+</p>
+
+<p>
+the consumers in a consumer group averagly consume messages from partitions in a topic
+</p>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/consumergroup1.png" alt="consumergroup1.png" onerror="this.src='https://i.loli.net/2020/03/31/8clyxBSRQk3Prtu.png'" />
+</p>
+<p><span class="figure-number">Figure 2: </span>consumergroup 1</p>
+</div>
+
+
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/consumergroup2.png" alt="consumergroup2.png" onerror="this.src='https://i.loli.net/2020/03/31/r3vsLqtyQE9ZXzx.png'" />
+</p>
+<p><span class="figure-number">Figure 3: </span>consumergroup2</p>
+</div>
+</div>
+
+<div id="outline-container-orgb7dd896" class="outline-3">
+<h3 id="orgb7dd896"><span class="section-number-3">2.1</span> Rebalance and heartbeat</h3>
+<div class="outline-text-3" id="text-2-1">
+<ol class="org-ol">
+<li>when a consumer crash, customer group will start a rebalance. which can cause cache invalidation and messages duplication.</li>
+<li>consumer &#x2013; heartbeat &#x2013;&gt; broker</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgaf88d0f" class="outline-3">
+<h3 id="orgaf88d0f"><span class="section-number-3">2.2</span> The Pool Loop</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-java"><span style="color: #b48ead;">try</span> <span style="color: #8c8c8c;">{</span>
+    <span style="color: #b48ead;">while</span> <span style="color: #93a8c6;">(</span><span style="color: #d08770;">true</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">{</span>
+        <span style="color: #c0c5ce;">ConsumerRecords</span><span style="color: #b0b1a3;">&lt;</span><span style="color: #c0c5ce;">String</span>, <span style="color: #c0c5ce;">String</span><span style="color: #b0b1a3;">&gt;</span> <span style="color: #bf616a;">records</span> = consumer.poll<span style="color: #b0b1a3;">(</span><span style="color: #d08770;">100</span><span style="color: #b0b1a3;">)</span>;
+        <span style="color: #b48ead;">for</span> <span style="color: #b0b1a3;">(</span><span style="color: #c0c5ce;">ConsumerRecord</span><span style="color: #97b098;">&lt;</span><span style="color: #c0c5ce;">String</span>, <span style="color: #c0c5ce;">String</span><span style="color: #97b098;">&gt;</span> <span style="color: #bf616a;">record</span> : records<span style="color: #b0b1a3;">)</span>
+            <span style="color: #b0b1a3;">{</span>
+                log.debug<span style="color: #97b098;">(</span><span style="color: #ffc0cb; font-weight: bold;">"</span><span style="color: #a3be8c;">topic = %s, partition = %s, offset = %d,</span>
+<span style="color: #a3be8c;">                 customer = %s, country = %s\n"</span>,
+                          record.topic<span style="color: #aebed8;">()</span>, record.partition<span style="color: #aebed8;">()</span>, record.offset<span style="color: #aebed8;">()</span>,
+                          record.key<span style="color: #aebed8;">()</span>, record.value<span style="color: #aebed8;">()</span><span style="color: #97b098;">)</span>;
+                <span style="color: #c0c5ce;">int</span> <span style="color: #bf616a;">updatedCount</span> = <span style="color: #d08770;">1</span>;
+                <span style="color: #b48ead;">if</span> <span style="color: #97b098;">(</span>custCountryMap.countainsValue<span style="color: #aebed8;">(</span>record.value<span style="color: #b0b0b3;">()</span><span style="color: #aebed8;">)</span><span style="color: #97b098;">)</span> <span style="color: #97b098;">{</span>
+                    updatedCount = custCountryMap.get<span style="color: #aebed8;">(</span>record.value<span style="color: #b0b0b3;">()</span><span style="color: #aebed8;">)</span> + <span style="color: #d08770;">1</span>;
+                <span style="color: #97b098;">}</span>
+                custCountryMap.put<span style="color: #97b098;">(</span>record.value<span style="color: #aebed8;">()</span>, updatedCount<span style="color: #97b098;">)</span>
+                    JSONObject json = <span style="color: #b48ead;">new</span> <span style="color: #c0c5ce;">JSONObject</span><span style="color: #97b098;">(</span>custCountryMap<span style="color: #97b098;">)</span>;
+                System.out.println<span style="color: #97b098;">(</span>json.toString<span style="color: #aebed8;">(</span><span style="color: #d08770;">4</span><span style="color: #aebed8;">)</span><span style="color: #97b098;">)</span>
+                    <span style="color: #b0b1a3;">}</span>
+    <span style="color: #93a8c6;">}</span>
+<span style="color: #8c8c8c;">}</span> <span style="color: #b48ead;">finally</span> <span style="color: #8c8c8c;">{</span>
+    consumer.close<span style="color: #93a8c6;">()</span>;
+<span style="color: #8c8c8c;">}</span>
+</pre>
+</div>
+
+<p>
+consumer use an infinite loop to fetch data.
+</p>
+
+<blockquote>
+<p>
+The same way that sharks must keep moving or they die, consumers must keep polling Kafka or they will be con‐ sidered dead and the partitions they are consuming will be handed to another consumer in the group to continue consuming. The parameter we pass, poll(), is a timeout interval and controls how long poll() will block if data is not avail‐ able in the consumer buffer. If this is set to 0, poll() will return immediately; otherwise, it will wait for the specified number of milliseconds for data to arrive from the broker.
+</p>
+</blockquote>
+
+<p>
+What's in Pool:
+</p>
+<ul class="org-ul">
+<li>get data</li>
+<li>heartbeat</li>
+<li>rebalance trigger</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5413ea9" class="outline-3">
+<h3 id="org5413ea9"><span class="section-number-3">2.3</span> Commits and Offsets</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+to mark if message has been read
+</p>
+</div>
+
+<div id="outline-container-org1b3d4df" class="outline-4">
+<h4 id="org1b3d4df"><span class="section-number-4">2.3.1</span> AutoCommit</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+Every 5 seconds, leading to duplicate messages processing in this period.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org8ee85c4" class="outline-4">
+<h4 id="org8ee85c4"><span class="section-number-4">2.3.2</span> Commit Manually</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<ul class="org-ul">
+<li>commitSync()</li>
+<li>commitAsync(): can set callback, but don't retry in it, will cause order problem</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org922cf99" class="outline-3">
+<h3 id="org922cf99"><span class="section-number-3">2.4</span> Rebalance Listeners</h3>
+</div>
+</div>
+
+<div id="outline-container-org85e1438" class="outline-2">
+<h2 id="org85e1438"><span class="section-number-2">3</span> Kafka Internals</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgbae2491" class="outline-3">
+<h3 id="orgbae2491"><span class="section-number-3">3.1</span> Requests Processing</h3>
+<div class="outline-text-3" id="text-3-1">
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/23746789723894.png" alt="23746789723894.png" onerror="this.src='https://i.loli.net/2020/04/04/q65uveCd4tWicAy.png'" />
+</p>
+</div>
+
+<p>
+producers and consumers connect broker by TCP long connection. Requests need bring information of which topic and partition it is sending to, to get this, broker support an api to return topic and partition list the producers care about.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7cbf127" class="outline-3">
+<h3 id="org7cbf127"><span class="section-number-3">3.2</span> Reliable Data</h3>
+<div class="outline-text-3" id="text-3-2">
+</div>
+<div id="outline-container-orgee1b29d" class="outline-4">
+<h4 id="orgee1b29d"><span class="section-number-4">3.2.1</span> Kafka reliablility guarantees</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<ul class="org-ul">
+<li>Kafka provides order guarantee of messages in a partition.</li>
+<li>Produced messages are considered "committed" when they were written to the partition on all its in-sync replicas.</li>
+<li>Messages that are committed will not be lost as long as at least one replica remain alive.</li>
+<li>Consumers can only read messages that are commited.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgbfa5bcd" class="outline-4">
+<h4 id="orgbfa5bcd"><span class="section-number-4">3.2.2</span> Replication</h4>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga7ac7ab" class="outline-2">
+<h2 id="orga7ac7ab"><span class="section-number-2">4</span> Data Pipeline</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Kafka can be used for:
+</p>
+<ol class="org-ol">
+<li>Application integration with producers and consumers mode</li>
+<li>Data integration with Kafka Connect (eg. sync data from mysql to elasticsearch)</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+
+<div>
+<p class="author">Author: <a href="https://gitlab.com/jgkamat/jgkamat.gitlab.io"> Norris</a></p>
+<p class="date">Published: </p>
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 26.1 (<a href="https://orgmode.org">Org</a> mode 9.3.1)</p>
+</div>
+</div>
+</body>
+</html>

@@ -56,17 +56,6 @@
 ***** DONE P1 锚点待定
       CLOSED: [2020-02-12 Wed 16:00]
 
-*** 问卷 5d
-**** TODO 问题类型整理，确定协议和接口格式 0.5d
-**** TODO 创建数据库 0.5d
-**** TODO 问题模块开发。2d
-     - 单选
-     - 目标学校 select
-     - 多选
-     - 雅思目标分数
-     - 带文本框的单选
-**** TODO 接口开发+测试 2d
-
 *** DONE 教育联运频道页 10.5d + 3d
     CLOSED: [2020-03-17 Tue 17:34]
 **** DONE 创建数据库 0.5d
@@ -97,7 +86,8 @@
 ****** TODO 设置目标接口 1d  xxx
 ****** TODO 目标文案解析 1d  xxx
 ***** TODO 关注接口 0.5d
-**** TODO 实操
+**** DONE 实操
+     CLOSED: [2020-04-08 Wed 17:09]
 ***** DONE controller model schema handler 框架
       CLOSED: [2020-02-18 Tue 12:29]
 ***** DONE banner module + test
@@ -138,15 +128,99 @@
       - 用户提交时间 ~created_at~ 
 **** DONE 同步用户信息到第三方
      CLOSED: [2020-03-17 Tue 17:35]
-*** TODO 绑定优惠券
+*** DONE 绑定优惠券
+    CLOSED: [2020-03-23 Mon 16:48]
 **** DONE 后台绑定 channelkey 1d
      CLOSED: [2020-03-17 Tue 17:35]
 **** DONE kafka 接口，发优惠券+私信+短信+存 1.5d
      CLOSED: [2020-03-17 Tue 17:35]
-**** TODO 联调 1d
-*** TODO 教育联运退款
-**** TODO 创建退款接口-退款退货，退款是否支持部分退款？ 1.5d
-**** TODO 退款列表接口-没啥说的 0.5d
-**** TODO 页面权限配置 0.5d
-**** TODO 快页面 1.5d
+**** DONE 联调 1d
+     CLOSED: [2020-03-23 Mon 16:48]
+*** DONE 教育联运退款
+    CLOSED: [2020-03-30 Mon 16:02]
+**** DONE 创建退款接口-退款退货，退款是否支持部分退款？ 1.5d
+     CLOSED: [2020-03-23 Mon 16:48]
+**** DONE 退款列表接口-没啥说的 0.5d
+     CLOSED: [2020-03-23 Mon 16:48]
+**** DONE 页面权限配置 0.5d
+     CLOSED: [2020-03-25 Wed 14:51]
+**** DONE 快页面 1.5d
+     CLOSED: [2020-03-25 Wed 14:51]
+*** DONE multimerge
+    CLOSED: [2020-03-25 Wed 14:51]
+**** TODO 堆长度加字段记录，不要去实时计算
+**** TODO 计算父子 index 不要用 * /，用 >>
+**** TODO for 循环找 node 的 index 是犯罪行为！
+**** TODO push 操作不需要重新 make heap
+*** TODO 验证微信已购 sku 5d
+**** TODO 前台接口 1d+历史数据
+**** TODO 微信登陆 1d
+**** TODO 后台 3d
+***** DONE 对接商户网管 0.5d
+      CLOSED: [2020-04-07 Tue 10:34]
+***** TODO 对接商户网管内网
+***** TODO 「商户」替换合作方 1.5d
+****** TODO remix 需要良友提供 python 包
+****** TODO education 还差 filling form
+***** TODO 后台接口（验证，列表） 1d
+**** TODO 联调 2d
 
+*** TODO 业务指标监控 
+*** DONE 分类+合作方名称
+    CLOSED: [2020-04-08 Wed 17:09]
+*** TODO 白板调研
+    功能点：
+    - 互动涂鸦： 多用户同时涂鸦
+    - 轨迹实时同步
+    - 文档共享
+    - 媒体共享
+    - 文档转码
+    - 白板与音视频实时同步录制： 同步录制
+    - 回放功能
+
+    白板就是图片上支持涂鸦而已
+    https://www.write-bug.com/article/1514.html
+
+    关键词：共享白板，网络电子白板
+
+    将图形进行矢量序列化处理
+
+    链表管理多个客户端socket
+
+    每种绘图工具创建一个数组保存特征值
+
+    socket listen --> 存档 --> 反序列化 --> 图形
+
+
+    图片模式，点阵模式
+    把电子白板分成不同的点阵区间，而后建立一个画图的数据链表，我们在电子白板上进行绘画的时候，把其画的点的位置写到这个数据链表里面，在这个链表里面
+    当操作者进行完一次操作的时候，其数据链表更新并传输一次，接收者接收到数据链表后，对这些数据进行还原，并重绘数据，这样就可以实时还原操作者的数据。
+    http://www.zoomus.com.cn/article/20181110000050.html
+
+
+    一致性和容错性
+
+    光标样式同步 optional
+
+
+    TCP or SCTP 
+    https://juejin.im/post/5c9cbbb85188251c3a2f36e8
+
+    websocket 实现
+    http://blog.bfw.wiki/user1/15828953466520870044.html
+
+    回放，这篇文章讲的好
+    https://zhuanlan.zhihu.com/p/73652727
+
+    https://github.com/FE-Kits/web-whiteboard
+
+
+    - 服务端
+      1. 存储(录制)
+      2. 长连接管理
+      3. 扩散写
+      4. 定时发送(回放)
+
+    - 前端/客户端
+      1. 画板
+      2. sync
