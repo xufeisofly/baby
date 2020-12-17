@@ -110,6 +110,10 @@
 
 *** 覆盖索引
 
+    #+begin_quote
+    Q: 大分页特别慢怎么办？ 举个例。。
+    #+end_quote
+
 	#+BEGIN_QUOTE
 	避免读取行数据，能满足查询数据需要的索引叫覆盖索引
 	#+END_QUOTE
@@ -125,24 +129,24 @@
 	- 大部分存储引擎缓存索引比缓存数据更好，如 *MyISAM*
 	- 对 *InnoDB* 尤其有用，因为第二索引保存了主键值，覆盖索引避免了二次索引查找
 
-	应用：
+	覆盖应用：
 
 **** LIKE 使用索引
 
 	#+BEGIN_SRC sql
 	KEY (`status`, `title`)
 
-	SELECT * FROM live WHERE status = 0 AND title LIKE '%长得丑怎么办%'
+	SELECT * FROM livestream WHERE status = 0 AND title LIKE '%长得丑怎么办%'
 	#+END_SRC
 
 	#+BEGIN_SRC sql
 	KEY (`status`, `title`, `sku_id`)
 
-	SELECT * FROM live
+	SELECT * FROM livestream
 	  JOIN (
-	    SELECT sku_id FROM live
+	    SELECT sku_id FROM livestream
 		WHERE status = 0 AND title LIKE '%长得丑怎么办%'
-	  ) AS t1 ON (t1.sku_id=live.sku_id)
+	  ) AS t1 ON (t1.sku_id=livestream.sku_id)
 	#+END_SRC
 
 **** 优化 OFFSET LIMIT
@@ -152,19 +156,18 @@
 	  使用覆盖索引进行偏移会减少开销，避免二次 IO，如
 
 	  #+BEGIN_SRC sql
-	  SELECT * FROM live ORDER BY name LIMIT 1000, 10
+	  SELECT * FROM livestream ORDER BY name LIMIT 1000, 10
 	  #+END_SRC
 
 	  #+BEGIN_SRC sql
 	  KEY (`id`, `name`)
 
-	  SELECT * FROM live
+	  SELECT * FROM livestream
 	    INNER JOIN (
-		  SELECT id FROM live
+		  SELECT id FROM livestream
 		  ORDER BY name LIMIT 1000, 10
 		) AS tmp USING(id)
 	  #+END_SRC
-
 
 *** 联合索引
 
