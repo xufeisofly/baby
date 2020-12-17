@@ -252,12 +252,19 @@
      由于需要读取的数据大概率在同一个 page（16KB）中，所以这个查询是在内存中进行的，因此两种索引的查询性能差距微乎其微
 
 **** 更新
-     *change buffer*
-     当需要更新一个 page 时候，分成两种情况。一种是 page 已经在内存里，直接更新就好了，一种是 page 不在内存中，则需要从磁盘读取 page 到内存中，再在内存对相应的 page 进行更新。
+***** change buffer
 
-     而后者十分损耗性能。
+      #+begin_quote
+      什么是 change buffer?
+      #+end_quote
+      
+     当需要更新一个 page 时候，分成两种情况。
+     - 一种是 page 已经被读到内存里了，直接更新就好
+     - 一种是 page 不在内存中，则需要从磁盘读取 page 到内存中，再在内存对相应的 page 进行更新。
 
-     因此如果 page 没有在内存中，Innodb 会先把 DML 操作写入 change buffer，随后在 merge 进磁盘， merge 的时机：
+     而后者十分损耗性能。*所以...*
+
+     如果 page 没有在内存中，Innodb 会先把 DML 操作写入 change buffer，随后在 merge 进磁盘， merge 的时机：
 
      - 从磁盘读取对应 page 时候
      - 后台单独线程定期 merge
@@ -439,15 +446,22 @@
 	 2. 性能分配不均匀
 	 #+END_EXAMPLE
 
-**** 查询优化
+*** 查询优化
 
 	查询优化考虑的是开销，并非速度
 
 	- 覆盖索引
 	- 早期终结
 	- 优化 COUNT
+
+    统计值的数量。非 *NULL*
+
+      #+begin_quote
+      Q: COUNT(*) COUNT(1) COUNT(字段) COUNT(id) 哪个快？
+      #+end_quote
       
-      InnoDB: 把数据一行一行的读出来，累积技术
+      InnoDB: 把数据一行一行的读出来，累积计数
+
       MyISAM: 保存总行数，直接读取
 
       #+begin_example
@@ -475,7 +489,9 @@
     #+end_example
 
     1.server 层要什么就给什么
+
     2.innodb 只给必要的字段
+
     3.innodb 只优化了 count(*)
 
     *COUNT(id)*:
@@ -486,18 +502,14 @@
 
     *COUNT(字段)*:
     情况一：可能为 NULL 的字段，遍历整张表，把每一行的字段取出来返回给 server 层，server 依次判断字段值是否为 NULL，把不是 NULL 的累加
+
     情况二：NOT NULL 字段，同 COUNT(id)
 
-    *COUNT(*)*:
+    COUNT(*):
     遍历整张表，专门做了优化不用取值，肯定不是 NULL，直接累加
     
-  
 
-      统计值的数量。非 *NULL*
-
-	  统计行的数量。当表达式永远不可能是 *NULL* 时会统计行的数量，如 ~COUNT(*)~ , 它不会把 * 展开成所有的列，而是会忽略所有的列并统计行数，并得到很好的性能。
-
-	  使用 *COUNT* 的查询很难优化，统计很多行。 *MyISAM* 简单优化
+    一种 MyISAM 的优化方式：
 
 	  #+BEGIN_SRC sql
 	  SELECT COUNT(*) FROM city WHERE id > 5
