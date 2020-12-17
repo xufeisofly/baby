@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -126,7 +126,7 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span><span style="color: #DCDCCC;">(</span>input<span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>(input)
   <span style="color: #F0DFAF; font-weight: bold;">if</span> a_condition
     input = <span style="color: #BFEBBF;">1</span>
   <span style="color: #F0DFAF; font-weight: bold;">else</span>
@@ -155,7 +155,7 @@ for the JavaScript code in this tag.
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">A</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span><span style="color: #DCDCCC;">(</span>arg1, arg2<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>(arg1, arg2)
     temp1 = arg1 - arg2 + a_method
     temp2 = temp1 * <span style="color: #BFEBBF;">2</span> + arg1
     temp1 + temp2
@@ -173,7 +173,7 @@ for the JavaScript code in this tag.
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Temp</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>a_instance, arg1, arg2<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(a_instance, arg1, arg2)
     <span style="color: #DFAF8F;">@a_instance</span> = a_instance
     <span style="color: #DFAF8F;">@arg1</span> = arg1
     <span style="color: #DFAF8F;">@arg2</span> = arg2
@@ -187,8 +187,8 @@ for the JavaScript code in this tag.
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">A</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span><span style="color: #DCDCCC;">(</span>arg1, arg2<span style="color: #DCDCCC;">)</span>
-    <span style="color: #7CB8BB;">Temp</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, arg1, arg2<span style="color: #DCDCCC;">)</span>.compute
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>(arg1, arg2)
+    <span style="color: #7CB8BB;">Temp</span>.new(<span style="color: #F0DFAF; font-weight: bold;">self</span>, arg1, arg2).compute
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
@@ -199,7 +199,7 @@ for the JavaScript code in this tag.
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Temp</span>
-  <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">...</span>
+  <span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F;">...</span>
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">compute</span>
     temp1_method + temp2_method
   <span style="color: #F0DFAF; font-weight: bold;">end</span>

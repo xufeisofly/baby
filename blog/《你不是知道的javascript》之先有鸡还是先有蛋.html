@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -84,7 +84,7 @@ javascript的执行顺序是什么样子的，举下面的例子
 <div class="org-src-container">
 <pre class="src src-javascript">a = <span style="color: #BFEBBF;">2</span>
 <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span>
-console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">)</span>
+console.log(a)
 </pre>
 </div>
 
@@ -93,7 +93,7 @@ console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">)</span>
+<pre class="src src-javascript">console.log(a)
 
 <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span> = <span style="color: #BFEBBF;">2</span>
 </pre>
@@ -110,7 +110,7 @@ console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span>
 a = <span style="color: #BFEBBF;">2</span>
-console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">)</span>
+console.log(a)
 </pre>
 </div>
 
@@ -120,7 +120,7 @@ console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">
 
 <div class="org-src-container">
 <pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span>
-console.log<span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">)</span>
+console.log(a)
 a = <span style="color: #BFEBBF;">2</span>
 </pre>
 </div>
@@ -139,13 +139,13 @@ a = <span style="color: #BFEBBF;">2</span>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">foo<span style="color: #DCDCCC;">()</span>
+<pre class="src src-javascript">foo()
 
-<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span>a<span style="color: #BFEBBF;">)</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">undefined</span>
+<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() {
+  console.log(a) <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">undefined</span>
 
   <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span> = <span style="color: #BFEBBF;">2</span>
-<span style="color: #DCDCCC;">}</span>
+}
 </pre>
 </div>
 
@@ -154,11 +154,11 @@ a = <span style="color: #BFEBBF;">2</span>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">foo<span style="color: #DCDCCC;">()</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">TypeError, &#32780;&#19981;&#26159;ReferenceError</span>
+<pre class="src src-javascript">foo() <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">TypeError, &#32780;&#19981;&#26159;ReferenceError</span>
 
-<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">foo</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span> bar<span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">foo</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span> bar() {
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F;">...</span>
+}
 </pre>
 </div>
 </div>
@@ -176,17 +176,17 @@ a = <span style="color: #BFEBBF;">2</span>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">foo<span style="color: #DCDCCC;">()</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">1</span>
+<pre class="src src-javascript">foo() <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">1</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">foo</span>
 
-<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">1</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() {
+  console.log(<span style="color: #BFEBBF;">1</span>)
+}
 
-foo = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">2</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+foo = <span style="color: #F0DFAF; font-weight: bold;">function</span>() {
+  console.log(<span style="color: #BFEBBF;">2</span>)
+}
 </pre>
 </div>
 
@@ -195,15 +195,15 @@ foo = <span style="color: #F0DFAF; font-weight: bold;">function</span><span styl
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">1</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() {
+  console.log(<span style="color: #BFEBBF;">1</span>)
+}
 
-foo<span style="color: #DCDCCC;">()</span>
+foo()
 
-foo = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">2</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+foo = <span style="color: #F0DFAF; font-weight: bold;">function</span>() {
+  console.log(<span style="color: #BFEBBF;">2</span>)
+}
 </pre>
 </div>
 </div>
@@ -217,19 +217,19 @@ foo = <span style="color: #F0DFAF; font-weight: bold;">function</span><span styl
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">foo<span style="color: #DCDCCC;">()</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">3</span>
+<pre class="src src-javascript">foo() <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">3</span>
 
-<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">1</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() {
+  console.log(<span style="color: #BFEBBF;">1</span>)
+}
 
-<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">foo</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">2</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">foo</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span>() {
+  console.log(<span style="color: #BFEBBF;">2</span>)
+}
 
-<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  console.log<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">3</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() {
+  console.log(<span style="color: #BFEBBF;">3</span>)
+}
 </pre>
 </div>
 </div>
@@ -243,15 +243,15 @@ foo = <span style="color: #F0DFAF; font-weight: bold;">function</span><span styl
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript">foo<span style="color: #DCDCCC;">()</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">b</span>
+<pre class="src src-javascript">foo() <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">b</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span> = <span style="color: #BFEBBF;">true</span>
 
-<span style="color: #F0DFAF; font-weight: bold;">if</span><span style="color: #DCDCCC;">(</span>a<span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span>
-  <span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #BFEBBF;">()</span> <span style="color: #BFEBBF;">{</span> console.log<span style="color: #D0BF8F;">(</span><span style="color: #CC9393;">"a"</span><span style="color: #D0BF8F;">)</span> <span style="color: #BFEBBF;">}</span>
-<span style="color: #DCDCCC;">}</span> <span style="color: #F0DFAF; font-weight: bold;">else</span> <span style="color: #DCDCCC;">{</span>
-  <span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span><span style="color: #BFEBBF;">()</span> <span style="color: #BFEBBF;">{</span> console.log<span style="color: #D0BF8F;">(</span><span style="color: #CC9393;">"b"</span><span style="color: #D0BF8F;">)</span> <span style="color: #BFEBBF;">}</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">if</span>(a) {
+  <span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() { console.log(<span style="color: #CC9393;">"a"</span>) }
+} <span style="color: #F0DFAF; font-weight: bold;">else</span> {
+  <span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">foo</span>() { console.log(<span style="color: #CC9393;">"b"</span>) }
+}
 </pre>
 </div>
 </div>

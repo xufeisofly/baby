@@ -84,14 +84,14 @@ for the JavaScript code in this tag.
 </blockquote>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">TextStatement</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span>(name)
     result = <span style="color: #CC9393;">'hi'</span>
     result += <span style="color: #CC9393;">"</span><span style="color: #DFAF8F;">#{name}</span><span style="color: #CC9393;"> \n"</span>
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">HtmlStatement</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span>(name)
     result = <span style="color: #CC9393;">'&lt;p&gt;hi&lt;/p&gt;'</span>
     result += <span style="color: #CC9393;">"&lt;h1&gt;</span><span style="color: #DFAF8F;">#{name}</span><span style="color: #CC9393;">&lt;/h1&gt;&lt;br \&gt;"</span>
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
@@ -105,7 +105,7 @@ for the JavaScript code in this tag.
 
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Statement</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span>(name)
     result = greeting_string
     result += name_string
   <span style="color: #F0DFAF; font-weight: bold;">end</span>

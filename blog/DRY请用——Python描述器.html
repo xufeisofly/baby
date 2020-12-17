@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -71,41 +71,41 @@ for the JavaScript code in this tag.
 <h2 id="org51fadee"><span class="section-number-2">1</span> non-data和data descriptors</h2>
 <div class="outline-text-2" id="text-1">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">property2</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">object</span><span style="color: #DCDCCC;">)</span>:
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">property2</span>(<span style="color: #DCDCCC; font-weight: bold;">object</span>):
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, fget<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, fget):
         <span style="color: #F0DFAF; font-weight: bold;">self</span>.fget = fget
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__get__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, ins, owner<span style="color: #DCDCCC;">)</span>:
-        <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.fget<span style="color: #DCDCCC;">(</span>ins<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__get__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, ins, owner):
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.fget(ins)
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__set__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, ins, value<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__set__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, ins, value):
         <span style="color: #F0DFAF; font-weight: bold;">self</span>.ins = value
 
-<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">K</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">object</span><span style="color: #DCDCCC;">)</span>:
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">K</span>(<span style="color: #DCDCCC; font-weight: bold;">object</span>):
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>):
         <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #CC9393;">'shiiiiit'</span>
 
-    <span style="color: #DFAF8F;">value</span> = property2<span style="color: #DCDCCC;">(</span>value<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">value</span> = property2(value)
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">property2</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">object</span><span style="color: #DCDCCC;">)</span>:
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">property2</span>(<span style="color: #DCDCCC; font-weight: bold;">object</span>):
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, fget<span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, fget):
         <span style="color: #F0DFAF; font-weight: bold;">self</span>.fget = fget
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__get__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, ins, owner<span style="color: #DCDCCC;">)</span>:
-        <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.fget<span style="color: #DCDCCC;">(</span>ins<span style="color: #DCDCCC;">)</span>
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__get__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, ins, owner):
+        <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.fget(ins)
 
-<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">K</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">object</span><span style="color: #DCDCCC;">)</span>:
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">K</span>(<span style="color: #DCDCCC; font-weight: bold;">object</span>):
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">value</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>):
         <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #CC9393;">'shiiiiit'</span>
 
-    <span style="color: #DFAF8F;">value</span> = property2<span style="color: #DCDCCC;">(</span>value<span style="color: #DCDCCC;">)</span>
+    <span style="color: #DFAF8F;">value</span> = property2(value)
 </pre>
 </div>
 </div>
@@ -116,7 +116,7 @@ for the JavaScript code in this tag.
 <h2 id="org22e90f1"><span class="section-number-2">2</span> cached<sub>property</sub></h2>
 <div class="outline-text-2" id="text-2">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">cached_property</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">object</span><span style="color: #DCDCCC;">)</span>:
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">cached_property</span>(<span style="color: #DCDCCC; font-weight: bold;">object</span>):
     <span style="color: #9FC59F;">"""Copied from Django.</span>
 <span style="color: #9FC59F;">    Decorator that converts a method with a single self argument into a</span>
 <span style="color: #9FC59F;">    property cached on the instance.</span>
@@ -124,15 +124,15 @@ for the JavaScript code in this tag.
 <span style="color: #9FC59F;">    methods. (e.g.  url = cached_property(get_absolute_url, name='url') )</span>
 <span style="color: #9FC59F;">    """</span>
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, func, name=<span style="color: #BFEBBF;">None</span><span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__init__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, func, name=<span style="color: #BFEBBF;">None</span>):
         <span style="color: #F0DFAF; font-weight: bold;">self</span>.func = func
-        <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #DCDCCC; font-weight: bold;">__doc__</span> = <span style="color: #DCDCCC; font-weight: bold;">getattr</span><span style="color: #DCDCCC;">(</span>func, <span style="color: #CC9393;">'__doc__'</span><span style="color: #DCDCCC;">)</span>
+        <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #DCDCCC; font-weight: bold;">__doc__</span> = <span style="color: #DCDCCC; font-weight: bold;">getattr</span>(func, <span style="color: #CC9393;">'__doc__'</span>)
         <span style="color: #F0DFAF; font-weight: bold;">self</span>.name = name <span style="color: #F0DFAF; font-weight: bold;">or</span> func.<span style="color: #DCDCCC; font-weight: bold;">__name__</span>
 
-    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__get__</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span>, instance, <span style="color: #DCDCCC; font-weight: bold;">type</span>=<span style="color: #BFEBBF;">None</span><span style="color: #DCDCCC;">)</span>:
+    <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">__get__</span>(<span style="color: #F0DFAF; font-weight: bold;">self</span>, instance, <span style="color: #DCDCCC; font-weight: bold;">type</span>=<span style="color: #BFEBBF;">None</span>):
         <span style="color: #F0DFAF; font-weight: bold;">if</span> instance <span style="color: #F0DFAF; font-weight: bold;">is</span> <span style="color: #BFEBBF;">None</span>:
             <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>
-        <span style="color: #DFAF8F;">res</span> = <span style="color: #DFAF8F;">instance.__dict__</span><span style="color: #DCDCCC;">[</span><span style="color: #F0DFAF; font-weight: bold;">self</span>.name<span style="color: #DCDCCC;">]</span> = <span style="color: #F0DFAF; font-weight: bold;">self</span>.func<span style="color: #DCDCCC;">(</span>instance<span style="color: #DCDCCC;">)</span>
+        <span style="color: #DFAF8F;">res</span> = <span style="color: #DFAF8F;">instance.__dict__</span>[<span style="color: #F0DFAF; font-weight: bold;">self</span>.name] = <span style="color: #F0DFAF; font-weight: bold;">self</span>.func(instance)
         <span style="color: #F0DFAF; font-weight: bold;">return</span> res
 
 </pre>

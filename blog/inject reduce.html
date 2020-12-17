@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -62,22 +62,22 @@ for the JavaScript code in this tag.
 inject和reduce互为别名，它们解决了一个我经常会使用，并且代码写的很脏的问题
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">result = <span style="color: #DCDCCC;">[]</span>
-<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span>.each <span style="color: #F0DFAF; font-weight: bold;">do</span> |item|
+<pre class="src src-ruby">result = []
+[<span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span>].each <span style="color: #F0DFAF; font-weight: bold;">do</span> |item|
   result &lt;&lt; item
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 result
-<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; [1, 2, 3]</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">=&gt; [1, 2, 3]</span>
 </pre>
 </div>
 <p>
 就可以变成
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span>.inject<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">[]</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">do</span> |result, item|
+<pre class="src src-ruby">[<span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span>].inject([]) <span style="color: #F0DFAF; font-weight: bold;">do</span> |result, item|
   result &lt;&lt; item
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
-<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; [1, 2, 3]</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">=&gt; [1, 2, 3]</span>
 </pre>
 </div>
 <p>
@@ -85,8 +85,8 @@ result
 当没有指定参数的时候，result默认为数组的第一个值
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">]</span>.inject <span style="color: #DCDCCC;">{</span> |result, item| result + item <span style="color: #DCDCCC;">}</span>
-<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">=&gt; 6</span>
+<pre class="src src-ruby">[<span style="color: #BFEBBF;">1</span>, <span style="color: #BFEBBF;">2</span>, <span style="color: #BFEBBF;">3</span>].inject { |result, item| result + item }
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">=&gt; 6</span>
 </pre>
 </div>
 <blockquote>

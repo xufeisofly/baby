@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -117,7 +117,7 @@ if 和 else的代码都得到了执行，因为fork的调用实际会返回两�
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #DCDCCC; font-weight: bold;">fork</span>
 
-<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt;</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F;">=&gt;</span>
 <span style="color: #BFEBBF;">21423</span>
 <span style="color: #BFEBBF;">nil</span>
 </pre>
@@ -134,10 +134,10 @@ ruby中可以给fork方法传递block
 
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">fork</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
-  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#23376;&#36827;&#31243;&#25191;&#34892;</span>
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#23376;&#36827;&#31243;&#25191;&#34892;</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#29238;&#36827;&#31243;&#25191;&#34892;</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#29238;&#36827;&#31243;&#25191;&#34892;</span>
 </pre>
 </div>
 </div>
@@ -201,7 +201,7 @@ The Parent is dead&#x2026;
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #BFEBBF;">5</span>.times <span style="color: #F0DFAF; font-weight: bold;">do</span> 
   <span style="color: #DCDCCC; font-weight: bold;">fork</span> <span style="color: #F0DFAF; font-weight: bold;">do</span>
-    <span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #DCDCCC; font-weight: bold;">rand</span><span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">5</span><span style="color: #DCDCCC;">)</span>.even?
+    <span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #DCDCCC; font-weight: bold;">rand</span>(<span style="color: #BFEBBF;">5</span>).even?
       <span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #BFEBBF;">111</span>
     <span style="color: #F0DFAF; font-weight: bold;">else</span>
       <span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #BFEBBF;">112</span>

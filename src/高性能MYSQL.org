@@ -1,5 +1,5 @@
 #+TITLE: 高性能 MYSQL
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 
 * 架构优化
 
@@ -225,6 +225,68 @@
 
 
 
+*** 唯一索引、普通索引
+    #+begin_quote
+    Q: 在业务代码可以保证数据唯一的前提下，唯一索引和普通索引哪个性能高？
+    #+end_quote
+    #+begin_quote
+    A: 普通索引性能高，尽量使用普通索引。
+    #+end_quote
+
+    #+CAPTION: index
+    [[file:/Users/norris/projects/baby/src/../images/7248404087.png]]
+
+**** 查询
+
+     #+begin_src sql
+       SELECT id FROM T WHERE k = 5;
+     #+end_src
+
+     唯一索引：查询 (5, 500) 后返回
+
+     普通索引：查询 (5, 500) 后，继续查找下一记录，直到碰到第一个不满足 (k=5) 条件的记录
+
+     由于需要读取的数据大概率在同一个 page（16KB）中，所以这个查询是在内存中进行的，因此两种索引的查询性能差距微乎其微
+
+**** 更新
+     *change buffer*
+     当需要更新一个 page 时候，分成两种情况。一种是 page 已经在内存里，直接更新就好了，一种是 page 不在内存中，则需要从磁盘读取 page 到内存中，再在内存对相应的 page 进行更新。
+
+     而后者十分损耗性能。
+
+     因此如果 page 没有在内存中，Innodb 会先把 DML 操作写入 change buffer，随后在 merge 进磁盘， merge 的时机：
+
+     - 从磁盘读取对应 page 时候
+     - 后台单独线程定期 merge
+     - mysql 正常关闭时候
+
+     使用了 change buffer 之后的读操作：
+
+     - 情况一：Page1 已经在内存中，直接更新并读取即可
+     - 情况二：Page2 不在内存中，则把 Page2 数据读入内容，再应用 change buffer 的操作
+
+       #+CAPTION: change buffer
+     [[file:/Users/norris/projects/baby/src/../images/3255306135.png]]
+
+
+     真正需要读 page 的时候，page 才会被载入内存，而更新的时候不需要载入内存。因此 change buffer 大大减少了随机读的情况。
+
+     #+begin_quote
+     唯一索引和普通索引都能够用到 change buffer 吗？
+     #+end_quote
+
+     举个例：在上述数据中插入（4, 400）
+
+     第一种情况：要更新的 page 已经在内存里。
+
+     - 唯一索引：找到 3，5 之间位置，判断没有冲突，插入 4，结束
+     - 普通索引：找到 3，5 之间位置，插入 4，结束
+     
+     第二种情况：要更新的 page 不在内存中。
+
+     - 唯一索引：数据页读入内存，判断没有冲突，插入，结束
+     - 普通索引：更新 change buffer，结束
+
 * 查询优化
 
 ** 为什么慢？
@@ -313,6 +375,8 @@
 #+CAPTION: mysql process
 [[file:/Users/norris/projects/baby/src/images/mysql_process.png]]
 
+
+
 *** 客户端/服务端协议
 
 	半双工，不能同时发送和接受
@@ -372,15 +436,61 @@
 	 2. 性能分配不均匀
 	 #+END_EXAMPLE
 
-*** 查询优化
+**** 查询优化
 
 	查询优化考虑的是开销，并非速度
 
 	- 覆盖索引
 	- 早期终结
 	- 优化 COUNT
+      
+      InnoDB: 把数据一行一行的读出来，累积技术
+      MyISAM: 保存总行数，直接读取
 
-	  统计值的数量。非 *NULL*
+      #+begin_example
+      Q: 为什么 innodb 的 count 要把数据一行一行的读出来？
+      #+end_example
+
+      #+begin_example
+      A: 因为要支持事务
+      #+end_example
+      
+      下面三个会话在同一时间查询 count(*)，由于innodb 支持不可重复度，因此需要得到不同的结果，因此没办法保存行数，而 MyISAM 是不支持事务的。
+
+    #+CAPTION: 1
+    [[file:/Users/norris/projects/baby/src/../images/4430301077.png]]
+
+
+    因此如果表很大，count 会很慢，建议单独存储行数，由业务方自行计数
+	  
+    #+begin_example
+    Q: COUNT(*) COUNT(1) COUNT(id) COUNT(字段) 那个快？
+    #+end_example
+    
+    #+begin_example
+    A: COUNT(*) > COUNT(1) > COUNT(id) > COUNT(字段)
+    #+end_example
+
+    1.server 层要什么就给什么
+    2.innodb 只给必要的字段
+    3.innodb 只优化了 count(*)
+
+    *COUNT(id)*:
+    遍历整张表，把每一行的 id 取出来返回给 server 层，server 层判断 id 是不可能为空的，按行累加
+
+    *COUNT(1)*:
+    遍历整张表，但不取值，给每一行填一个 1，最后累加（省去了解析行数据的时间损耗）
+
+    *COUNT(字段)*:
+    情况一：可能为 NULL 的字段，遍历整张表，把每一行的字段取出来返回给 server 层，server 依次判断字段值是否为 NULL，把不是 NULL 的累加
+    情况二：NOT NULL 字段，同 COUNT(id)
+
+    *COUNT(*)*:
+    遍历整张表，专门做了优化不用取值，肯定不是 NULL，直接累加
+    
+  
+
+      统计值的数量。非 *NULL*
 
 	  统计行的数量。当表达式永远不可能是 *NULL* 时会统计行的数量，如 ~COUNT(*)~ , 它不会把 * 展开成所有的列，而是会忽略所有的列并统计行数，并得到很好的性能。
 
@@ -394,7 +504,8 @@
 	  SELECT (SELECT COUNT(*) FROM city) - COUNT(*) FROM city WHERE id <= 5
 	  #+END_SRC
 
-	  自查询总行数是常量，不用遍历表
+	  子查询总行数是常量，不用遍历表
+
     - IN。 排序 + 二分法
 
 	- 优化关联查询

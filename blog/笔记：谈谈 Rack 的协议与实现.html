@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -113,14 +113,14 @@ Rack协议规定了webserver和Rack应用之间的通信方式，中间件使之
 
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">StatusLogger</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>app, options=<span style="color: #BFEBBF;">{}</span><span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(app, options={})
     <span style="color: #DFAF8F;">@app</span> = app
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">call</span><span style="color: #DCDCCC;">(</span>env<span style="color: #DCDCCC;">)</span>
-    status, headers, body = <span style="color: #DFAF8F;">@app</span>.call<span style="color: #DCDCCC;">(</span>env<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">call</span>(env)
+    status, headers, body = <span style="color: #DFAF8F;">@app</span>.call(env)
     <span style="color: #DCDCCC; font-weight: bold;">puts</span> status
-    <span style="color: #DCDCCC;">[</span>status, headers, body<span style="color: #DCDCCC;">]</span>
+    [status, headers, body]
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
@@ -132,7 +132,7 @@ Rack协议规定了webserver和Rack应用之间的通信方式，中间件使之
 
 <div class="org-src-container">
 <pre class="src src-ruby">use <span style="color: #7CB8BB;">StatusLogger</span>
-run <span style="color: #7CB8BB;">Proc</span>.new <span style="color: #DCDCCC;">{</span> |env| <span style="color: #BFEBBF;">[</span><span style="color: #CC9393;">'200'</span>, <span style="color: #D0BF8F;">{</span> <span style="color: #CC9393;">'Content-Type'</span> =&gt; <span style="color: #CC9393;">'text/html'</span> <span style="color: #D0BF8F;">}</span>, <span style="color: #D0BF8F;">[</span><span style="color: #CC9393;">'get rack\'d'</span><span style="color: #D0BF8F;">]</span><span style="color: #BFEBBF;">]</span> <span style="color: #DCDCCC;">}</span>
+run <span style="color: #7CB8BB;">Proc</span>.new { |env| [<span style="color: #CC9393;">'200'</span>, { <span style="color: #CC9393;">'Content-Type'</span> =&gt; <span style="color: #CC9393;">'text/html'</span> }, [<span style="color: #CC9393;">'get rack\'d'</span>]] }
 </pre>
 </div>
 
@@ -161,16 +161,16 @@ run <span style="color: #7CB8BB;">Proc</span>.new <span style="color: #DCDCCC;">
 
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">default_options</span>
-  environment  = <span style="color: #7CB8BB;">ENV</span><span style="color: #DCDCCC;">[</span><span style="color: #CC9393;">'RACK_ENV'</span><span style="color: #DCDCCC;">]</span> || <span style="color: #CC9393;">'development'</span>
+  environment  = <span style="color: #7CB8BB;">ENV</span>[<span style="color: #CC9393;">'RACK_ENV'</span>] || <span style="color: #CC9393;">'development'</span>
   default_host = environment == <span style="color: #CC9393;">'development'</span> ? <span style="color: #CC9393;">'localhost'</span> : <span style="color: #CC9393;">'0.0.0.0'</span>
-  <span style="color: #DCDCCC;">{</span>
+  {
     <span style="color: #BFEBBF;">:environment</span> =&gt; environment,
     <span style="color: #BFEBBF;">:pid</span>         =&gt; <span style="color: #BFEBBF;">nil</span>,
     <span style="color: #BFEBBF;">:Port</span>        =&gt; <span style="color: #BFEBBF;">9292</span>,
     <span style="color: #BFEBBF;">:Host</span>        =&gt; default_host,
-    <span style="color: #BFEBBF;">:AccessLog</span>   =&gt; <span style="color: #BFEBBF;">[]</span>,
+    <span style="color: #BFEBBF;">:AccessLog</span>   =&gt; [],
     <span style="color: #BFEBBF;">:config</span>      =&gt; <span style="color: #CC9393;">"config.ru"</span>
-  <span style="color: #DCDCCC;">}</span>
+  }
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
@@ -199,11 +199,11 @@ run <span style="color: #7CB8BB;">Proc</span>.new <span style="color: #DCDCCC;">
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Builder</span>.new <span style="color: #DCDCCC;">{</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Builder</span>.new {
   use <span style="color: #7CB8BB;">MiddleWare1</span>
   use <span style="color: #7CB8BB;">MiddleWare2</span>
-  run <span style="color: #7CB8BB;">Proc</span>.new <span style="color: #BFEBBF;">{</span> |env| <span style="color: #D0BF8F;">[</span><span style="color: #CC9393;">'200'</span>, <span style="color: #93E0E3;">{</span> <span style="color: #CC9393;">'Content-Type'</span> =&gt; <span style="color: #CC9393;">'text/html'</span> <span style="color: #93E0E3;">}</span>, <span style="color: #93E0E3;">[</span><span style="color: #CC9393;">'get rack\'d'</span><span style="color: #93E0E3;">]</span><span style="color: #D0BF8F;">]</span> <span style="color: #BFEBBF;">}</span>
-<span style="color: #DCDCCC;">}</span>.to_app
+  run <span style="color: #7CB8BB;">Proc</span>.new { |env| [<span style="color: #CC9393;">'200'</span>, { <span style="color: #CC9393;">'Content-Type'</span> =&gt; <span style="color: #CC9393;">'text/html'</span> }, [<span style="color: #CC9393;">'get rack\'d'</span>]] }
+}.to_app
 </pre>
 </div>
 
@@ -212,11 +212,11 @@ build<sub>app的作用是将所有的中间件包裹在Rack的周围</sub>，因
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">build_app</span><span style="color: #DCDCCC;">(</span>app<span style="color: #DCDCCC;">)</span>
-  middleware<span style="color: #DCDCCC;">[</span>options<span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:environment</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">]</span>.reverse_each <span style="color: #F0DFAF; font-weight: bold;">do</span> |middleware|
-    middleware = middleware.call<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">self</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">if</span> middleware.respond_to?<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:call</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">build_app</span>(app)
+  middleware[options[<span style="color: #BFEBBF;">:environment</span>]].reverse_each <span style="color: #F0DFAF; font-weight: bold;">do</span> |middleware|
+    middleware = middleware.call(<span style="color: #F0DFAF; font-weight: bold;">self</span>) <span style="color: #F0DFAF; font-weight: bold;">if</span> middleware.respond_to?(<span style="color: #BFEBBF;">:call</span>)
     klass, *args = middleware
-    app = klass.new<span style="color: #DCDCCC;">(</span>app, *args<span style="color: #DCDCCC;">)</span>
+    app = klass.new(app, *args)
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
   app
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
@@ -242,13 +242,13 @@ build<sub>app的作用是将所有的中间件包裹在Rack的周围</sub>，因
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">config.ru</span>
+<pre class="src src-ruby"><span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">config.ru</span>
 use <span style="color: #7CB8BB;">MiddleWare1</span>
 use <span style="color: #7CB8BB;">MiddleWare2</span>
 run <span style="color: #7CB8BB;">RackApp</span>
 
-<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">equals to</span>
-<span style="color: #7CB8BB;">MiddleWare1</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #7CB8BB;">MiddleWare2</span>.new<span style="color: #BFEBBF;">(</span><span style="color: #7CB8BB;">RackApp</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">equals to</span>
+<span style="color: #7CB8BB;">MiddleWare1</span>.new(<span style="color: #7CB8BB;">MiddleWare2</span>.new(<span style="color: #7CB8BB;">RackApp</span>))
 </pre>
 </div>
 </div>
@@ -263,7 +263,7 @@ webserver选择方法
 
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">server</span>
-  <span style="color: #DFAF8F;">@_server</span> ||= <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Handler</span>.get<span style="color: #DCDCCC;">(</span>options<span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">:server</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">)</span>
+  <span style="color: #DFAF8F;">@_server</span> ||= <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Handler</span>.get(options[<span style="color: #BFEBBF;">:server</span>])
   <span style="color: #F0DFAF; font-weight: bold;">unless</span> <span style="color: #DFAF8F;">@_server</span>
     <span style="color: #DFAF8F;">@_server</span> = <span style="color: #7CB8BB;">Rack</span>::<span style="color: #7CB8BB;">Handler</span>.default
   <span style="color: #F0DFAF; font-weight: bold;">end</span>

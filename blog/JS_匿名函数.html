@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -81,13 +81,13 @@ for the JavaScript code in this tag.
 就是&#x2026;没有名字的函数呗，举个例子
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">bob</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
-<span style="color: #DCDCCC;">}</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">function</span> <span style="color: #93E0E3;">bob</span>() {
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F;">...</span>
+}
 
-<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">bob</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">bob</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span>() {
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F;">...</span>
+}
 </pre>
 </div>
 <p>
@@ -132,19 +132,19 @@ for the JavaScript code in this tag.
 <h2 id="org14f7e24"><span class="section-number-2">3</span> 立即执行函数（iffe）</h2>
 <div class="outline-text-2" id="text-3">
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #BFEBBF;">()</span> <span style="color: #BFEBBF;">{</span>
-  alert<span style="color: #D0BF8F;">(</span><span style="color: #CC9393;">'i am a iffe'</span><span style="color: #D0BF8F;">)</span>    
-<span style="color: #BFEBBF;">}()</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-javascript">(<span style="color: #F0DFAF; font-weight: bold;">function</span>() {
+  alert(<span style="color: #CC9393;">'i am a iffe'</span>)    
+}())
 </pre>
 </div>
 <p>
 function最外面要加括号，感觉就像是
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
-  alert<span style="color: #BFEBBF;">(</span><span style="color: #CC9393;">'i am not a iffe'</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
-a<span style="color: #DCDCCC;">()</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">a</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span>() {
+  alert(<span style="color: #CC9393;">'i am not a iffe'</span>)
+}
+a()
 </pre>
 </div>
 
@@ -153,9 +153,9 @@ iffe很有用的地方就是，它创造了一个自己的scope，内部的变�
 所以JQuery源码上来就是
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript">JQuery = <span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #BFEBBF;">(){</span>
-  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F; font-style: italic;">...  </span>
-<span style="color: #BFEBBF;">}()</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-javascript">JQuery = (<span style="color: #F0DFAF; font-weight: bold;">function</span>(){
+  <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F;">...  </span>
+}())
 </pre>
 </div>
 </div>

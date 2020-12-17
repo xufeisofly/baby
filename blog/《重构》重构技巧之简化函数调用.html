@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -141,14 +141,14 @@ for the JavaScript code in this tag.
 </blockquote>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">find_thief</span>
-  thief = find_person<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:thief</span><span style="color: #DCDCCC;">)</span>
+  thief = find_person(<span style="color: #BFEBBF;">:thief</span>)
   send_alert
   thief
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">check_security</span>
   thief = find_thief
-  some_later_code<span style="color: #DCDCCC;">(</span>thief<span style="color: #DCDCCC;">)</span>
+  some_later_code(thief)
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
@@ -157,12 +157,12 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">new_find_thief</span>
-  thief = find_person<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:thief</span><span style="color: #DCDCCC;">)</span>
+  thief = find_person(<span style="color: #BFEBBF;">:thief</span>)
   thief
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">find_thief</span>
-  thief = find_person<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:thief</span><span style="color: #DCDCCC;">)</span>
+  thief = find_person(<span style="color: #BFEBBF;">:thief</span>)
   send_alert
   new_find_thief
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
@@ -170,7 +170,7 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">check_security</span>
   find_thief
   thief = new_find_thief
-  some_later_code<span style="color: #DCDCCC;">(</span>thief<span style="color: #DCDCCC;">)</span>
+  some_later_code(thief)
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
@@ -200,7 +200,7 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">method<span style="color: #DCDCCC;">(</span>deal.days, deal.priority<span style="color: #DCDCCC;">)</span> =&gt; method<span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby">method(deal.days, deal.priority) =&gt; method(deal)
 </pre>
 </div>
 <p>
@@ -220,15 +220,15 @@ find<sub>thief看似是一个查询方法</sub>，返回一个thief，但里面�
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">level = get_level<span style="color: #DCDCCC;">()</span>
-my_method<span style="color: #DCDCCC;">(</span>level<span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby">level = get_level()
+my_method(level)
 </pre>
 </div>
 <p>
 改为
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">my_method<span style="color: #DCDCCC;">()</span>
+<pre class="src src-ruby">my_method()
 </pre>
 </div>
 <p>
@@ -249,10 +249,10 @@ my_method<span style="color: #DCDCCC;">(</span>level<span style="color: #DCDCCC;
 不知道多少次看到代码用一对值表示一个范围，start end upper lower，可以创建一个Range对象
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #7CB8BB;">Range</span> = <span style="color: #7CB8BB;">Struct</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:start</span>, <span style="color: #BFEBBF;">:end</span><span style="color: #DCDCCC;">)</span>
-range = <span style="color: #7CB8BB;">Range</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">start:</span> start, <span style="color: #F0DFAF; font-weight: bold;">end</span>: <span style="color: #F0DFAF; font-weight: bold;">end</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Range</span> = <span style="color: #7CB8BB;">Struct</span>.new(<span style="color: #BFEBBF;">:start</span>, <span style="color: #BFEBBF;">:end</span>)
+range = <span style="color: #7CB8BB;">Range</span>.new(<span style="color: #BFEBBF;">start:</span> start, <span style="color: #F0DFAF; font-weight: bold;">end</span>: <span style="color: #F0DFAF; font-weight: bold;">end</span>)
 
-method<span style="color: #DCDCCC;">(</span>range<span style="color: #DCDCCC;">)</span>
+method(range)
 </pre>
 </div>
 </div>
@@ -272,7 +272,7 @@ method<span style="color: #DCDCCC;">(</span>range<span style="color: #DCDCCC;">)
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(type)
     <span style="color: #DFAF8F;">@type</span> = type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
@@ -283,11 +283,11 @@ method<span style="color: #DCDCCC;">(</span>range<span style="color: #DCDCCC;">)
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(type)
     <span style="color: #DFAF8F;">@type</span> = type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>(type)
     <span style="color: #F0DFAF; font-weight: bold;">if</span> type == <span style="color: #CC9393;">'teacher'</span> <span style="color: #F0DFAF; font-weight: bold;">then</span>
       <span style="color: #7CB8BB;">Teacher</span>.new
     <span style="color: #F0DFAF; font-weight: bold;">elsif</span> type == <span style="color: #CC9393;">'worker'</span> <span style="color: #F0DFAF; font-weight: bold;">then</span>
@@ -337,9 +337,9 @@ ruby里基本都是exception，很少再见到error code了，不过对于异常
 <pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #7CB8BB;">PhoneNumberException</span>, <span style="color: #CC9393;">'&#25163;&#26426;&#21495;&#19981;&#33021;&#20026;&#31354;'</span> <span style="color: #F0DFAF; font-weight: bold;">if</span> phone.blank?
 
 <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">method</span>
-  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">...</span>
 <span style="color: #F0DFAF; font-weight: bold;">rescue</span> <span style="color: #7CB8BB;">PhoneNumberException</span> =&gt; e
-  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">...</span>
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">...</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
@@ -406,7 +406,7 @@ Exceptions can be perceived as non-local GOTO statements. This can adversely aff
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>
     some_object.save!
   <span style="color: #F0DFAF; font-weight: bold;">rescue</span> =&gt; e
-    render <span style="color: #BFEBBF;">json:</span> <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">msg:</span> e.message <span style="color: #DCDCCC;">}</span>, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
+    render <span style="color: #BFEBBF;">json:</span> { <span style="color: #BFEBBF;">msg:</span> e.message }, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
@@ -421,7 +421,7 @@ Exceptions can be perceived as non-local GOTO statements. This can adversely aff
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>
     some_object.save!
   <span style="color: #F0DFAF; font-weight: bold;">rescue</span> <span style="color: #7CB8BB;">ActiveRecord</span>::<span style="color: #7CB8BB;">RecordInvalid</span> =&gt; e
-    render <span style="color: #BFEBBF;">json:</span> <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">msg:</span> e.message <span style="color: #DCDCCC;">}</span>, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
+    render <span style="color: #BFEBBF;">json:</span> { <span style="color: #BFEBBF;">msg:</span> e.message }, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
@@ -442,9 +442,9 @@ Programmers read code a heck of a lot more than they write it so your code shoul
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BestController</span> &lt; <span style="color: #7CB8BB;">ApplicationController</span>
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">create</span>
     <span style="color: #F0DFAF; font-weight: bold;">if</span> some_object.save
-      <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">do_something</span>
+      <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">do_something</span>
     <span style="color: #F0DFAF; font-weight: bold;">else</span>
-      render <span style="color: #BFEBBF;">json:</span> <span style="color: #DCDCCC;">{</span> <span style="color: #BFEBBF;">msg:</span> <span style="color: #CC9393;">'xxx'</span> <span style="color: #DCDCCC;">}</span>, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
+      render <span style="color: #BFEBBF;">json:</span> { <span style="color: #BFEBBF;">msg:</span> <span style="color: #CC9393;">'xxx'</span> }, <span style="color: #BFEBBF;">status:</span> <span style="color: #BFEBBF;">:unprocessable_entity</span>
     <span style="color: #F0DFAF; font-weight: bold;">end</span>
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>

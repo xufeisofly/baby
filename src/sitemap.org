@@ -1,5 +1,6 @@
 #+TITLE: Sitemap for project baby
 
+- [[file:mac_unload_swap.org][mac_unload_swap]]
 - [[file:Kafka.org][Kafka]]
 - [[file:substitution and environment model.org][Substitution model and Environment model]]
 - [[file:Polymorphism of scheme.org][Polymorphism of scheme]]

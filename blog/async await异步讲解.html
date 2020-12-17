@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -105,14 +105,14 @@ promise 只能成功或失败一次，而不能成功或失败两次，也不能
 promise的基本结构
 </p>
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">promise</span> = <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">Promise</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #BFEBBF;">(</span><span style="color: #DFAF8F;">resolve</span>, <span style="color: #DFAF8F;">reject</span><span style="color: #BFEBBF;">)</span> <span style="color: #BFEBBF;">{</span>
-  <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#20570;&#19968;&#20010;&#24322;&#27493;&#30340;&#20107;&#24773;</span>
-  <span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #D0BF8F;">(</span><span style="color: #5F7F5F;">/* </span><span style="color: #7F9F7F; font-style: italic;">&#20107;&#24773;&#25104;&#21151; */</span><span style="color: #D0BF8F;">)</span> <span style="color: #D0BF8F;">{</span>
-    resolve<span style="color: #93E0E3;">(</span><span style="color: #CC9393;">'worked'</span><span style="color: #93E0E3;">)</span>
-  <span style="color: #D0BF8F;">}</span> <span style="color: #F0DFAF; font-weight: bold;">else</span> <span style="color: #D0BF8F;">{</span>
-    reject<span style="color: #93E0E3;">(</span>Error<span style="color: #9FC59F;">(</span><span style="color: #CC9393;">'broke'</span><span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span>
-  <span style="color: #D0BF8F;">}</span>
-<span style="color: #BFEBBF;">}</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">promise</span> = <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">Promise</span>(<span style="color: #F0DFAF; font-weight: bold;">function</span>(<span style="color: #DFAF8F;">resolve</span>, <span style="color: #DFAF8F;">reject</span>) {
+  <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">&#20570;&#19968;&#20010;&#24322;&#27493;&#30340;&#20107;&#24773;</span>
+  <span style="color: #F0DFAF; font-weight: bold;">if</span> (<span style="color: #5F7F5F;">/* </span><span style="color: #7F9F7F;">&#20107;&#24773;&#25104;&#21151; */</span>) {
+    resolve(<span style="color: #CC9393;">'worked'</span>)
+  } <span style="color: #F0DFAF; font-weight: bold;">else</span> {
+    reject(Error(<span style="color: #CC9393;">'broke'</span>))
+  }
+})
 </pre>
 </div>
 <p>

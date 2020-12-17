@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -142,13 +142,13 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby">passwd = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'/etc/passwd'</span> <span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby">passwd = <span style="color: #7CB8BB;">File</span>.open(<span style="color: #CC9393;">'/etc/passwd'</span> )
 <span style="color: #DCDCCC; font-weight: bold;">puts</span> passwd.fileno
 
-hosts= <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC;">(</span> <span style="color: #CC9393;">'/etc/hosts'</span><span style="color: #DCDCCC;">)</span>
+hosts= <span style="color: #7CB8BB;">File</span>.open( <span style="color: #CC9393;">'/etc/hosts'</span>)
 <span style="color: #DCDCCC; font-weight: bold;">puts</span> hosts.fileno
 
-null = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC;">(</span> <span style="color: #CC9393;">'/dev/null'</span> <span style="color: #DCDCCC;">)</span>
+null = <span style="color: #7CB8BB;">File</span>.open( <span style="color: #CC9393;">'/dev/null'</span> )
 <span style="color: #DCDCCC; font-weight: bold;">puts</span> null.fileno
 </pre>
 </div>
@@ -193,8 +193,8 @@ null = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">p</span> <span style="color: #7CB8BB;">Process</span>.getrlimit<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:NOFILE</span><span style="color: #DCDCCC;">)</span>
-<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; [2560, 9223372036854775807]</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">p</span> <span style="color: #7CB8BB;">Process</span>.getrlimit(<span style="color: #BFEBBF;">:NOFILE</span>)
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F;">=&gt; [2560, 9223372036854775807]</span>
 </pre>
 </div>
 
@@ -204,9 +204,9 @@ null = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC
 </pre>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #7CB8BB;">Process</span>.setrlimit<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:NOFILE</span>, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Process</span>.setrlimit(<span style="color: #BFEBBF;">:NOFILE</span>, <span style="color: #BFEBBF;">3</span>)
 
-<span style="color: #7CB8BB;">Process</span>.getrlimit<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:NOFILE</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #7CB8BB;">Process</span>.getrlimit(<span style="color: #BFEBBF;">:NOFILE</span>)
 </pre>
 </div>
 </div>
@@ -240,7 +240,7 @@ null = <span style="color: #7CB8BB;">File</span>.open<span style="color: #DCDCCC
 <div class="org-src-container">
 <pre class="src src-ruby">$ ruby argv.rb foo bar
 
-<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; ARGV = ['foo', 'bar']</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F;">=&gt; ARGV = ['foo', 'bar']</span>
 </pre>
 </div>
 </div>
@@ -285,9 +285,9 @@ by the way，进程名称也可以修改，直接赋值即可
 <h4 id="orgaaac62d"><span class="section-number-4">8.1.1</span> Kernel#exit</h4>
 <div class="outline-text-4" id="text-8-1-1">
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#24847;&#21619;&#30528;&#20197;0&#20316;&#20026;&#36864;&#20986;&#30721;&#36864;&#20986;</span>
-<span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #BFEBBF;">22</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#24378;&#21046;&#25351;&#23450;&#19968;&#20010;&#36864;&#20986;&#30721;</span>
-<span style="color: #DCDCCC; font-weight: bold;">at_exit</span> <span style="color: #DCDCCC;">{</span> <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"exit hook!"</span> <span style="color: #DCDCCC;">}</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">at_exit&#26159;exit&#30340;&#38057;&#23376;&#26041;&#27861;&#65292;&#36864;&#20986;&#26102;&#20250;&#25191;&#34892;block</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#24847;&#21619;&#30528;&#20197;0&#20316;&#20026;&#36864;&#20986;&#30721;&#36864;&#20986;</span>
+<span style="color: #DCDCCC; font-weight: bold;">exit</span> <span style="color: #BFEBBF;">22</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#24378;&#21046;&#25351;&#23450;&#19968;&#20010;&#36864;&#20986;&#30721;</span>
+<span style="color: #DCDCCC; font-weight: bold;">at_exit</span> { <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"exit hook!"</span> } <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">at_exit&#26159;exit&#30340;&#38057;&#23376;&#26041;&#27861;&#65292;&#36864;&#20986;&#26102;&#20250;&#25191;&#34892;block</span>
 </pre>
 </div>
 </div>
@@ -306,9 +306,9 @@ by the way，进程名称也可以修改，直接赋值即可
 <h4 id="orgd26348e"><span class="section-number-4">8.1.3</span> Kernel#abort</h4>
 <div class="outline-text-4" id="text-8-1-3">
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">abort</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#36864;&#20986;&#30721;&#20026;1     </span>
-<span style="color: #DCDCCC; font-weight: bold;">at_exit</span> <span style="color: #DCDCCC;">{</span> <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"last!"</span> <span style="color: #DCDCCC;">}</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#20250;&#35843;&#29992;at_exit</span>
-<span style="color: #DCDCCC; font-weight: bold;">abort</span> <span style="color: #CC9393;">"some error"</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#21487;&#20197;&#25351;&#23450;STDERR</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">abort</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#36864;&#20986;&#30721;&#20026;1     </span>
+<span style="color: #DCDCCC; font-weight: bold;">at_exit</span> { <span style="color: #DCDCCC; font-weight: bold;">puts</span> <span style="color: #CC9393;">"last!"</span> } <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#20250;&#35843;&#29992;at_exit</span>
+<span style="color: #DCDCCC; font-weight: bold;">abort</span> <span style="color: #CC9393;">"some error"</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#21487;&#20197;&#25351;&#23450;STDERR</span>
 </pre>
 </div>
 </div>
@@ -319,7 +319,7 @@ by the way，进程名称也可以修改，直接赋值即可
 <h4 id="orgaff58d4"><span class="section-number-4">8.1.4</span> Kernel#raise</h4>
 <div class="outline-text-4" id="text-8-1-4">
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #CC9393;">'hell'</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#36864;&#20986;&#30721;&#20026;1&#65292;&#19988;&#20250;&#35843;&#29992;at_exit</span>
+<pre class="src src-ruby"><span style="color: #DCDCCC; font-weight: bold;">raise</span> <span style="color: #CC9393;">'hell'</span> <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#36864;&#20986;&#30721;&#20026;1&#65292;&#19988;&#20250;&#35843;&#29992;at_exit</span>
 </pre>
 </div>
 </div>

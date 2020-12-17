@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -99,7 +99,7 @@ for the JavaScript code in this tag.
 </blockquote>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Customer</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(name)
     <span style="color: #DFAF8F;">@name</span> = name
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -109,7 +109,7 @@ for the JavaScript code in this tag.
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Order</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>customer_name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(customer_name)
     <span style="color: #DFAF8F;">@customer</span> = <span style="color: #7CB8BB;">Customer</span>.new customer_name
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -127,12 +127,12 @@ for the JavaScript code in this tag.
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Customer</span>
   <span style="color: #DFAF8F;">@@customer_hash</span> = <span style="color: #7CB8BB;">Hash</span>.new
 
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(name)
     <span style="color: #DFAF8F;">@name</span> = name
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #93E0E3;">create</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
-    <span style="color: #DFAF8F;">@@customer_hash</span><span style="color: #DCDCCC;">[</span>name<span style="color: #DCDCCC;">]</span> ||= <span style="color: #F0DFAF; font-weight: bold;">self</span>.new<span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.<span style="color: #93E0E3;">create</span>(name)
+    <span style="color: #DFAF8F;">@@customer_hash</span>[name] ||= <span style="color: #F0DFAF; font-weight: bold;">self</span>.new(name)
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">name</span>
@@ -141,8 +141,8 @@ for the JavaScript code in this tag.
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Order</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>customer_name<span style="color: #DCDCCC;">)</span>
-    <span style="color: #DFAF8F;">@customer</span> = <span style="color: #7CB8BB;">Customer</span>.create<span style="color: #DCDCCC;">(</span>customer_name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(customer_name)
+    <span style="color: #DFAF8F;">@customer</span> = <span style="color: #7CB8BB;">Customer</span>.create(customer_name)
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">customer</span>
@@ -173,15 +173,15 @@ for the JavaScript code in this tag.
 </p>
 </blockquote>
 <div class="org-src-container">
-<pre class="src src-ruby">row<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">0</span><span style="color: #DCDCCC;">]</span> = <span style="color: #CC9393;">'Liverpool'</span>
-row<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">]</span> = <span style="color: #BFEBBF;">15</span>
+<pre class="src src-ruby">row[<span style="color: #BFEBBF;">0</span>] = <span style="color: #CC9393;">'Liverpool'</span>
+row[<span style="color: #BFEBBF;">1</span>] = <span style="color: #BFEBBF;">15</span>
 </pre>
 </div>
 <p>
 改为
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #7CB8BB;">Performance</span> = <span style="color: #7CB8BB;">Struct</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:name</span>, <span style="color: #BFEBBF;">:win</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Performance</span> = <span style="color: #7CB8BB;">Struct</span>.new(<span style="color: #BFEBBF;">:name</span>, <span style="color: #BFEBBF;">:win</span>)
 row = <span style="color: #7CB8BB;">Performance</span>.new
 row.name = <span style="color: #CC9393;">'Liverpool'</span>
 row.win = <span style="color: #BFEBBF;">15</span>

@@ -59,29 +59,26 @@ for the JavaScript code in this tag.
 <body>
 <div id="content">
 <div class="org-src-container">
-<pre class="src src-javascript">(<span style="color: #F0DFAF; font-weight: bold;">function</span>(<span style="color: #DFAF8F;">window</span>, <span style="color: #BFEBBF;">undefined</span>) {
-  <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">jQuery</span> = (<span style="color: #F0DFAF; font-weight: bold;">function</span>() {
-    <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">jQuery</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span>(<span style="color: #DFAF8F;">selector</span>, <span style="color: #DFAF8F;">context</span>) {
-      <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">jQuery.fn.init</span>(selector, context, rootjQuery)
-    }
+<pre class="src src-shell">// &#26597;&#30475;&#24403;&#21069;&#20351;&#29992;&#24773;&#20917; 
+$ sysctl vm.swapusage
+vm.swapusage: <span style="color: #DFAF8F;">total</span> = <span style="color: #BFEBBF;">1024.00M</span>  <span style="color: #DFAF8F;">used</span> = <span style="color: #BFEBBF;">354.50M</span>  <span style="color: #DFAF8F;">free</span> = <span style="color: #BFEBBF;">669.50M</span>  (encrypted)
 
-    jQuery.fn = jQuery.<span style="color: #BFEBBF;">prototype</span> = {
-      constructor: jQuery,
-      <span style="color: #93E0E3;">init</span>: <span style="color: #F0DFAF; font-weight: bold;">function</span>(<span style="color: #DFAF8F;">selector</span>, <span style="color: #DFAF8F;">context</span>, <span style="color: #DFAF8F;">rootjQuery</span>) { ... },
-      <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F;">...</span>
-    }
+// &#20851;&#38381;&#34394;&#25311;&#20869;&#23384;
+$ sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.dynamic_pager.plist
+$ sudo rm /private/var/vm/swapfile*
 
-    jQuery.fn.init.<span style="color: #BFEBBF;">prototype</span> = jQuery.fn
-    jQuery.extend = jQuery.fn.extend = <span style="color: #F0DFAF; font-weight: bold;">function</span>() { ... }
-    jQuery.extend({
-      <span style="color: #5F7F5F;">//</span><span style="color: #7F9F7F;">...</span>
-    })
-    <span style="color: #F0DFAF; font-weight: bold;">return</span> jQuery
-  })();
-  window.jQuery = window.$ = jQuery
-})(window);
+// &#37325;&#26032;&#24320;&#21551;&#34394;&#25311;&#20869;&#23384; 
+$ sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.dynamic_pager.plist
 </pre>
 </div>
+
+<p>
+修改 swap 的 compressor mode
+</p>
+
+<p>
+<a href="https://medium.com/@ayltai/need-for-speed-how-to-squeeze-every-last-drop-out-of-macos-sierra-7ac17b680c98">https://medium.com/@ayltai/need-for-speed-how-to-squeeze-every-last-drop-out-of-macos-sierra-7ac17b680c98</a>
+</p>
 </div>
 <div id="postamble" class="status">
 

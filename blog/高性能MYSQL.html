@@ -8,7 +8,7 @@
 <title>高性能 MYSQL</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" type="text/css" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -71,11 +71,12 @@ for the JavaScript code in this tag.
 <li><a href="#org03b0f02">1.1.2. 前缀索引</a></li>
 <li><a href="#org37f3434">1.1.3. 覆盖索引</a></li>
 <li><a href="#org3288b67">1.1.4. 联合索引</a></li>
+<li><a href="#org451e12b">1.1.5. 唯一索引、普通索引</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org846f046">2. 查询优化</a>
+<li><a href="#org6ba9922">2. 查询优化</a>
 <ul>
 <li><a href="#orgc031ee8">2.1. 为什么慢？</a>
 <ul>
@@ -87,7 +88,6 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#org102b92a">2.2.1. 客户端/服务端协议</a></li>
 <li><a href="#orgc92f5de">2.2.2. 查询缓存</a></li>
-<li><a href="#org9e098b5">2.2.3. 查询优化</a></li>
 </ul>
 </li>
 </ul>
@@ -157,7 +157,7 @@ for the JavaScript code in this tag.
 
 
 <div class="figure">
-<p><img src="images/clustered_index.png" alt="clustered_index.png" />
+<p><img src="file:///Users/norris/projects/baby/images/clustered_index.png" alt="clustered_index.png" />
 </p>
 <p><span class="figure-number">Figure 1: </span>聚集和非聚集对比图</p>
 </div>
@@ -264,7 +264,7 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">ALTER</span> <span style="color: #F0DFAF; font-weight: bold;">TABLE</span> <span style="color: #F0DFAF; font-weight: bold;">table_name</span> <span style="color: #F0DFAF; font-weight: bold;">ADD</span> <span style="color: #F0DFAF; font-weight: bold;">KEY</span><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">column_name</span><span style="color: #BFEBBF;">(</span>prefix_length<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>;
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">ALTER</span> <span style="color: #F0DFAF; font-weight: bold;">TABLE</span> <span style="color: #F0DFAF; font-weight: bold;">table_name</span> <span style="color: #F0DFAF; font-weight: bold;">ADD</span> <span style="color: #F0DFAF; font-weight: bold;">KEY</span>(<span style="color: #F0DFAF; font-weight: bold;">column_name</span>(prefix_length));
 </pre>
 </div>
 
@@ -273,7 +273,7 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> cnt, city <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city_demo <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> city <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> cnt <span style="color: #F0DFAF; font-weight: bold;">DESC</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">4</span>;
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span>(*) <span style="color: #F0DFAF; font-weight: bold;">AS</span> cnt, city <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city_demo <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> city <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> cnt <span style="color: #F0DFAF; font-weight: bold;">DESC</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">4</span>;
 </pre>
 </div>
 
@@ -315,7 +315,7 @@ for the JavaScript code in this tag.
 </table>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> cnt, <span style="color: #F0DFAF; font-weight: bold;">LEFT</span><span style="color: #DCDCCC;">(</span>city, <span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> pref <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city_demo <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> pref <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> cnt <span style="color: #F0DFAF; font-weight: bold;">DESC</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">4</span>;
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span>(*) <span style="color: #F0DFAF; font-weight: bold;">AS</span> cnt, <span style="color: #F0DFAF; font-weight: bold;">LEFT</span>(city, <span style="color: #BFEBBF;">3</span>) <span style="color: #F0DFAF; font-weight: bold;">AS</span> pref <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city_demo <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> pref <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> cnt <span style="color: #F0DFAF; font-weight: bold;">DESC</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">4</span>;
 </pre>
 </div>
 
@@ -357,7 +357,7 @@ for the JavaScript code in this tag.
 </table>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> cnt, <span style="color: #F0DFAF; font-weight: bold;">LEFT</span><span style="color: #DCDCCC;">(</span>city, <span style="color: #BFEBBF;">7</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> pref <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city_demo <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> pref <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> cnt <span style="color: #F0DFAF; font-weight: bold;">DESC</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">4</span>;
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span>(*) <span style="color: #F0DFAF; font-weight: bold;">AS</span> cnt, <span style="color: #F0DFAF; font-weight: bold;">LEFT</span>(city, <span style="color: #BFEBBF;">7</span>) <span style="color: #F0DFAF; font-weight: bold;">AS</span> pref <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city_demo <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> pref <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> cnt <span style="color: #F0DFAF; font-weight: bold;">DESC</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">4</span>;
 </pre>
 </div>
 
@@ -414,9 +414,9 @@ for the JavaScript code in this tag.
 </blockquote>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">key</span> <span style="color: #DCDCCC;">(</span>`sku_id`, `<span style="color: #F0DFAF; font-weight: bold;">type</span>`<span style="color: #DCDCCC;">)</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">key</span> (`sku_id`, `<span style="color: #F0DFAF; font-weight: bold;">type</span>`)
 
-<span style="color: #F0DFAF; font-weight: bold;">select</span> sku_id, <span style="color: #F0DFAF; font-weight: bold;">type</span> <span style="color: #F0DFAF; font-weight: bold;">from</span> sku <span style="color: #F0DFAF; font-weight: bold;">where</span> sku_id <span style="color: #F0DFAF; font-weight: bold;">in</span> <span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">1</span>,<span style="color: #BFEBBF;">2</span>,<span style="color: #BFEBBF;">3</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">select</span> sku_id, <span style="color: #F0DFAF; font-weight: bold;">type</span> <span style="color: #F0DFAF; font-weight: bold;">from</span> sku <span style="color: #F0DFAF; font-weight: bold;">where</span> sku_id <span style="color: #F0DFAF; font-weight: bold;">in</span> (<span style="color: #BFEBBF;">1</span>,<span style="color: #BFEBBF;">2</span>,<span style="color: #BFEBBF;">3</span>)
 </pre>
 </div>
 
@@ -436,20 +436,20 @@ for the JavaScript code in this tag.
 <li><a id="org5c2b666"></a>LIKE 使用索引<br />
 <div class="outline-text-5" id="text-1-1-3-1">
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> <span style="color: #DCDCCC;">(</span>`status`, `title`<span style="color: #DCDCCC;">)</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> (`status`, `title`)
 
 <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> live <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> status = <span style="color: #BFEBBF;">0</span> <span style="color: #F0DFAF; font-weight: bold;">AND</span> title <span style="color: #F0DFAF; font-weight: bold;">LIKE</span> <span style="color: #CC9393;">'%&#38271;&#24471;&#19985;&#24590;&#20040;&#21150;%'</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> <span style="color: #DCDCCC;">(</span>`status`, `title`, `sku_id`<span style="color: #DCDCCC;">)</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> (`status`, `title`, `sku_id`)
 
 <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> live
-  <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> <span style="color: #DCDCCC;">(</span>
+  <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> (
     <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> sku_id <span style="color: #F0DFAF; font-weight: bold;">FROM</span> live
     <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> status = <span style="color: #BFEBBF;">0</span> <span style="color: #F0DFAF; font-weight: bold;">AND</span> title <span style="color: #F0DFAF; font-weight: bold;">LIKE</span> <span style="color: #CC9393;">'%&#38271;&#24471;&#19985;&#24590;&#20040;&#21150;%'</span>
-  <span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> t1 <span style="color: #F0DFAF; font-weight: bold;">ON</span> <span style="color: #DCDCCC;">(</span>t1.sku_id=live.sku_id<span style="color: #DCDCCC;">)</span>
+  ) <span style="color: #F0DFAF; font-weight: bold;">AS</span> t1 <span style="color: #F0DFAF; font-weight: bold;">ON</span> (t1.sku_id=live.sku_id)
 </pre>
 </div>
 </div>
@@ -471,13 +471,13 @@ for the JavaScript code in this tag.
 </div>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> <span style="color: #DCDCCC;">(</span>`id`, `<span style="color: #F0DFAF; font-weight: bold;">name</span>`<span style="color: #DCDCCC;">)</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> (`id`, `<span style="color: #F0DFAF; font-weight: bold;">name</span>`)
 
 <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> live
-  <span style="color: #F0DFAF; font-weight: bold;">INNER</span> <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> <span style="color: #DCDCCC;">(</span>
+  <span style="color: #F0DFAF; font-weight: bold;">INNER</span> <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> (
     <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> id <span style="color: #F0DFAF; font-weight: bold;">FROM</span> live
     <span style="color: #F0DFAF; font-weight: bold;">ORDER</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> <span style="color: #F0DFAF; font-weight: bold;">name</span> <span style="color: #F0DFAF; font-weight: bold;">LIMIT</span> <span style="color: #BFEBBF;">1000</span>, <span style="color: #BFEBBF;">10</span>
-  <span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> tmp <span style="color: #F0DFAF; font-weight: bold;">USING</span><span style="color: #DCDCCC;">(</span>id<span style="color: #DCDCCC;">)</span>
+  ) <span style="color: #F0DFAF; font-weight: bold;">AS</span> tmp <span style="color: #F0DFAF; font-weight: bold;">USING</span>(id)
 </pre>
 </div>
 </div>
@@ -504,7 +504,7 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> <span style="color: #DCDCCC;">(</span>`<span style="color: #F0DFAF; font-weight: bold;">type</span>`, `status`, `publish_time`<span style="color: #DCDCCC;">)</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">KEY</span> (`<span style="color: #F0DFAF; font-weight: bold;">type</span>`, `status`, `publish_time`)
 
 <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #F0DFAF; font-weight: bold;">type</span>, status <span style="color: #F0DFAF; font-weight: bold;">FROM</span> live
 <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> <span style="color: #F0DFAF; font-weight: bold;">type</span> = <span style="color: #CC9393;">'video'</span>
@@ -553,23 +553,141 @@ for the JavaScript code in this tag.
 
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">select</span> * <span style="color: #F0DFAF; font-weight: bold;">from</span> <span style="color: #F0DFAF; font-weight: bold;">where</span> sex <span style="color: #F0DFAF; font-weight: bold;">in</span> <span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">0</span>,<span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">and</span> ...
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">select</span> * <span style="color: #F0DFAF; font-weight: bold;">from</span> <span style="color: #F0DFAF; font-weight: bold;">where</span> sex <span style="color: #F0DFAF; font-weight: bold;">in</span> (<span style="color: #BFEBBF;">0</span>,<span style="color: #BFEBBF;">1</span>) <span style="color: #F0DFAF; font-weight: bold;">and</span> ...
 </pre>
 </div>
 </div>
 </div>
+
+
+
+
+
+
+
+
+<div id="outline-container-org451e12b" class="outline-4">
+<h4 id="org451e12b"><span class="section-number-4">1.1.5</span> 唯一索引、普通索引</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<blockquote>
+<p>
+Q: 在业务代码可以保证数据唯一的前提下，唯一索引和普通索引哪个性能高？
+</p>
+</blockquote>
+<blockquote>
+<p>
+A: 普通索引性能高，尽量使用普通索引。
+</p>
+</blockquote>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/7248404087.png" alt="7248404087.png" />
+</p>
+<p><span class="figure-number">Figure 2: </span>index</p>
 </div>
 </div>
 
+<ol class="org-ol">
+<li><a id="org0807e51"></a>查询<br />
+<div class="outline-text-5" id="text-1-1-5-1">
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> id <span style="color: #F0DFAF; font-weight: bold;">FROM</span> T <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> k = <span style="color: #BFEBBF;">5</span>;
+</pre>
+</div>
+
+<p>
+唯一索引：查询 (5, 500) 后返回
+</p>
+
+<p>
+普通索引：查询 (5, 500) 后，继续查找下一记录，直到碰到第一个不满足 (k=5) 条件的记录
+</p>
+
+<p>
+由于需要读取的数据大概率在同一个 page（16KB）中，所以这个查询是在内存中进行的，因此两种索引的查询性能差距微乎其微
+</p>
+</div>
+</li>
+
+<li><a id="org52de310"></a>更新<br />
+<div class="outline-text-5" id="text-1-1-5-2">
+<p>
+<b>change buffer</b>
+当需要更新一个 page 时候，分成两种情况。一种是 page 已经在内存里，直接更新就好了，一种是 page 不在内存中，则需要从磁盘读取 page 到内存中，再在内存对相应的 page 进行更新。
+</p>
+
+<p>
+而后者十分损耗性能。
+</p>
+
+<p>
+因此如果 page 没有在内存中，Innodb 会先把 DML 操作写入 change buffer，随后在 merge 进磁盘， merge 的时机：
+</p>
+
+<ul class="org-ul">
+<li>从磁盘读取对应 page 时候</li>
+<li>后台单独线程定期 merge</li>
+<li>mysql 正常关闭时候</li>
+</ul>
+
+<p>
+使用了 change buffer 之后的读操作：
+</p>
+
+<ul class="org-ul">
+<li>情况一：Page1 已经在内存中，直接更新并读取即可</li>
+<li><p>
+情况二：Page2 不在内存中，则把 Page2 数据读入内容，再应用 change buffer 的操作
+</p></li>
+</ul>
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/3255306135.png" alt="3255306135.png" />
+</p>
+</div>
 
 
+<p>
+真正需要读 page 的时候，page 才会被载入内存，而更新的时候不需要载入内存。因此 change buffer 大大减少了随机读的情况。
+</p>
 
+<blockquote>
+<p>
+唯一索引和普通索引都能够用到 change buffer 吗？
+</p>
+</blockquote>
 
+<p>
+举个例：在上述数据中插入（4, 400）
+</p>
 
+<p>
+第一种情况：要更新的 page 已经在内存里。
+</p>
 
+<ul class="org-ul">
+<li>唯一索引：找到 3，5 之间位置，判断没有冲突，插入 4，结束</li>
+<li>普通索引：找到 3，5 之间位置，插入 4，结束</li>
+</ul>
 
-<div id="outline-container-org846f046" class="outline-2">
-<h2 id="org846f046"><span class="section-number-2">2</span> 查询优化</h2>
+<p>
+第二种情况：要更新的 page 不在内存中。
+</p>
+
+<ul class="org-ul">
+<li>唯一索引：数据页读入内存，判断没有冲突，插入，结束</li>
+<li>普通索引：更新 change buffer，结束</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6ba9922" class="outline-2">
+<h2 id="org6ba9922"><span class="section-number-2">2</span> 查询优化</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 <div id="outline-container-orgc031ee8" class="outline-3">
@@ -632,7 +750,7 @@ Full Table Scan &gt; Index Scan &gt; Range Scan &gt; Unique Index Scan &gt; Cons
 </div>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">ALTER</span> <span style="color: #F0DFAF; font-weight: bold;">TABLE</span> <span style="color: #93E0E3;">employees</span> <span style="color: #F0DFAF; font-weight: bold;">ADD</span> INDEX `idx_birth_date` <span style="color: #DCDCCC;">(</span>`birth_date`<span style="color: #DCDCCC;">)</span>;
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">ALTER</span> <span style="color: #F0DFAF; font-weight: bold;">TABLE</span> <span style="color: #93E0E3;">employees</span> <span style="color: #F0DFAF; font-weight: bold;">ADD</span> INDEX `idx_birth_date` (`birth_date`);
 EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> employees <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> birth_date = <span style="color: #CC9393;">'1953-11-07'</span>;
 </pre>
 </div>
@@ -642,7 +760,7 @@ EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span s
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql">EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> birth_date, <span style="color: #DCDCCC; font-weight: bold;">count</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">FROM</span> employees <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> birth_date;
+<pre class="src src-sql">EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> birth_date, <span style="color: #DCDCCC; font-weight: bold;">count</span>(*) <span style="color: #F0DFAF; font-weight: bold;">FROM</span> employees <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> birth_date;
 </pre>
 </div>
 
@@ -652,10 +770,10 @@ EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span s
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql">EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> birth_date, <span style="color: #DCDCCC; font-weight: bold;">count</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">FROM</span> employees
-<span style="color: #F0DFAF; font-weight: bold;">INNER</span> <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> <span style="color: #DCDCCC;">(</span>
-    <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #F0DFAF; font-weight: bold;">DISTINCT</span><span style="color: #BFEBBF;">(</span>birth_date<span style="color: #BFEBBF;">)</span> <span style="color: #F0DFAF; font-weight: bold;">FROM</span> `employees`
-<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">AS</span> t1 <span style="color: #F0DFAF; font-weight: bold;">USING</span> <span style="color: #DCDCCC;">(</span>birth_date<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> birth_date;
+<pre class="src src-sql">EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> birth_date, <span style="color: #DCDCCC; font-weight: bold;">count</span>(*) <span style="color: #F0DFAF; font-weight: bold;">FROM</span> employees
+<span style="color: #F0DFAF; font-weight: bold;">INNER</span> <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> (
+    <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #F0DFAF; font-weight: bold;">DISTINCT</span>(birth_date) <span style="color: #F0DFAF; font-weight: bold;">FROM</span> `employees`
+) <span style="color: #F0DFAF; font-weight: bold;">AS</span> t1 <span style="color: #F0DFAF; font-weight: bold;">USING</span> (birth_date) <span style="color: #F0DFAF; font-weight: bold;">GROUP</span> <span style="color: #F0DFAF; font-weight: bold;">BY</span> birth_date;
 </pre>
 </div></li>
 
@@ -684,7 +802,7 @@ EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span s
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> tag <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> tag=<span style="color: #CC9393;">'mysql'</span>;
 <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> tag_post <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> tag_id = <span style="color: #BFEBBF;">1234</span>;
-<span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> post <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> post.id <span style="color: #F0DFAF; font-weight: bold;">in</span> <span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">123</span>,<span style="color: #BFEBBF;">456</span>,<span style="color: #BFEBBF;">789</span><span style="color: #DCDCCC;">)</span>;
+<span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span style="color: #F0DFAF; font-weight: bold;">FROM</span> post <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> post.id <span style="color: #F0DFAF; font-weight: bold;">in</span> (<span style="color: #BFEBBF;">123</span>,<span style="color: #BFEBBF;">456</span>,<span style="color: #BFEBBF;">789</span>);
 </pre>
 </div>
 
@@ -702,11 +820,13 @@ EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span s
 <div class="outline-text-3" id="text-2-2">
 
 <div class="figure">
-<p><img src="images/mysql_process.png" alt="mysql_process.png" />
+<p><img src="file:///Users/norris/projects/baby/images/mysql_process.png" alt="mysql_process.png" />
 </p>
-<p><span class="figure-number">Figure 2: </span>mysql process</p>
+<p><span class="figure-number">Figure 4: </span>mysql process</p>
 </div>
 </div>
+
+
 
 <div id="outline-container-org102b92a" class="outline-4">
 <h4 id="org102b92a"><span class="section-number-4">2.2.1</span> 客户端/服务端协议</h4>
@@ -768,9 +888,9 @@ EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span s
 
 
 <div class="figure">
-<p><img src="images/live_cache_status.png" alt="live_cache_status.png" />
+<p><img src="file:///Users/norris/projects/baby/images/live_cache_status.png" alt="live_cache_status.png" />
 </p>
-<p><span class="figure-number">Figure 3: </span>live cache status</p>
+<p><span class="figure-number">Figure 5: </span>live cache status</p>
 </div>
 </div>
 </li>
@@ -785,9 +905,9 @@ EXPLAIN <span style="color: #F0DFAF; font-weight: bold;">SELECT</span> * <span s
 
 
 <div class="figure">
-<p><img src="images/query_cache_memory.png" alt="query_cache_memory.png" />
+<p><img src="file:///Users/norris/projects/baby/images/query_cache_memory.png" alt="query_cache_memory.png" />
 </p>
-<p><span class="figure-number">Figure 4: </span>query cache memory</p>
+<p><span class="figure-number">Figure 6: </span>query cache memory</p>
 </div>
 
 <blockquote>
@@ -808,12 +928,9 @@ Assuming that scalability could be improved, the limiting factor of the query ca
 </pre>
 </div>
 </li>
-</ol>
-</div>
 
-<div id="outline-container-org9e098b5" class="outline-4">
-<h4 id="org9e098b5"><span class="section-number-4">2.2.3</span> 查询优化</h4>
-<div class="outline-text-4" id="text-2-2-3">
+<li><a id="orgaae9b70"></a>查询优化<br />
+<div class="outline-text-5" id="text-2-2-2-4">
 <p>
 查询优化考虑的是开销，并非速度
 </p>
@@ -824,6 +941,73 @@ Assuming that scalability could be improved, the limiting factor of the query ca
 <li><p>
 优化 COUNT
 </p>
+
+<p>
+InnoDB: 把数据一行一行的读出来，累积技术
+MyISAM: 保存总行数，直接读取
+</p>
+
+<pre class="example">
+Q: 为什么 innodb 的 count 要把数据一行一行的读出来？
+</pre>
+
+<pre class="example">
+A: 因为要支持事务
+</pre>
+
+<p>
+下面三个会话在同一时间查询 count(*)，由于innodb 支持不可重复度，因此需要得到不同的结果，因此没办法保存行数，而 MyISAM 是不支持事务的。
+</p></li>
+</ul>
+
+
+<div class="figure">
+<p><img src="file:///Users/norris/projects/baby/images/4430301077.png" alt="4430301077.png" />
+</p>
+<p><span class="figure-number">Figure 7: </span>1</p>
+</div>
+
+
+<p>
+因此如果表很大，count 会很慢，建议单独存储行数，由业务方自行计数
+</p>
+
+<pre class="example">
+Q: COUNT(*) COUNT(1) COUNT(id) COUNT(字段) 那个快？
+</pre>
+
+<pre class="example">
+A: COUNT(*) &gt; COUNT(1) &gt; COUNT(id) &gt; COUNT(字段)
+</pre>
+
+<p>
+1.server 层要什么就给什么
+2.innodb 只给必要的字段
+3.innodb 只优化了 count(*)
+</p>
+
+<p>
+<b>COUNT(id)</b>:
+遍历整张表，把每一行的 id 取出来返回给 server 层，server 层判断 id 是不可能为空的，按行累加
+</p>
+
+<p>
+<b>COUNT(1)</b>:
+遍历整张表，但不取值，给每一行填一个 1，最后累加（省去了解析行数据的时间损耗）
+</p>
+
+<p>
+<b>COUNT(字段)</b>:
+情况一：可能为 NULL 的字段，遍历整张表，把每一行的字段取出来返回给 server 层，server 依次判断字段值是否为 NULL，把不是 NULL 的累加
+情况二：NOT NULL 字段，同 COUNT(id)
+</p>
+
+<p>
+<b>COUNT(</b>)*:
+遍历整张表，专门做了优化不用取值，肯定不是 NULL，直接累加
+</p>
+
+
 
 <p>
 统计值的数量。非 <b>NULL</b>
@@ -838,18 +1022,20 @@ Assuming that scalability could be improved, the limiting factor of the query ca
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> id &gt; <span style="color: #BFEBBF;">5</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span>(*) <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> id &gt; <span style="color: #BFEBBF;">5</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span><span style="color: #BFEBBF;">(</span>*<span style="color: #BFEBBF;">)</span> <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city<span style="color: #DCDCCC;">)</span> - <span style="color: #DCDCCC; font-weight: bold;">COUNT</span><span style="color: #DCDCCC;">(</span>*<span style="color: #DCDCCC;">)</span> <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> id &lt;= <span style="color: #BFEBBF;">5</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> (<span style="color: #F0DFAF; font-weight: bold;">SELECT</span> <span style="color: #DCDCCC; font-weight: bold;">COUNT</span>(*) <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city) - <span style="color: #DCDCCC; font-weight: bold;">COUNT</span>(*) <span style="color: #F0DFAF; font-weight: bold;">FROM</span> city <span style="color: #F0DFAF; font-weight: bold;">WHERE</span> id &lt;= <span style="color: #BFEBBF;">5</span>
 </pre>
 </div>
 
 <p>
-自查询总行数是常量，不用遍历表
-</p></li>
+子查询总行数是常量，不用遍历表
+</p>
+
+<ul class="org-ul">
 <li>IN。 排序 + 二分法</li>
 
 <li><p>
@@ -864,19 +1050,19 @@ Assuming that scalability could be improved, the limiting factor of the query ca
 
 <div class="org-src-container">
 <pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">SELECT</span> tbl1.col1, tbl2.col2 <span style="color: #F0DFAF; font-weight: bold;">FROM</span> tbl1
-<span style="color: #F0DFAF; font-weight: bold;">INNER</span> <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> tbl2 <span style="color: #F0DFAF; font-weight: bold;">USING</span> <span style="color: #DCDCCC;">(</span>col3<span style="color: #DCDCCC;">)</span>
-<span style="color: #F0DFAF; font-weight: bold;">WHERE</span> tbl1.col1 <span style="color: #F0DFAF; font-weight: bold;">IN</span> <span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">5</span>,<span style="color: #BFEBBF;">6</span><span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">INNER</span> <span style="color: #F0DFAF; font-weight: bold;">JOIN</span> tbl2 <span style="color: #F0DFAF; font-weight: bold;">USING</span> (col3)
+<span style="color: #F0DFAF; font-weight: bold;">WHERE</span> tbl1.col1 <span style="color: #F0DFAF; font-weight: bold;">IN</span> (<span style="color: #BFEBBF;">5</span>,<span style="color: #BFEBBF;">6</span>)
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #DFAF8F;">tbl1_rows</span> = <span style="color: #DCDCCC;">[</span>row <span style="color: #F0DFAF; font-weight: bold;">for</span> row <span style="color: #F0DFAF; font-weight: bold;">in</span> tbl1 <span style="color: #F0DFAF; font-weight: bold;">if</span> tbl1.col1 <span style="color: #F0DFAF; font-weight: bold;">in</span> <span style="color: #BFEBBF;">[</span><span style="color: #BFEBBF;">5</span>,<span style="color: #BFEBBF;">6</span><span style="color: #BFEBBF;">]</span><span style="color: #DCDCCC;">]</span>
+<pre class="src src-python"><span style="color: #DFAF8F;">tbl1_rows</span> = [row <span style="color: #F0DFAF; font-weight: bold;">for</span> row <span style="color: #F0DFAF; font-weight: bold;">in</span> tbl1 <span style="color: #F0DFAF; font-weight: bold;">if</span> tbl1.col1 <span style="color: #F0DFAF; font-weight: bold;">in</span> [<span style="color: #BFEBBF;">5</span>,<span style="color: #BFEBBF;">6</span>]]
 
 <span style="color: #F0DFAF; font-weight: bold;">for</span> tbl1_row <span style="color: #F0DFAF; font-weight: bold;">in</span> tbl1_rows:
-    <span style="color: #DFAF8F;">tbl2_rows</span> = <span style="color: #DCDCCC;">[</span>row <span style="color: #F0DFAF; font-weight: bold;">for</span> row <span style="color: #F0DFAF; font-weight: bold;">in</span> tbl2 <span style="color: #F0DFAF; font-weight: bold;">if</span> tbl2.col3 = tbl1_row.col3<span style="color: #DCDCCC;">]</span>
+    <span style="color: #DFAF8F;">tbl2_rows</span> = [row <span style="color: #F0DFAF; font-weight: bold;">for</span> row <span style="color: #F0DFAF; font-weight: bold;">in</span> tbl2 <span style="color: #F0DFAF; font-weight: bold;">if</span> tbl2.col3 = tbl1_row.col3]
 
     <span style="color: #F0DFAF; font-weight: bold;">for</span> tbl2_row <span style="color: #F0DFAF; font-weight: bold;">in</span> tbl2_rows:
-        <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#25340;&#25509;&#32467;&#26524;</span>
+        <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#25340;&#25509;&#32467;&#26524;</span>
 </pre>
 </div>
 
@@ -895,6 +1081,8 @@ tbl2.col3 需要有索引，而 tbl1.col3 不需要
 <li>优化 OFFSET LIMIT</li>
 </ul>
 </div>
+</li>
+</ol>
 </div>
 </div>
 </div>

@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -90,7 +90,7 @@ for the JavaScript code in this tag.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #DFAF8F;">config</span> = conf<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'project_name'</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-python"><span style="color: #DFAF8F;">config</span> = conf(<span style="color: #CC9393;">'project_name'</span>)
 </pre>
 </div>
 
@@ -148,36 +148,36 @@ for the JavaScript code in this tag.
 下面为发现资源的伪代码：
 </p>
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">get_database_config</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>:
+<pre class="src src-python"><span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">get_database_config</span>(name):
   <span style="color: #9FC59F;">"""&#33719;&#21462;db&#30340;&#22320;&#22336;"""</span>
-  <span style="color: #DFAF8F;">config</span> = discover<span style="color: #DCDCCC;">(</span>RESOURCE_MYSQL, name<span style="color: #DCDCCC;">)</span>
-  <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #CC9393;">'mysql+pymysql://'</span> + config.instances<span style="color: #DCDCCC;">[</span><span style="color: #BFEBBF;">0</span><span style="color: #DCDCCC;">]</span>.addr + <span style="color: #CC9393;">'?charset=utf8'</span>
+  <span style="color: #DFAF8F;">config</span> = discover(RESOURCE_MYSQL, name)
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #CC9393;">'mysql+pymysql://'</span> + config.instances[<span style="color: #BFEBBF;">0</span>].addr + <span style="color: #CC9393;">'?charset=utf8'</span>
 
-<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discover</span><span style="color: #DCDCCC;">(</span>kind, name<span style="color: #DCDCCC;">)</span>:
-  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#26681;&#25454;&#19981;&#21516;&#30340;&#36164;&#28304;&#21457;&#29616;&#19981;&#21516;&#30340;&#29615;&#22659;&#21464;&#37327;</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discover</span>(kind, name):
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#26681;&#25454;&#19981;&#21516;&#30340;&#36164;&#28304;&#21457;&#29616;&#19981;&#21516;&#30340;&#29615;&#22659;&#21464;&#37327;</span>
   <span style="color: #F0DFAF; font-weight: bold;">if</span> kind == RESOURCE_MYSQL:
     <span style="color: #DFAF8F;">f</span> = discover_mysql
-  <span style="color: #F0DFAF; font-weight: bold;">return</span> f<span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> f(name)
 
-<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discover_mysql</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>:
-  <span style="color: #F0DFAF; font-weight: bold;">return</span> MySQLResource.discover<span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discover_mysql</span>(name):
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> MySQLResource.discover(name)
 
-<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">MySQLResource</span><span style="color: #DCDCCC;">(</span>BaseResource<span style="color: #DCDCCC;">)</span>:
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">MySQLResource</span>(BaseResource):
   <span style="color: #DFAF8F;">kind</span> = <span style="color: #CC9393;">'mysql'</span>
 
-<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseResource</span><span style="color: #DCDCCC;">(</span><span style="color: #DCDCCC; font-weight: bold;">object</span><span style="color: #DCDCCC;">)</span>:
-  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">&#32422;&#23450;&#29615;&#22659;&#21464;&#37327;&#26684;&#24335;</span>
+<span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BaseResource</span>(<span style="color: #DCDCCC; font-weight: bold;">object</span>):
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">&#32422;&#23450;&#29615;&#22659;&#21464;&#37327;&#26684;&#24335;</span>
   <span style="color: #DFAF8F;">RES_ENV_ADDR_TPL</span> = <span style="color: #CC9393;">'ZAE_RES_{}_{}_ADDR'</span>
 
   <span style="color: #7CB8BB;">@classmethod</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discover</span><span style="color: #DCDCCC;">(</span>cls, name<span style="color: #DCDCCC;">)</span>:
-    <span style="color: #F0DFAF; font-weight: bold;">return</span> cls._load<span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">discover</span>(cls, name):
+    <span style="color: #F0DFAF; font-weight: bold;">return</span> cls._load(name)
 
   <span style="color: #7CB8BB;">@classmethod</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">_load</span><span style="color: #DCDCCC;">(</span>name<span style="color: #DCDCCC;">)</span>:
-    <span style="color: #DFAF8F;">key</span> = RES_ENV_ADDR_TPL.<span style="color: #DCDCCC; font-weight: bold;">format</span><span style="color: #DCDCCC;">(</span>cls.kind.upper<span style="color: #BFEBBF;">()</span>, name<span style="color: #DCDCCC;">)</span>
-    <span style="color: #DFAF8F;">value</span> = getenv<span style="color: #DCDCCC;">(</span>key<span style="color: #DCDCCC;">)</span>
-    <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #CC9393;">"%s://%s"</span> % <span style="color: #DCDCCC;">(</span>cls.kind, value<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">_load</span>(name):
+    <span style="color: #DFAF8F;">key</span> = RES_ENV_ADDR_TPL.<span style="color: #DCDCCC; font-weight: bold;">format</span>(cls.kind.upper(), name)
+    <span style="color: #DFAF8F;">value</span> = getenv(key)
+    <span style="color: #F0DFAF; font-weight: bold;">return</span> <span style="color: #CC9393;">"%s://%s"</span> % (cls.kind, value)
 </pre>
 </div>
 </div>

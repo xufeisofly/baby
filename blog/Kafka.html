@@ -141,7 +141,7 @@ so to reach higher throughput
 <h4 id="org752ff48"><span class="section-number-4">1.1.1</span> Synchronously</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <div class="org-src-container">
-<pre class="src src-python">producer.send<span style="color: #8c8c8c;">()</span>.get<span style="color: #8c8c8c;">()</span>
+<pre class="src src-python">producer.send().get()
 </pre>
 </div>
 </div>
@@ -151,9 +151,9 @@ so to reach higher throughput
 <h4 id="org6d9a4b4"><span class="section-number-4">1.1.2</span> Asynchronously</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <div class="org-src-container">
-<pre class="src src-python">producer.send<span style="color: #8c8c8c;">()</span>
+<pre class="src src-python">producer.send()
 
-<span style="color: #b48ead;">def</span> <span style="color: #8fa1b3;">onCompletion</span><span style="color: #8c8c8c;">()</span>: ...
+<span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">onCompletion</span>(): ...
 </pre>
 </div>
 </div>
@@ -232,27 +232,27 @@ the consumers in a consumer group averagly consume messages from partitions in a
 <h3 id="orgaf88d0f"><span class="section-number-3">2.2</span> The Pool Loop</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
-<pre class="src src-java"><span style="color: #b48ead;">try</span> <span style="color: #8c8c8c;">{</span>
-    <span style="color: #b48ead;">while</span> <span style="color: #93a8c6;">(</span><span style="color: #d08770;">true</span><span style="color: #93a8c6;">)</span> <span style="color: #93a8c6;">{</span>
-        <span style="color: #c0c5ce;">ConsumerRecords</span><span style="color: #b0b1a3;">&lt;</span><span style="color: #c0c5ce;">String</span>, <span style="color: #c0c5ce;">String</span><span style="color: #b0b1a3;">&gt;</span> <span style="color: #bf616a;">records</span> = consumer.poll<span style="color: #b0b1a3;">(</span><span style="color: #d08770;">100</span><span style="color: #b0b1a3;">)</span>;
-        <span style="color: #b48ead;">for</span> <span style="color: #b0b1a3;">(</span><span style="color: #c0c5ce;">ConsumerRecord</span><span style="color: #97b098;">&lt;</span><span style="color: #c0c5ce;">String</span>, <span style="color: #c0c5ce;">String</span><span style="color: #97b098;">&gt;</span> <span style="color: #bf616a;">record</span> : records<span style="color: #b0b1a3;">)</span>
-            <span style="color: #b0b1a3;">{</span>
-                log.debug<span style="color: #97b098;">(</span><span style="color: #ffc0cb; font-weight: bold;">"</span><span style="color: #a3be8c;">topic = %s, partition = %s, offset = %d,</span>
-<span style="color: #a3be8c;">                 customer = %s, country = %s\n"</span>,
-                          record.topic<span style="color: #aebed8;">()</span>, record.partition<span style="color: #aebed8;">()</span>, record.offset<span style="color: #aebed8;">()</span>,
-                          record.key<span style="color: #aebed8;">()</span>, record.value<span style="color: #aebed8;">()</span><span style="color: #97b098;">)</span>;
-                <span style="color: #c0c5ce;">int</span> <span style="color: #bf616a;">updatedCount</span> = <span style="color: #d08770;">1</span>;
-                <span style="color: #b48ead;">if</span> <span style="color: #97b098;">(</span>custCountryMap.countainsValue<span style="color: #aebed8;">(</span>record.value<span style="color: #b0b0b3;">()</span><span style="color: #aebed8;">)</span><span style="color: #97b098;">)</span> <span style="color: #97b098;">{</span>
-                    updatedCount = custCountryMap.get<span style="color: #aebed8;">(</span>record.value<span style="color: #b0b0b3;">()</span><span style="color: #aebed8;">)</span> + <span style="color: #d08770;">1</span>;
-                <span style="color: #97b098;">}</span>
-                custCountryMap.put<span style="color: #97b098;">(</span>record.value<span style="color: #aebed8;">()</span>, updatedCount<span style="color: #97b098;">)</span>
-                    JSONObject json = <span style="color: #b48ead;">new</span> <span style="color: #c0c5ce;">JSONObject</span><span style="color: #97b098;">(</span>custCountryMap<span style="color: #97b098;">)</span>;
-                System.out.println<span style="color: #97b098;">(</span>json.toString<span style="color: #aebed8;">(</span><span style="color: #d08770;">4</span><span style="color: #aebed8;">)</span><span style="color: #97b098;">)</span>
-                    <span style="color: #b0b1a3;">}</span>
-    <span style="color: #93a8c6;">}</span>
-<span style="color: #8c8c8c;">}</span> <span style="color: #b48ead;">finally</span> <span style="color: #8c8c8c;">{</span>
-    consumer.close<span style="color: #93a8c6;">()</span>;
-<span style="color: #8c8c8c;">}</span>
+<pre class="src src-java"><span style="color: #F0DFAF; font-weight: bold;">try</span> {
+    <span style="color: #F0DFAF; font-weight: bold;">while</span> (<span style="color: #BFEBBF;">true</span>) {
+        <span style="color: #7CB8BB;">ConsumerRecords</span>&lt;<span style="color: #7CB8BB;">String</span>, <span style="color: #7CB8BB;">String</span>&gt; <span style="color: #DFAF8F;">records</span> = consumer.poll(<span style="color: #BFEBBF;">100</span>);
+        <span style="color: #F0DFAF; font-weight: bold;">for</span> (<span style="color: #7CB8BB;">ConsumerRecord</span>&lt;<span style="color: #7CB8BB;">String</span>, <span style="color: #7CB8BB;">String</span>&gt; <span style="color: #DFAF8F;">record</span> : records)
+            {
+                log.debug(<span style="color: #D0BF8F; font-weight: bold;">"</span><span style="color: #CC9393;">topic = %s, partition = %s, offset = %d,</span>
+<span style="color: #CC9393;">                 customer = %s, country = %s\n"</span>,
+                          record.topic(), record.partition(), record.offset(),
+                          record.key(), record.value());
+                <span style="color: #7CB8BB;">int</span> <span style="color: #DFAF8F;">updatedCount</span> = <span style="color: #BFEBBF;">1</span>;
+                <span style="color: #F0DFAF; font-weight: bold;">if</span> (custCountryMap.countainsValue(record.value())) {
+                    updatedCount = custCountryMap.get(record.value()) + <span style="color: #BFEBBF;">1</span>;
+                }
+                custCountryMap.put(record.value(), updatedCount)
+                    JSONObject json = <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">JSONObject</span>(custCountryMap);
+                System.out.println(json.toString(<span style="color: #BFEBBF;">4</span>))
+                    }
+    }
+} <span style="color: #F0DFAF; font-weight: bold;">finally</span> {
+    consumer.close();
+}
 </pre>
 </div>
 

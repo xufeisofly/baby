@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -174,7 +174,7 @@ for the JavaScript code in this tag.
 将特定组合的参数封装成一个对象，如
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">method<span style="color: #DCDCCC;">(</span>start_date, end_date<span style="color: #DCDCCC;">)</span> =&gt; method<span style="color: #DCDCCC;">(</span>date_range<span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby">method(start_date, end_date) =&gt; method(date_range)
 </pre>
 </div>
 <p>
@@ -190,7 +190,7 @@ date<sub>range是一个对象</sub>
 保持对象完整，如果参数只是某个对象的几个属性，可以改为传递整个对象
 </p>
 <div class="org-src-container">
-<pre class="src src-ruby">method<span style="color: #DCDCCC;">(</span>deal.destination, deal.days<span style="color: #DCDCCC;">)</span> =&gt; method<span style="color: #DCDCCC;">(</span>deal<span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby">method(deal.destination, deal.days) =&gt; method(deal)
 </pre>
 </div>
 </div>
@@ -284,7 +284,7 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
 
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>blood_type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(blood_type)
     <span style="color: #DFAF8F;">@blood_type</span> = blood_type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -305,7 +305,7 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Blood</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(type)
     <span style="color: #DFAF8F;">@type</span> = type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -330,7 +330,7 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>blood_instance<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(blood_instance)
     <span style="color: #DFAF8F;">@blood_instance</span> = blood_instance
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -339,8 +339,8 @@ switch语句造成的问题是重复。可能要在不同的地方不断的加sw
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-blood_instance = <span style="color: #7CB8BB;">Blood</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:a</span><span style="color: #DCDCCC;">)</span>.instance
-person = <span style="color: #7CB8BB;">Person</span>.new<span style="color: #DCDCCC;">(</span>blood_instance<span style="color: #DCDCCC;">)</span>
+blood_instance = <span style="color: #7CB8BB;">Blood</span>.new(<span style="color: #BFEBBF;">:a</span>).instance
+person = <span style="color: #7CB8BB;">Person</span>.new(blood_instance)
 person.talk
 </pre>
 </div>
@@ -371,7 +371,7 @@ person.talk
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">BloodType</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(type)
     <span style="color: #DFAF8F;">@type</span> = type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -404,7 +404,7 @@ person.talk
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">Person</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(type)
     <span style="color: #DFAF8F;">@type</span> = type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
@@ -412,8 +412,8 @@ person.talk
     <span style="color: #DFAF8F;">@type</span>
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">type=</span><span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>
-    <span style="color: #DFAF8F;">@type</span> = <span style="color: #7CB8BB;">BloodType</span>.new<span style="color: #DCDCCC;">(</span>type<span style="color: #DCDCCC;">)</span>.new_type
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">type=</span>(type)
+    <span style="color: #DFAF8F;">@type</span> = <span style="color: #7CB8BB;">BloodType</span>.new(type).new_type
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
   <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">talk</span>
@@ -421,9 +421,9 @@ person.talk
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
-person = <span style="color: #7CB8BB;">Person</span>.new<span style="color: #DCDCCC;">(</span><span style="color: #BFEBBF;">:a</span><span style="color: #DCDCCC;">)</span>
+person = <span style="color: #7CB8BB;">Person</span>.new(<span style="color: #BFEBBF;">:a</span>)
 person.talk
-<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">&#25913;&#21464;&#34880;&#22411;</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F;">&#25913;&#21464;&#34880;&#22411;</span>
 person.type = <span style="color: #BFEBBF;">:b</span>
 person.talk
 </pre>
@@ -528,7 +528,7 @@ person.talk
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
 <span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">B</span> &lt; <span style="color: #7CB8BB;">A</span>
-  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F; font-style: italic;">only need m_accepted</span>
+  <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">only need m_accepted</span>
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
@@ -538,7 +538,7 @@ person.talk
 </p>
 <div class="org-src-container">
 <pre class="src src-ruby"><span style="color: #F0DFAF; font-weight: bold;">class</span> <span style="color: #7CB8BB;">B</span>
-  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span><span style="color: #DCDCCC;">(</span>a_instance<span style="color: #DCDCCC;">)</span>
+  <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">initialize</span>(a_instance)
     <span style="color: #DFAF8F;">@_a_instance</span> = a_instance
   <span style="color: #F0DFAF; font-weight: bold;">end</span>
 

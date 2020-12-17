@@ -606,16 +606,16 @@ innodb 支持 group commit，采用两阶段提交的方式
 </p>
 
 <div class="org-src-container">
-<pre class="src src-c"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#31532;&#19968;&#38454;&#27573;&#65292;&#20869;&#23384;&#37324;&#27880;&#20876; commit</span>
-<span style="color: #7CB8BB;">int</span> <span style="color: #93E0E3;">innobase_commit</span><span style="color: #DCDCCC;">()</span> <span style="color: #DCDCCC;">{</span>
+<pre class="src src-c"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">&#31532;&#19968;&#38454;&#27573;&#65292;&#20869;&#23384;&#37324;&#27880;&#20876; commit</span>
+<span style="color: #7CB8BB;">int</span> <span style="color: #93E0E3;">innobase_commit</span>() {
     trx-&gt;flush_log_later = TRUE;
-    innobase_commit_low<span style="color: #BFEBBF;">(</span>trx<span style="color: #BFEBBF;">)</span>;
+    innobase_commit_low(trx);
     trx-&gt;flush_log_later = FALSE;
 
     ...
-    <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#32479;&#19968; group commit&#65292;write fsync &#33853;&#30424;</span>
-    trx_commit_complete_for_mysql<span style="color: #BFEBBF;">(</span>trx<span style="color: #BFEBBF;">)</span>
-  <span style="color: #DCDCCC;">}</span>
+    <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">&#32479;&#19968; group commit&#65292;write fsync &#33853;&#30424;</span>
+    trx_commit_complete_for_mysql(trx)
+  }
 </pre>
 </div>
 
@@ -624,10 +624,10 @@ innodb 支持 group commit，采用两阶段提交的方式
 </p>
 
 <div class="org-src-container">
-<pre class="src src-c"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">prepare &#20013;&#26377; X &#38145;&#65292;&#20250;&#38459;&#22622;&#65292;innobase_commit &#20013;&#30340; group commit &#22833;&#21435;&#24847;&#20041;</span>
-<span style="color: #93E0E3;">innobase_xa_prepare</span><span style="color: #DCDCCC;">()</span>
-<span style="color: #93E0E3;">write</span><span style="color: #DCDCCC;">()</span> <span style="color: #7CB8BB;">and</span> <span style="color: #93E0E3;">fsync</span><span style="color: #DCDCCC;">()</span> binary <span style="color: #7CB8BB;">log</span>
-<span style="color: #93E0E3;">innobase_commit</span><span style="color: #DCDCCC;">()</span>
+<pre class="src src-c"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">prepare &#20013;&#26377; X &#38145;&#65292;&#20250;&#38459;&#22622;&#65292;innobase_commit &#20013;&#30340; group commit &#22833;&#21435;&#24847;&#20041;</span>
+<span style="color: #93E0E3;">innobase_xa_prepare</span>()
+<span style="color: #93E0E3;">write</span>() <span style="color: #7CB8BB;">and</span> <span style="color: #93E0E3;">fsync</span>() binary <span style="color: #7CB8BB;">log</span>
+<span style="color: #93E0E3;">innobase_commit</span>()
 </pre>
 </div>
 

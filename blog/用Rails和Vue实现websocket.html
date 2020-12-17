@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -127,11 +127,11 @@ websocket-rails使用的是webserver的事件监听，然而我的app使用的�
     <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
     <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">deliver_websocket</span>
-      data = <span style="color: #DCDCCC;">{</span>
-        <span style="color: #BFEBBF;">messages:</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.class.with_recipient<span style="color: #BFEBBF;">(</span>recipient<span style="color: #BFEBBF;">)</span>.with_status<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">:unfinished</span><span style="color: #BFEBBF;">)</span>.order<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">created_at:</span> <span style="color: #BFEBBF;">:desc</span><span style="color: #BFEBBF;">)</span>.limit<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">20</span><span style="color: #BFEBBF;">)</span>
-      <span style="color: #DCDCCC;">}</span>
+      data = {
+        <span style="color: #BFEBBF;">messages:</span> <span style="color: #F0DFAF; font-weight: bold;">self</span>.class.with_recipient(recipient).with_status(<span style="color: #BFEBBF;">:unfinished</span>).order(<span style="color: #BFEBBF;">created_at:</span> <span style="color: #BFEBBF;">:desc</span>).limit(<span style="color: #BFEBBF;">20</span>)
+      }
 
-      <span style="color: #7CB8BB;">WebsocketRails</span><span style="color: #DCDCCC;">[</span>channel_name<span style="color: #DCDCCC;">]</span>.trigger<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'change'</span>, data<span style="color: #DCDCCC;">)</span>
+      <span style="color: #7CB8BB;">WebsocketRails</span>[channel_name].trigger(<span style="color: #CC9393;">'change'</span>, data)
     <span style="color: #F0DFAF; font-weight: bold;">end</span>
 
     <span style="color: #F0DFAF; font-weight: bold;">def</span> <span style="color: #93E0E3;">channel_name</span>
@@ -156,8 +156,8 @@ websocket-rails使用的是webserver的事件监听，然而我的app使用的�
 
   belongs_to <span style="color: #BFEBBF;">:recipient</span>
 
-  scope <span style="color: #BFEBBF;">:with_recipient</span>, -&gt;<span style="color: #DCDCCC;">(</span>recipient<span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span> where<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">recipient:</span> recipient<span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
-  scope <span style="color: #BFEBBF;">:with_status</span>, -&gt;<span style="color: #DCDCCC;">(</span>status<span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span> where<span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">status:</span> status<span style="color: #BFEBBF;">)</span> <span style="color: #DCDCCC;">}</span>
+  scope <span style="color: #BFEBBF;">:with_recipient</span>, -&gt;(recipient) { where(<span style="color: #BFEBBF;">recipient:</span> recipient) }
+  scope <span style="color: #BFEBBF;">:with_status</span>, -&gt;(status) { where(<span style="color: #BFEBBF;">status:</span> status) }
 <span style="color: #F0DFAF; font-weight: bold;">end</span>
 </pre>
 </div>
@@ -194,20 +194,20 @@ websocket-rails应该只计划用于Rails全栈框架搭建的应用，为什么
 </p>
 
 <div class="org-src-container">
-<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">websocketChannel</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">(</span><span style="color: #DFAF8F;">server</span>, <span style="color: #DFAF8F;">channel_name</span><span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span>
-  <span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">dispatcher</span> = <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">WebSocketRails</span><span style="color: #BFEBBF;">(</span>server<span style="color: #BFEBBF;">)</span>
+<pre class="src src-javascript"><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">websocketChannel</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span>(<span style="color: #DFAF8F;">server</span>, <span style="color: #DFAF8F;">channel_name</span>) {
+  <span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">dispatcher</span> = <span style="color: #F0DFAF; font-weight: bold;">new</span> <span style="color: #7CB8BB;">WebSocketRails</span>(server)
 
-  <span style="color: #F0DFAF; font-weight: bold;">return</span> dispatcher.subscribe<span style="color: #BFEBBF;">(</span>channel_name<span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+  <span style="color: #F0DFAF; font-weight: bold;">return</span> dispatcher.subscribe(channel_name)
+}
 
-<span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">websocketBindEvent</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span><span style="color: #DCDCCC;">(</span><span style="color: #DFAF8F;">channel</span><span style="color: #DCDCCC;">)</span> <span style="color: #DCDCCC;">{</span>
-  channel.bind<span style="color: #BFEBBF;">(</span><span style="color: #CC9393;">'change'</span>, data =&gt; <span style="color: #D0BF8F;">{</span>
-    dispatchMessages<span style="color: #93E0E3;">(</span>data<span style="color: #93E0E3;">)</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">&#20998;&#21457;&#28040;&#24687;</span>
-  <span style="color: #D0BF8F;">}</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">}</span>
+<span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">websocketBindEvent</span> = <span style="color: #F0DFAF; font-weight: bold;">function</span>(<span style="color: #DFAF8F;">channel</span>) {
+  channel.bind(<span style="color: #CC9393;">'change'</span>, data =&gt; {
+    dispatchMessages(data) <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">&#20998;&#21457;&#28040;&#24687;</span>
+  })
+}
 
-<span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">channel</span> = websocketChannel<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'localhost:4040/websocket'</span>, <span style="color: #CC9393;">'message'</span><span style="color: #DCDCCC;">)</span> <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F; font-style: italic;">server&#31471;&#21475;&#26159;&#22312;rails&#23450;&#20041;&#30340;</span>
-websocketBindEvent<span style="color: #DCDCCC;">(</span>channel<span style="color: #DCDCCC;">)</span>
+<span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #DFAF8F;">channel</span> = websocketChannel(<span style="color: #CC9393;">'localhost:4040/websocket'</span>, <span style="color: #CC9393;">'message'</span>) <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">server&#31471;&#21475;&#26159;&#22312;rails&#23450;&#20041;&#30340;</span>
+websocketBindEvent(channel)
 </pre>
 </div>
 </div>
@@ -221,9 +221,9 @@ websocketBindEvent<span style="color: #DCDCCC;">(</span>channel<span style="colo
 </p>
 
 <div class="org-src-container">
-<pre class="src src-ruby"><span style="color: #7CB8BB;">Redis</span>.current.set<span style="color: #DCDCCC;">(</span><span style="color: #CC9393;">'a'</span>, <span style="color: #BFEBBF;">1</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-ruby"><span style="color: #7CB8BB;">Redis</span>.current.set(<span style="color: #CC9393;">'a'</span>, <span style="color: #BFEBBF;">1</span>)
 
-<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F; font-style: italic;">=&gt; RuntimeError: eventmachine not initialized: evma_connect_to_server</span>
+<span style="color: #5F7F5F;">#</span><span style="color: #7F9F7F;">=&gt; RuntimeError: eventmachine not initialized: evma_connect_to_server</span>
 </pre>
 </div>
 

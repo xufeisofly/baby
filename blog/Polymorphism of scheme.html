@@ -75,11 +75,11 @@ Let's see the code.
 First we define a object constructor with type and selector to get type. Polymorphism alwarys need a type.
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">make-obj</span> type data<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span>cons type data<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme">(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">make-obj</span> type data)
+  (cons type data))
 
-<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">get-type</span> obj<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span>car obj<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">get-type</span> obj)
+  (car obj))
 </pre>
 </div>
 
@@ -87,11 +87,11 @@ First we define a object constructor with type and selector to get type. Polymor
 Let's say we have two types, 'a and 'b, and the procedure name which diffs between the two types
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #5F7F5F;">;; </span><span style="color: #7F9F7F; font-style: italic;">for 'a</span>
-<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #BFEBBF;">)</span> 'A<span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme"><span style="color: #5F7F5F;">;; </span><span style="color: #7F9F7F;">for 'a</span>
+(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">name</span> obj) 'A)
 
-<span style="color: #5F7F5F;">;; </span><span style="color: #7F9F7F; font-style: italic;">for 'b</span>
-<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #BFEBBF;">)</span> 'B'<span style="color: #DCDCCC;">)</span>
+<span style="color: #5F7F5F;">;; </span><span style="color: #7F9F7F;">for 'b</span>
+(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">name</span> obj) 'B')
 </pre>
 </div>
 
@@ -99,7 +99,7 @@ Let's say we have two types, 'a and 'b, and the procedure name which diffs betwe
 Unfortunatly we don't have OO methods, but we can define a global table. It can be any type, but of course a list in lisp.
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #93E0E3;">table</span> '<span style="color: #BFEBBF;">()</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme">(<span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #93E0E3;">table</span> '())
 </pre>
 </div>
 
@@ -107,19 +107,19 @@ Unfortunatly we don't have OO methods, but we can define a global table. It can 
 Well, funcs to put and get are also needed
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">put</span> type op f<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">set!</span> table <span style="color: #D0BF8F;">(</span>cons <span style="color: #93E0E3;">(</span>list type op f<span style="color: #93E0E3;">)</span> table<span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme">(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">put</span> type op f)
+  (<span style="color: #F0DFAF; font-weight: bold;">set!</span> table (cons (list type op f) table)))
 
-<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">get</span> type op<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">iter</span> a<span style="color: #D0BF8F;">)</span>
-    <span style="color: #D0BF8F;">(</span><span style="color: #F0DFAF; font-weight: bold;">if</span> <span style="color: #93E0E3;">(</span>not <span style="color: #9FC59F;">(</span>pair? a<span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span>
+(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">get</span> type op)
+  (<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">iter</span> a)
+    (<span style="color: #F0DFAF; font-weight: bold;">if</span> (not (pair? a))
         'failed
-        <span style="color: #93E0E3;">(</span><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #9FC59F;">(</span><span style="color: #94BFF3;">(</span>row <span style="color: #E0CF9F;">(</span>car a<span style="color: #E0CF9F;">)</span><span style="color: #94BFF3;">)</span><span style="color: #9FC59F;">)</span>
-          <span style="color: #9FC59F;">(</span><span style="color: #F0DFAF; font-weight: bold;">cond</span> <span style="color: #94BFF3;">(</span><span style="color: #E0CF9F;">(</span><span style="color: #F0DFAF; font-weight: bold;">and</span> <span style="color: #8FB28F;">(</span>eq? <span style="color: #6CA0A3;">(</span>car row<span style="color: #6CA0A3;">)</span> type<span style="color: #8FB28F;">)</span> <span style="color: #8FB28F;">(</span>eq? <span style="color: #6CA0A3;">(</span>cadr row<span style="color: #6CA0A3;">)</span> op<span style="color: #8FB28F;">)</span><span style="color: #E0CF9F;">)</span>
-                 <span style="color: #E0CF9F;">(</span>car <span style="color: #8FB28F;">(</span>cddr row<span style="color: #8FB28F;">)</span><span style="color: #E0CF9F;">)</span><span style="color: #94BFF3;">)</span>
-                <span style="color: #94BFF3;">(</span><span style="color: #F0DFAF; font-weight: bold;">else</span>
-                 <span style="color: #E0CF9F;">(</span>iter <span style="color: #8FB28F;">(</span>cdr a<span style="color: #8FB28F;">)</span><span style="color: #E0CF9F;">)</span><span style="color: #94BFF3;">)</span><span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span><span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span>iter table<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+        (<span style="color: #F0DFAF; font-weight: bold;">let</span> ((row (car a)))
+          (<span style="color: #F0DFAF; font-weight: bold;">cond</span> ((<span style="color: #F0DFAF; font-weight: bold;">and</span> (eq? (car row) type) (eq? (cadr row) op))
+                 (car (cddr row)))
+                (<span style="color: #F0DFAF; font-weight: bold;">else</span>
+                 (iter (cdr a)))))))
+  (iter table))
 </pre>
 </div>
 
@@ -127,9 +127,9 @@ Well, funcs to put and get are also needed
 Now we can store type-procedure infos into the table like this
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span>put 'a 'func-name func<span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme">(put 'a 'func-name func)
 
-<span style="color: #DCDCCC;">(</span>get 'a 'func-name<span style="color: #DCDCCC;">)</span> #=&gt; &lt;func procedure process&gt;
+(get 'a 'func-name) #=&gt; &lt;func procedure process&gt;
 </pre>
 </div>
 
@@ -137,13 +137,13 @@ Now we can store type-procedure infos into the table like this
 OK, now we redefine the name func into internal procedures called install-A and install-B while put the infos to the table.
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">install-A</span><span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #D0BF8F;">)</span> 'A<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span>put 'a 'name name<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme">(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">install-A</span>)
+  (<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">name</span> obj) 'A)
+  (put 'a 'name name))
 
-<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">install-B</span><span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">name</span> obj<span style="color: #D0BF8F;">)</span> 'B<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span>put 'b 'name name<span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">install-B</span>)
+  (<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">name</span> obj) 'B)
+  (put 'b 'name name))
 </pre>
 </div>
 
@@ -151,16 +151,16 @@ OK, now we redefine the name func into internal procedures called install-A and 
 And here is the Polymorphism.
 </p>
 <div class="org-src-container">
-<pre class="src src-scheme"><span style="color: #DCDCCC;">(</span>install-A<span style="color: #DCDCCC;">)</span>
-<span style="color: #DCDCCC;">(</span>install-B<span style="color: #DCDCCC;">)</span>
+<pre class="src src-scheme">(install-A)
+(install-B)
 
-<span style="color: #DCDCCC;">(</span><span style="color: #F0DFAF; font-weight: bold;">define</span> <span style="color: #BFEBBF;">(</span><span style="color: #93E0E3;">apply-generic</span> op obj<span style="color: #BFEBBF;">)</span>
-  <span style="color: #BFEBBF;">(</span><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #D0BF8F;">(</span><span style="color: #93E0E3;">(</span>type <span style="color: #9FC59F;">(</span>get-type obj<span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span><span style="color: #D0BF8F;">)</span>
-    <span style="color: #D0BF8F;">(</span><span style="color: #F0DFAF; font-weight: bold;">let</span> <span style="color: #93E0E3;">(</span><span style="color: #9FC59F;">(</span>f <span style="color: #94BFF3;">(</span>get type op<span style="color: #94BFF3;">)</span><span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span>
-      <span style="color: #93E0E3;">(</span>apply f <span style="color: #9FC59F;">(</span>list obj<span style="color: #9FC59F;">)</span><span style="color: #93E0E3;">)</span><span style="color: #D0BF8F;">)</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span>
+(<span style="color: #F0DFAF; font-weight: bold;">define</span> (<span style="color: #93E0E3;">apply-generic</span> op obj)
+  (<span style="color: #F0DFAF; font-weight: bold;">let</span> ((type (get-type obj)))
+    (<span style="color: #F0DFAF; font-weight: bold;">let</span> ((f (get type op)))
+      (apply f (list obj)))))
 
-<span style="color: #DCDCCC;">(</span>apply-generic 'name <span style="color: #BFEBBF;">(</span>make-obj 'b <span style="color: #BFEBBF;">3</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span> # =&gt; B
-<span style="color: #DCDCCC;">(</span>apply-generic 'name <span style="color: #BFEBBF;">(</span>make-obj 'a <span style="color: #BFEBBF;">3</span><span style="color: #BFEBBF;">)</span><span style="color: #DCDCCC;">)</span> # =&gt; A
+(apply-generic 'name (make-obj 'b <span style="color: #BFEBBF;">3</span>)) # =&gt; B
+(apply-generic 'name (make-obj 'a <span style="color: #BFEBBF;">3</span>)) # =&gt; A
 </pre>
 </div>
 

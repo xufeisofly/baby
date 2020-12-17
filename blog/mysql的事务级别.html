@@ -8,7 +8,7 @@
 <title>&lrm;</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content=" Norris" />
-<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" href="https://jgkamat.gitlab.io/src/jgkamat.css"/>
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -108,10 +108,10 @@ mysql的四种事务隔离级别和实践
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">create</span> <span style="color: #F0DFAF; font-weight: bold;">table</span> <span style="color: #93E0E3;">test</span> <span style="color: #DCDCCC;">(</span>
-  `id` <span style="color: #7CB8BB;">int</span><span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">11</span><span style="color: #BFEBBF;">)</span> <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">null</span> auto_increment,
-  `num` <span style="color: #7CB8BB;">int</span><span style="color: #BFEBBF;">(</span><span style="color: #BFEBBF;">11</span><span style="color: #BFEBBF;">)</span>
-<span style="color: #DCDCCC;">)</span>
+<pre class="src src-sql"><span style="color: #F0DFAF; font-weight: bold;">create</span> <span style="color: #F0DFAF; font-weight: bold;">table</span> <span style="color: #93E0E3;">test</span> (
+  `id` <span style="color: #7CB8BB;">int</span>(<span style="color: #BFEBBF;">11</span>) <span style="color: #F0DFAF; font-weight: bold;">not</span> <span style="color: #F0DFAF; font-weight: bold;">null</span> auto_increment,
+  `num` <span style="color: #7CB8BB;">int</span>(<span style="color: #BFEBBF;">11</span>)
+)
 </pre>
 </div>
 
