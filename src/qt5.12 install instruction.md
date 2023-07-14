@@ -1,4 +1,5 @@
-![image](https://github.com/xufeisofly/baby/assets/19555180/9737fda6-6af7-433a-a7ca-82b0527265f1)![image](https://github.com/xufeisofly/baby/assets/19555180/8ac4150c-0f56-4f8b-9a78-99e5a514d5c2)## 安装 qt5.12
+
+## 安装 qt5.12
 现在只能去官网下载了，不过网盘里有。
 选择 MSVC2015 MSVC2017
 ![image](https://github.com/xufeisofly/baby/assets/19555180/75b5daba-1685-44e0-85d7-15cddfe0f553)
